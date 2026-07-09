@@ -11,12 +11,15 @@ want to keep across local agents, experiments, and future projects.
 | Skill | Purpose |
 | --- | --- |
 | [`git-commit`](./git-commit/SKILL.md) | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
+| [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
 
 ## Repository Layout
 
 ```text
 .
 |-- git-commit/
+|   `-- SKILL.md
+|-- handoff/
 |   `-- SKILL.md
 |-- LICENSE
 `-- README.md

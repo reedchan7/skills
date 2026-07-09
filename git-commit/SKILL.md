@@ -50,6 +50,8 @@ message must describe what really changed, not what you assume changed.
 - ≤72 chars per line; a wrapped line continues with two-space indent
 - Describe behavior and intent; don't inventory file paths, function
   names, or config keys
+- Do not add AI/tool attribution footers unless the user explicitly asks.
+  Human co-author trailers are fine when requested.
 - Omit the body entirely when it would only restate the subject
 
 ### 4. Commit — the whole message through exactly one `-m`
@@ -82,6 +84,8 @@ Check the printed message against all of:
 - [ ] Subject ≤72 chars, blank line between subject and body
 - [ ] Bullets on consecutive lines — no blank line between any two
 - [ ] Nothing you didn't write (stray footers, duplicated paragraphs)
+- [ ] No unrequested AI/tool attribution footers (`Co-Authored-By`,
+  `Claude-Session`, Artifact URLs)
 - [ ] Changed files match what the message claims
 
 Any mismatch → fix with `git commit --amend` (safe while unpushed),
