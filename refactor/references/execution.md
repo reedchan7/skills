@@ -3,7 +3,7 @@
 For an agent implementing a `docs/refactor/tasks/RT-*.md` file.
 
 The protocol embedded in the RT file (`rt-protocol-vN`, section "Executor
-protocol") is CANONICAL. This file explains how to apply it and adds
+protocol"; current version `rt-protocol-v1`) is CANONICAL. This file explains how to apply it and adds
 context; it deliberately does not restate the numbered steps. On any
 mismatch, the RT file's embedded version wins for that task.
 
