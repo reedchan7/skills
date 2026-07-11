@@ -12,6 +12,7 @@ want to keep across local agents, experiments, and future projects.
 | --- | --- |
 | [`git-commit`](./git-commit/SKILL.md) | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
 | [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
+| [`refactor`](./refactor/SKILL.md) | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. |
 
 ## Repository Layout
 
@@ -21,6 +22,10 @@ want to keep across local agents, experiments, and future projects.
 |   `-- SKILL.md
 |-- handoff/
 |   `-- SKILL.md
+|-- refactor/
+|   |-- SKILL.md
+|   |-- references/
+|   `-- assets/
 |-- LICENSE
 `-- README.md
 ```
