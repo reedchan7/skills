@@ -1,6 +1,6 @@
 ---
 name: git-commit
-description: Use when the user asks to commit code, save changes, submit changes, or prepare a Conventional Commit message.
+description: Use whenever the user or another skill/workflow asks to create, amend, save, submit, or prepare a Git commit or Conventional Commit message.
 ---
 
 # git-commit
