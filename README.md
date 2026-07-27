@@ -10,6 +10,7 @@ want to keep across local agents, experiments, and future projects.
 
 | Skill | Purpose |
 | --- | --- |
+| [`code-review`](./code-review/SKILL.md) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
 | [`git-commit`](./git-commit/SKILL.md) | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
 | [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
 | [`refactor`](./refactor/SKILL.md) | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. |
@@ -18,6 +19,13 @@ want to keep across local agents, experiments, and future projects.
 
 ```text
 .
+|-- code-review/
+|   |-- SKILL.md
+|   `-- references/
+|-- docs/
+|   `-- research/
+|-- evals/
+|   `-- code-review/
 |-- git-commit/
 |   `-- SKILL.md
 |-- handoff/
@@ -26,6 +34,8 @@ want to keep across local agents, experiments, and future projects.
 |   |-- SKILL.md
 |   |-- references/
 |   `-- assets/
+|-- scripts/
+|   `-- link-skill.sh
 |-- LICENSE
 `-- README.md
 ```
@@ -48,10 +58,28 @@ description: Use when ...
 
 Optional resources can be added only when they are actually useful:
 
-- `agents/openai.yaml` for UI-facing metadata
-- `scripts/` for repeatable commands or deterministic helpers
 - `references/` for larger background material loaded on demand
 - `assets/` for templates or files used by the skill
+- `scripts/` for repeatable commands or deterministic helpers
+
+Runtime-specific metadata files (for example Codex's `agents/openai.yaml`) stay
+out of this repository: these skills are linked into several agent CLIs, and only
+one of them reads that file.
+
+## Benchmarks
+
+`docs/research/` records how the published code-review candidates were compared
+and what the resulting skill must beat. `evals/` holds the behavioral benchmark
+that decides it — a skill's claims are only as good as its paired no-skill
+baseline.
+
+`evals/` is not part of any skill: nothing under it is linked into an agent
+runtime. Its generated case repositories are gitignored and rebuilt on demand:
+
+```bash
+python3 evals/code-review/private/build_cases.py
+python3 evals/code-review/private/self_check.py
+```
 
 ## Using These Skills
 

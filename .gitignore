@@ -2,3 +2,10 @@
 .DS_Store
 .idea
 .vscode
+__pycache__/
+*.pyc
+
+# Generated benchmark case repositories. Each one is a nested Git repository, so
+# committing them would produce broken gitlinks instead of files. Regenerate with
+# `python3 evals/<name>/private/build_cases.py`.
+/evals/*/cases/

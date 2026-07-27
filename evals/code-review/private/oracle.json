@@ -1,0 +1,1228 @@
+{
+  "cases": [
+    {
+      "case_id": "c-17a2",
+      "findings": [
+        {
+          "category": "authorization",
+          "causal_anchors": [
+            {
+              "file": "src/http/exportRoute.ts",
+              "line_end": 11,
+              "line_start": 11
+            },
+            {
+              "file": "src/services/exportService.ts",
+              "line_end": 9,
+              "line_start": 9
+            }
+          ],
+          "concept_groups": [
+            [
+              "request body",
+              "client controlled",
+              "untrusted requestedby"
+            ],
+            [
+              "membership",
+              "permission",
+              "authorization"
+            ],
+            [
+              "impersonate",
+              "spoof",
+              "another user"
+            ]
+          ],
+          "file": "src/http/exportRoute.ts",
+          "finding_id": "c-17a2-f1",
+          "language": "TypeScript",
+          "line_end": 11,
+          "line_start": 11,
+          "severity": "critical"
+        }
+      ],
+      "language": "TypeScript",
+      "split": "calibration"
+    },
+    {
+      "case_id": "c-2f09",
+      "findings": [
+        {
+          "category": "concurrency-idempotency",
+          "causal_anchors": [
+            {
+              "file": "delivery/processor.py",
+              "line_end": 5,
+              "line_start": 5
+            },
+            {
+              "file": "delivery/processor.py",
+              "line_end": 8,
+              "line_start": 8
+            },
+            {
+              "file": "delivery/store.py",
+              "line_end": 13,
+              "line_start": 13
+            }
+          ],
+          "concept_groups": [
+            [
+              "before delivery",
+              "before handler",
+              "marked done first"
+            ],
+            [
+              "exception",
+              "crash",
+              "delivery fails"
+            ],
+            [
+              "retry",
+              "duplicate",
+              "permanently skipped"
+            ]
+          ],
+          "file": "delivery/processor.py",
+          "finding_id": "c-2f09-f1",
+          "language": "Python",
+          "line_end": 7,
+          "line_start": 7,
+          "severity": "high"
+        }
+      ],
+      "language": "Python",
+      "split": "calibration"
+    },
+    {
+      "case_id": "c-4c31",
+      "findings": [
+        {
+          "category": "compatibility-rollout",
+          "causal_anchors": [
+            {
+              "file": "session/envelope.go",
+              "line_end": 7,
+              "line_start": 7
+            },
+            {
+              "file": "session/verifier.go",
+              "line_end": 6,
+              "line_start": 6
+            }
+          ],
+          "concept_groups": [
+            [
+              "rolling",
+              "mixed version",
+              "staggered deployment",
+              "backward compatible"
+            ],
+            [
+              "expires_at_ms",
+              "old field",
+              "legacy envelope"
+            ],
+            [
+              "zero",
+              "immediately expired",
+              "cannot decode"
+            ]
+          ],
+          "file": "session/envelope.go",
+          "finding_id": "c-4c31-f1",
+          "language": "Go",
+          "line_end": 7,
+          "line_start": 7,
+          "severity": "high"
+        }
+      ],
+      "language": "Go",
+      "split": "calibration"
+    },
+    {
+      "case_id": "c-6b84",
+      "findings": [
+        {
+          "category": "data-query",
+          "causal_anchors": [
+            {
+              "file": "migrations/002_account_archives.sql",
+              "line_end": 6,
+              "line_start": 6
+            },
+            {
+              "file": "queries/upsert_account.sql",
+              "line_end": 3,
+              "line_start": 3
+            }
+          ],
+          "concept_groups": [
+            [
+              "is null",
+              "null comparison",
+              "three valued logic",
+              "unknown"
+            ],
+            [
+              "empty index",
+              "partial unique index",
+              "uniqueness not enforced"
+            ],
+            [
+              "on conflict",
+              "no matching constraint",
+              "conflict inference"
+            ]
+          ],
+          "file": "migrations/002_account_archives.sql",
+          "finding_id": "c-6b84-f1",
+          "language": "SQL",
+          "line_end": 6,
+          "line_start": 6,
+          "severity": "high"
+        }
+      ],
+      "language": "SQL",
+      "split": "calibration"
+    },
+    {
+      "case_id": "c-8de0",
+      "findings": [],
+      "language": "Rust",
+      "split": "calibration"
+    },
+    {
+      "case_id": "c-b71e",
+      "findings": [
+        {
+          "category": "performance-scale",
+          "causal_anchors": [
+            {
+              "file": "feed/service.go",
+              "line_end": 11,
+              "line_start": 11
+            },
+            {
+              "file": "feed/service.go",
+              "line_end": 15,
+              "line_start": 15
+            },
+            {
+              "file": "feed/handler.go",
+              "line_end": 6,
+              "line_start": 6
+            }
+          ],
+          "concept_groups": [
+            [
+              "n+1",
+              "per post",
+              "inside the loop",
+              "one query per author"
+            ],
+            [
+              "batch",
+              "single query",
+              "authorsbyids",
+              "any($1)"
+            ],
+            [
+              "200 posts",
+              "400 queries",
+              "round trip",
+              "latency",
+              "highest traffic"
+            ]
+          ],
+          "file": "feed/service.go",
+          "finding_id": "c-b71e-f1",
+          "language": "Go",
+          "line_end": 11,
+          "line_start": 11,
+          "severity": "medium"
+        }
+      ],
+      "language": "Go",
+      "split": "calibration"
+    },
+    {
+      "case_id": "c-d2f6",
+      "findings": [
+        {
+          "category": "boundary-encoding",
+          "causal_anchors": [
+            {
+              "file": "src/labels.rs",
+              "line_end": 5,
+              "line_start": 5
+            },
+            {
+              "file": "src/labels.rs",
+              "line_end": 2,
+              "line_start": 2
+            },
+            {
+              "file": "src/render.rs",
+              "line_end": 7,
+              "line_start": 7
+            }
+          ],
+          "concept_groups": [
+            [
+              "byte",
+              "byte index",
+              "len counts bytes",
+              "not characters"
+            ],
+            [
+              "char boundary",
+              "utf-8",
+              "multibyte",
+              "cjk",
+              "emoji"
+            ],
+            [
+              "panic",
+              "crash",
+              "request fails"
+            ],
+            [
+              "truncate",
+              "shorter than expected",
+              "wrong length"
+            ]
+          ],
+          "file": "src/labels.rs",
+          "finding_id": "c-d2f6-f1",
+          "language": "Rust",
+          "line_end": 5,
+          "line_start": 5,
+          "severity": "high"
+        }
+      ],
+      "language": "Rust",
+      "split": "calibration"
+    },
+    {
+      "case_id": "s-f4b2",
+      "findings": [
+        {
+          "category": "data-race",
+          "causal_anchors": [
+            {
+              "file": "internal/flags/cache.go",
+              "line_end": 11,
+              "line_start": 11
+            },
+            {
+              "file": "internal/flags/cache.go",
+              "line_end": 14,
+              "line_start": 14
+            },
+            {
+              "file": "internal/flags/reload.go",
+              "line_end": 14,
+              "line_start": 14
+            }
+          ],
+          "concept_groups": [
+            [
+              "unlocked read",
+              "without the lock",
+              "no rlock",
+              "lock bypassed"
+            ],
+            [
+              "concurrent map",
+              "data race",
+              "fatal error",
+              "crash"
+            ],
+            [
+              "map write",
+              "background watcher",
+              "admin toggle",
+              "replace"
+            ]
+          ],
+          "file": "internal/flags/cache.go",
+          "finding_id": "s-f4b2-f1",
+          "language": "Go",
+          "line_end": 11,
+          "line_start": 11,
+          "severity": "high"
+        }
+      ],
+      "language": "Go",
+      "split": "sealed"
+    },
+    {
+      "case_id": "c-f8b3",
+      "findings": [
+        {
+          "category": "spec-conformance",
+          "causal_anchors": [
+            {
+              "file": "src/services/exportService.ts",
+              "line_end": 9,
+              "line_start": 9
+            },
+            {
+              "file": "src/http/exportRoute.ts",
+              "line_end": 12,
+              "line_start": 12
+            }
+          ],
+          "concept_groups": [
+            [
+              "clamp",
+              "clamped",
+              "silently adjusted",
+              "math.min"
+            ],
+            [
+              "reject",
+              "400",
+              "validation error",
+              "out of range"
+            ],
+            [
+              "spec",
+              "acceptance criteria",
+              "story 412",
+              "stated requirement"
+            ],
+            [
+              "500",
+              "outside 1 to 90",
+              "invalid value accepted",
+              "wrong retention"
+            ]
+          ],
+          "file": "src/services/exportService.ts",
+          "finding_id": "c-f8b3-f1",
+          "language": "TypeScript",
+          "line_end": 9,
+          "line_start": 9,
+          "severity": "medium"
+        }
+      ],
+      "language": "TypeScript",
+      "split": "calibration"
+    },
+    {
+      "case_id": "s-d1a9",
+      "findings": [
+        {
+          "category": "standards-violation",
+          "causal_anchors": [
+            {
+              "file": "billing/discount.py",
+              "line_end": 2,
+              "line_start": 2
+            },
+            {
+              "file": "billing/checkout.py",
+              "line_end": 6,
+              "line_start": 6
+            },
+            {
+              "file": "AGENTS.md",
+              "line_end": 5,
+              "line_start": 5
+            }
+          ],
+          "concept_groups": [
+            [
+              "agents.md",
+              "repository instruction",
+              "project rule",
+              "documented standard"
+            ],
+            [
+              "float",
+              "floating point",
+              "binary representation"
+            ],
+            [
+              "round",
+              "rounding outside",
+              "money module",
+              "apply_rate"
+            ],
+            [
+              "cents",
+              "off by one",
+              "reconciliation",
+              "minor units"
+            ]
+          ],
+          "file": "billing/discount.py",
+          "finding_id": "s-d1a9-f1",
+          "language": "Python",
+          "line_end": 2,
+          "line_start": 2,
+          "severity": "high"
+        }
+      ],
+      "language": "Python",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-b8e5",
+      "findings": [
+        {
+          "category": "history-regression",
+          "causal_anchors": [
+            {
+              "file": "src/dispatcher.rs",
+              "line_end": 10,
+              "line_start": 10
+            },
+            {
+              "file": "src/store.rs",
+              "line_end": 8,
+              "line_start": 8
+            }
+          ],
+          "concept_groups": [
+            [
+              "guard removed",
+              "delivered check",
+              "is_delivered",
+              "skip already delivered"
+            ],
+            [
+              "incident",
+              "git history",
+              "blame",
+              "previous fix",
+              "reintroduced"
+            ],
+            [
+              "partial failure",
+              "re-run",
+              "retry",
+              "resend"
+            ],
+            [
+              "duplicate",
+              "sent twice",
+              "customer endpoint"
+            ]
+          ],
+          "file": "src/dispatcher.rs",
+          "finding_id": "s-b8e5-f1",
+          "language": "Rust",
+          "line_end": 10,
+          "line_start": 10,
+          "severity": "high"
+        }
+      ],
+      "language": "Rust",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-e7d2",
+      "findings": [
+        {
+          "category": "spec-conformance",
+          "causal_anchors": [
+            {
+              "file": "projects/handler.go",
+              "line_end": 5,
+              "line_start": 5
+            },
+            {
+              "file": "projects/handler.go",
+              "line_end": 9,
+              "line_start": 9
+            },
+            {
+              "file": "projects/query.go",
+              "line_end": 15,
+              "line_start": 15
+            }
+          ],
+          "concept_groups": [
+            [
+              "page size",
+              "default changed",
+              "25 to 100",
+              "quadruple"
+            ],
+            [
+              "scope",
+              "not requested",
+              "unrelated",
+              "out of scope"
+            ],
+            [
+              "spec",
+              "story 631",
+              "response shape",
+              "must not change"
+            ],
+            [
+              "existing client",
+              "every caller",
+              "mobile",
+              "payload"
+            ]
+          ],
+          "file": "projects/handler.go",
+          "finding_id": "s-e7d2-f1",
+          "language": "Go",
+          "line_end": 5,
+          "line_start": 5,
+          "severity": "medium"
+        }
+      ],
+      "language": "Go",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-c9f7",
+      "findings": [],
+      "language": "SQL",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-0a73",
+      "findings": [
+        {
+          "category": "concurrency-idempotency",
+          "causal_anchors": [
+            {
+              "file": "src/payments/chargeService.ts",
+              "line_end": 11,
+              "line_start": 11
+            },
+            {
+              "file": "src/payments/chargeService.ts",
+              "line_end": 14,
+              "line_start": 14
+            },
+            {
+              "file": "src/payments/chargeService.ts",
+              "line_end": 15,
+              "line_start": 15
+            },
+            {
+              "file": "src/payments/gateway.ts",
+              "line_end": 3,
+              "line_start": 3
+            }
+          ],
+          "concept_groups": [
+            [
+              "random",
+              "new attempt id",
+              "unstable idempotency key"
+            ],
+            [
+              "concurrent",
+              "race",
+              "retry"
+            ],
+            [
+              "duplicate capture",
+              "charged twice",
+              "external side effect"
+            ],
+            [
+              "insert after",
+              "unique constraint too late",
+              "database dedupe after capture"
+            ]
+          ],
+          "file": "src/payments/chargeService.ts",
+          "finding_id": "s-0a73-f1",
+          "language": "TypeScript",
+          "line_end": 14,
+          "line_start": 14,
+          "severity": "critical"
+        }
+      ],
+      "language": "TypeScript",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-19c4",
+      "findings": [
+        {
+          "category": "authorization",
+          "causal_anchors": [
+            {
+              "file": "reports/routes.py",
+              "line_end": 6,
+              "line_start": 6
+            },
+            {
+              "file": "reports/store.py",
+              "line_end": 4,
+              "line_start": 4
+            }
+          ],
+          "concept_groups": [
+            [
+              "organization",
+              "tenant",
+              "org scope"
+            ],
+            [
+              "bundle id",
+              "url controlled",
+              "identifier alone"
+            ],
+            [
+              "cross tenant",
+              "other organization",
+              "idor"
+            ]
+          ],
+          "file": "reports/store.py",
+          "finding_id": "s-19c4-f1",
+          "language": "Python",
+          "line_end": 4,
+          "line_start": 4,
+          "severity": "critical"
+        }
+      ],
+      "language": "Python",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-2e81",
+      "findings": [
+        {
+          "category": "data-query",
+          "causal_anchors": [
+            {
+              "file": "timeline/query.go",
+              "line_end": 14,
+              "line_start": 14
+            },
+            {
+              "file": "timeline/query.go",
+              "line_end": 15,
+              "line_start": 15
+            },
+            {
+              "file": "timeline/handler.go",
+              "line_end": 9,
+              "line_start": 9
+            }
+          ],
+          "concept_groups": [
+            [
+              "operator precedence",
+              "parentheses",
+              "and before or"
+            ],
+            [
+              "or branch",
+              "cursor tie branch"
+            ],
+            [
+              "bypass project",
+              "bypass state",
+              "other project",
+              "unfiltered rows"
+            ]
+          ],
+          "file": "timeline/query.go",
+          "finding_id": "s-2e81-f1",
+          "language": "Go",
+          "line_end": 14,
+          "line_start": 14,
+          "severity": "high"
+        },
+        {
+          "category": "compatibility-rollout",
+          "causal_anchors": [
+            {
+              "file": "timeline/handler.go",
+              "line_end": 7,
+              "line_start": 7
+            },
+            {
+              "file": "timeline/query.go",
+              "line_end": 14,
+              "line_start": 14
+            }
+          ],
+          "concept_groups": [
+            [
+              "default",
+              "no default",
+              "empty string",
+              "unconditional"
+            ],
+            [
+              "omitted",
+              "existing caller",
+              "no state parameter",
+              "every client"
+            ],
+            [
+              "filter",
+              "matches nothing",
+              "wrong rows",
+              "state = $2"
+            ]
+          ],
+          "file": "timeline/handler.go",
+          "finding_id": "s-2e81-f2",
+          "language": "Go",
+          "line_end": 7,
+          "line_start": 7,
+          "severity": "high"
+        }
+      ],
+      "language": "Go",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-3bd6",
+      "findings": [
+        {
+          "category": "state-flow",
+          "causal_anchors": [
+            {
+              "file": "src/worker.rs",
+              "line_end": 7,
+              "line_start": 7
+            },
+            {
+              "file": "src/worker.rs",
+              "line_end": 8,
+              "line_start": 8
+            },
+            {
+              "file": "src/queue.rs",
+              "line_end": 10,
+              "line_start": 10
+            }
+          ],
+          "concept_groups": [
+            [
+              "ack before",
+              "acknowledged before",
+              "completion first"
+            ],
+            [
+              "persist fails",
+              "crash",
+              "worker loss"
+            ],
+            [
+              "no retry",
+              "lost job",
+              "missing outcome",
+              "not redelivered"
+            ]
+          ],
+          "file": "src/worker.rs",
+          "finding_id": "s-3bd6-f1",
+          "language": "Rust",
+          "line_end": 7,
+          "line_start": 7,
+          "severity": "high"
+        }
+      ],
+      "language": "Rust",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-4f20",
+      "findings": [
+        {
+          "category": "compatibility-rollout",
+          "causal_anchors": [
+            {
+              "file": "migrations/002_job_states.sql",
+              "line_end": 3,
+              "line_start": 3
+            },
+            {
+              "file": "queries/create_job.sql",
+              "line_end": 2,
+              "line_start": 2
+            }
+          ],
+          "concept_groups": [
+            [
+              "rolling",
+              "mixed version",
+              "deployment order",
+              "staggered"
+            ],
+            [
+              "old writer",
+              "queued",
+              "legacy state"
+            ],
+            [
+              "constraint rejects",
+              "new rows",
+              "not valid still enforced"
+            ],
+            [
+              "new app before migration",
+              "old constraint",
+              "pending rejected"
+            ]
+          ],
+          "file": "migrations/002_job_states.sql",
+          "finding_id": "s-4f20-f1",
+          "language": "SQL",
+          "line_end": 3,
+          "line_start": 3,
+          "severity": "critical"
+        },
+        {
+          "category": "compatibility-rollout",
+          "causal_anchors": [
+            {
+              "file": "migrations/002_job_states.sql",
+              "line_end": 6,
+              "line_start": 6
+            },
+            {
+              "file": "queries/create_job.sql",
+              "line_end": 2,
+              "line_start": 2
+            }
+          ],
+          "concept_groups": [
+            [
+              "else",
+              "no else",
+              "unmapped",
+              "case without else"
+            ],
+            [
+              "null",
+              "not null",
+              "violation",
+              "aborts"
+            ],
+            [
+              "pending",
+              "new writer",
+              "rollout",
+              "concurrent write"
+            ]
+          ],
+          "file": "migrations/002_job_states.sql",
+          "finding_id": "s-4f20-f2",
+          "language": "SQL",
+          "line_end": 6,
+          "line_start": 6,
+          "severity": "high"
+        }
+      ],
+      "language": "SQL",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-58a9",
+      "findings": [
+        {
+          "category": "testing",
+          "causal_anchors": [
+            {
+              "file": "src/http/deferRoute.ts",
+              "line_end": 4,
+              "line_start": 4
+            },
+            {
+              "file": "src/scheduler/deferTask.ts",
+              "line_end": 4,
+              "line_start": 4
+            },
+            {
+              "file": "test/deferTask.test.ts",
+              "line_end": 4,
+              "line_start": 4
+            }
+          ],
+          "concept_groups": [
+            [
+              "seconds",
+              "milliseconds",
+              "unit conversion",
+              "multiply by 1000"
+            ],
+            [
+              "too early",
+              "30 milliseconds",
+              "wrong run time"
+            ],
+            [
+              "test",
+              "assertion removed",
+              "does not assert timestamp",
+              "material coverage"
+            ]
+          ],
+          "file": "src/scheduler/deferTask.ts",
+          "finding_id": "s-58a9-f1",
+          "language": "TypeScript",
+          "line_end": 4,
+          "line_start": 4,
+          "severity": "medium"
+        }
+      ],
+      "language": "TypeScript",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-6c12",
+      "findings": [
+        {
+          "category": "state-flow",
+          "causal_anchors": [
+            {
+              "file": "recovery/service.py",
+              "line_end": 5,
+              "line_start": 5
+            },
+            {
+              "file": "recovery/service.py",
+              "line_end": 6,
+              "line_start": 6
+            },
+            {
+              "file": "recovery/store.py",
+              "line_end": 7,
+              "line_start": 7
+            }
+          ],
+          "concept_groups": [
+            [
+              "consume before validation",
+              "delete before validate",
+              "token taken first"
+            ],
+            [
+              "invalid password",
+              "validation error",
+              "weak password"
+            ],
+            [
+              "cannot retry",
+              "token lost",
+              "single use consumed"
+            ]
+          ],
+          "file": "recovery/service.py",
+          "finding_id": "s-6c12-f1",
+          "language": "Python",
+          "line_end": 5,
+          "line_start": 5,
+          "severity": "medium"
+        }
+      ],
+      "language": "Python",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-7d45",
+      "findings": [
+        {
+          "category": "concurrency-idempotency",
+          "causal_anchors": [
+            {
+              "file": "src/domain.rs",
+              "line_end": 2,
+              "line_start": 2
+            },
+            {
+              "file": "src/dispatcher.rs",
+              "line_end": 9,
+              "line_start": 9
+            },
+            {
+              "file": "src/importer.rs",
+              "line_end": 6,
+              "line_start": 6
+            }
+          ],
+          "concept_groups": [
+            [
+              "account id",
+              "tenant dimension",
+              "composite key"
+            ],
+            [
+              "same invoice id",
+              "external id collision",
+              "only unique per account"
+            ],
+            [
+              "suppressed",
+              "skipped",
+              "false duplicate",
+              "wrong account"
+            ]
+          ],
+          "file": "src/dispatcher.rs",
+          "finding_id": "s-7d45-f1",
+          "language": "Rust",
+          "line_end": 9,
+          "line_start": 9,
+          "severity": "high"
+        }
+      ],
+      "language": "Rust",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-82f7",
+      "findings": [],
+      "language": "TypeScript",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-91b3",
+      "findings": [],
+      "language": "Go",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-a6e8",
+      "findings": [],
+      "language": "SQL",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-c3a8",
+      "findings": [
+        {
+          "category": "input-validation",
+          "causal_anchors": [
+            {
+              "file": "src/extract.rs",
+              "line_end": 9,
+              "line_start": 9
+            },
+            {
+              "file": "src/paths.rs",
+              "line_end": 3,
+              "line_start": 3
+            },
+            {
+              "file": "src/manifest.rs",
+              "line_end": 2,
+              "line_start": 2
+            }
+          ],
+          "concept_groups": [
+            [
+              "traversal",
+              "parent directory",
+              "zip slip",
+              "escape the root"
+            ],
+            [
+              "untrusted",
+              "attacker controlled",
+              "uploaded archive",
+              "entry name"
+            ],
+            [
+              "safe_relative",
+              "validation removed",
+              "no longer rejected",
+              "only for logging"
+            ],
+            [
+              "overwrite",
+              "arbitrary file write",
+              "outside the root",
+              "absolute path"
+            ]
+          ],
+          "file": "src/extract.rs",
+          "finding_id": "s-c3a8-f1",
+          "language": "Rust",
+          "line_end": 9,
+          "line_start": 9,
+          "severity": "critical"
+        }
+      ],
+      "language": "Rust",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-d64b",
+      "findings": [
+        {
+          "category": "resource-lifecycle",
+          "causal_anchors": [
+            {
+              "file": "catalog/service.go",
+              "line_end": 10,
+              "line_start": 10
+            },
+            {
+              "file": "catalog/service.go",
+              "line_end": 19,
+              "line_start": 19
+            },
+            {
+              "file": "catalog/service.go",
+              "line_end": 23,
+              "line_start": 23
+            },
+            {
+              "file": "catalog/store.go",
+              "line_end": 9,
+              "line_start": 9
+            }
+          ],
+          "concept_groups": [
+            [
+              "defer",
+              "rows.close",
+              "not closed",
+              "closed only on the success path"
+            ],
+            [
+              "early return",
+              "client disconnect",
+              "write error",
+              "scan error"
+            ],
+            [
+              "connection leak",
+              "pool exhaustion",
+              "maxopenconns",
+              "ten connections",
+              "hangs"
+            ]
+          ],
+          "file": "catalog/service.go",
+          "finding_id": "s-d64b-f1",
+          "language": "Go",
+          "line_end": 10,
+          "line_start": 10,
+          "severity": "high"
+        }
+      ],
+      "language": "Go",
+      "split": "sealed"
+    },
+    {
+      "case_id": "s-e2c7",
+      "findings": [],
+      "language": "Python",
+      "split": "sealed"
+    }
+  ],
+  "format_version": 1
+}
