@@ -1,6 +1,6 @@
 ---
 name: refactor
-description: Use when the user asks to refactor, restructure, or clean up code at any scale — systemic signals (recurring change friction, defect hotspots, dependency tangles, architectural erosion, modernization requests), a code-health or architecture audit, a bounded local refactor (rename, extract, simplify a function, file, or module), or when asked to execute an existing docs/refactor/tasks/RT-*.md task file.
+description: Use when the user asks to refactor, restructure, tidy, or clean up code at any scale — systemic signals (recurring change friction, defect hotspots, dependency tangles, architectural erosion, modernization requests), a code-health or architecture audit, a bounded local refactor (rename, extract, simplify a function, file, or module), a clean-code tidy sweep (hard-coded values, magic numbers and strings, duplicated literals, dead code, naming, comment rot — cleanup that must not change behavior), or when asked to execute an existing docs/refactor/tasks/RT-*.md task file.
 ---
 
 # refactor
@@ -14,12 +14,15 @@ handling — not doctrine.
 
 | Mode | Trigger | Run |
 |------|---------|-----|
-| Bounded refactor | Small, clearly scoped mechanical ask (rename, extract, inline, simplify one function/file/module) | Preflight: authority, dirty-tree check, baseline verify, implicit behavior envelope. Then execute per `references/execution.md`. Skip Phases 2–6. No `docs/refactor/` artifacts unless asked. |
+| Bounded refactor | Small structural ask at ONE site (rename, extract, inline, simplify one function/file/module) | Preflight: authority, dirty-tree check, baseline verify, implicit behavior envelope. Then execute per `references/execution.md`. Skip Phases 2–6. No `docs/refactor/` artifacts unless asked. |
+| Tidy sweep | Clean-code cleanup, wide but shallow — hard-coded values, magic numbers/strings, duplicated literals, dead code, naming, comment rot across a file, module, or repo. No structural change. | Same preflight as Bounded, then inventory → grouped plan → batched execution per `references/tidy.md`. Skip Phases 2–6. No `docs/refactor/` artifacts unless asked. |
 | Execute RT task | Given a `docs/refactor/tasks/RT-*.md` | Freshness check, then executor protocol (`references/execution.md`). |
 | Assessment only | Audit / assess / "how healthy is this code", no mandate to change | Phases 0–3; stop after presenting options. Write the assessment only with write authority. |
 | Full planning | Systemic refactor of a repo/subsystem | Phases 0–6. |
 
-Bounded mode skips the planning phases, never the discipline.
+Bounded and Tidy modes skip the planning phases, never the discipline.
+Bounded is one deliberate structural change at one site; Tidy is the same
+class of small transformation repeated across many sites.
 
 ## Iron laws
 
@@ -126,6 +129,7 @@ gates.
 
 | Condition | Load |
 |---|---|
+| Running a Tidy sweep | `references/tidy.md` |
 | Running Phase 2 diagnosis | `references/diagnose.md` |
 | Evidence shows a cross-boundary design problem | `references/architecture.md` |
 | Building envelope/safety; medium/high-risk, DB, or API change | `references/safety.md` |

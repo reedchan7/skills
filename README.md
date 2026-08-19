@@ -13,7 +13,7 @@ want to keep across local agents, experiments, and future projects.
 | [`code-review`](./code-review/SKILL.md) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
 | [`git-commit`](./git-commit/SKILL.md) | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
 | [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
-| [`refactor`](./refactor/SKILL.md) | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. |
+| [`refactor`](./refactor/SKILL.md) | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. Includes a lightweight Tidy mode for clean-code sweeps (hard-coded values, duplicated literals, dead code, naming). |
 
 ## Repository Layout
 
@@ -35,7 +35,7 @@ want to keep across local agents, experiments, and future projects.
 |   |-- references/
 |   `-- assets/
 |-- scripts/
-|   `-- link-skill.sh
+|   `-- link-skills.sh       # one smart linker for personal + Matt + all agents
 |-- LICENSE
 `-- README.md
 ```
@@ -83,18 +83,33 @@ python3 evals/code-review/private/self_check.py
 
 ## Using These Skills
 
-Clone the repository, then link or copy the skill directories into the skill
-root used by the target Agent runtime.
-
-For local OpenAI/Codex-style agents, a typical setup is:
+One script. No args = full smart sync:
 
 ```bash
-mkdir -p "$HOME/.agents/skills"
-ln -s "$PWD/git-commit" "$HOME/.agents/skills/git-commit"
+./scripts/link-skills.sh
 ```
 
-After linking, start a new agent session so the runtime can load the updated
-skill list.
+It will:
+
+1. Link every personal skill in this repo (with aliases, e.g. `code-review` → `code-review-pro`)
+2. Auto-detect a Matt Pocock clone and link those too (`code-review` → `matt-code-review`)
+3. Keep personal names when they already own a hub entry (e.g. `handoff`)
+4. Retire known renames and sweep broken hub symlinks
+5. Fan out hub entries to Claude / Codex / Grok / zcode / kimi-code / pi / reasonix / Gemini / Antigravity (CLI + IDE) / dsh
+
+Optional one-offs:
+
+```bash
+./scripts/link-skills.sh git-commit              # single personal skill
+./scripts/link-skills.sh code-review             # still installs as code-review-pro
+./scripts/link-skills.sh /path/to/skill [as]     # any external skill dir
+./scripts/link-skills.sh --unlink some-name      # remove from hub + agents
+```
+
+After `git pull` on Matt (or editing a personal skill), just re-run
+`./scripts/link-skills.sh`. Then start a new agent session so runtimes reload.
+
+Hub root: `~/.agents/skills`.
 
 ## Writing Guidelines
 
