@@ -44,10 +44,16 @@ python3 private/compare_runs.py /tmp/feature-dev-runs
 | `true-spec-conflict` | Production bytes unchanged; conflict recorded; no manufactured green |
 | `greenfield-bootstrap` | Test/tooling bootstrap establishes a baseline before product behavior |
 | `dirty-local-candidate` | User dirty bytes unchanged; review inventory includes local/untracked changes |
-| `resume-drift` | Stale checked slice is invalidated instead of blindly trusted |
+| `resume-drift` | Stale checked slice is unchecked or re-hashed; claimed placeholder recorded |
 | `draft-must-stop` | Draft SPEC is not implemented; production bytes unchanged |
 | `ambiguous-active-specs` | Two active SPECs and no path → no silent pick, no code |
 | `scope-trap` | Approved label change lands; unused helper/TODO left untouched |
+| `holdout-existing-runner` | Behavior lands on an existing runner; bootstrap/smoke/manifest additions fail |
+| `holdout-first-product-test` | Existing module, no tests; first test is a product slice, not toolchain bootstrap |
+
+Holdout cases measure transfer and over-ceremony. A strong control that just
+implements the behavior can score 100; a near-zero delta is success, not
+saturation to paper over. Do not retune the skill to fixture names.
 
 ## P0 acceptance matrix
 

@@ -74,7 +74,8 @@ accessibility · i18n/time · reliability/idempotency · observability ·
 compatibility/mixed versions · capacity/resource bounds.
 
 Every included NFR is quantified or explicitly unresolved; every active NFR
-has `Verify:`.
+has `Verify:`. Express unused lenses stay closed: one `none` / `N/A` /
+`not measured` line, not an invented checklist.
 
 ## Design, release, and testing decisions
 

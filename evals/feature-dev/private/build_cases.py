@@ -642,6 +642,111 @@ def case_scope(repo: Path) -> dict:
     }
 
 
+def case_holdout_existing_runner(repo: Path) -> dict:
+    write(
+        repo,
+        "widget.py",
+        """
+        def widget(text: str) -> str:
+            return text
+        """,
+    )
+    write(
+        repo,
+        "test_widget.py",
+        """
+        import unittest
+        from widget import widget
+
+
+        class WidgetTests(unittest.TestCase):
+            def test_passthrough(self):
+                self.assertEqual(widget("keep"), "keep")
+
+
+        if __name__ == "__main__":
+            unittest.main()
+        """,
+    )
+    write(
+        repo,
+        "docs/features/010-widget-trim/SPEC.md",
+        approved_spec(
+            "010",
+            "Widget trim",
+            "express",
+            "Return widget text with leading and trailing ASCII whitespace removed.",
+            ["Use Python standard library only."],
+            [
+                (
+                    "AC-001",
+                    "WHEN widget is called THE SYSTEM SHALL return the text with "
+                    "leading and trailing ASCII whitespace removed.",
+                    "test — `python3 -m unittest -v`",
+                )
+            ],
+            [
+                (
+                    "RC-001",
+                    "THE SYSTEM SHALL CONTINUE TO preserve non-space characters "
+                    "WHEN widget is called.",
+                    "test — `python3 -m unittest -v`",
+                )
+            ],
+        ),
+    )
+    initialize(repo)
+    return {
+        "case_id": "holdout-existing-runner",
+        "skill": "feature-implement",
+        "prompt": (
+            "Use /feature-implement with docs/features/010-widget-trim/SPEC.md. "
+            "Plan continuation is pre-authorized if it stays Express and in scope. "
+            "Edit files but do not commit or push."
+        ),
+    }
+
+
+def case_holdout_first_product_test(repo: Path) -> dict:
+    write(
+        repo,
+        "catalog.py",
+        """
+        def sku(name: str) -> str:
+            return name
+        """,
+    )
+    write(
+        repo,
+        "docs/features/011-catalog-sku/SPEC.md",
+        approved_spec(
+            "011",
+            "Catalog SKU",
+            "express",
+            "Return the catalog SKU as ASCII uppercase.",
+            ["Use Python standard library only."],
+            [
+                (
+                    "AC-001",
+                    "WHEN sku is called THE SYSTEM SHALL return the name in ASCII uppercase.",
+                    "test — local unit test",
+                )
+            ],
+            [],
+        ),
+    )
+    initialize(repo)
+    return {
+        "case_id": "holdout-first-product-test",
+        "skill": "feature-implement",
+        "prompt": (
+            "Use /feature-implement with docs/features/011-catalog-sku/SPEC.md. "
+            "Plan continuation is pre-authorized if it stays Express and in scope. "
+            "Edit files but do not commit or push."
+        ),
+    }
+
+
 BUILDERS = [
     case_express,
     case_migration,
@@ -652,6 +757,8 @@ BUILDERS = [
     case_draft,
     case_ambiguous,
     case_scope,
+    case_holdout_existing_runner,
+    case_holdout_first_product_test,
 ]
 
 

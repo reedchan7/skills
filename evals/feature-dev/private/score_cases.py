@@ -99,6 +99,24 @@ def has_exact_assertion(source: str, key: str, expected: str) -> bool:
     return False
 
 
+def extra_toolchain(repo: Path) -> list[str]:
+    found = [
+        name
+        for name in ("pyproject.toml", "requirements.txt", "setup.cfg", "pytest.ini")
+        if (repo / name).exists()
+    ]
+    found.extend(path.as_posix() for path in repo.glob("test_smoke.py"))
+    found.extend(path.as_posix() for path in repo.glob("tests/**/test_smoke.py"))
+    return found
+
+
+def plan_has_bootstrap_slice(repo: Path) -> bool:
+    plan = latest_plan(repo)
+    if plan is None:
+        return False
+    return re.search(r"\*\*S\d+\s+—\s+[^*]*[Bb]ootstrap", plan.read_text()) is not None
+
+
 def test_catches_mutation(repo: Path, relative: str, old: str, new: str) -> bool:
     with tempfile.TemporaryDirectory() as directory:
         copy = Path(directory) / "repo"
@@ -218,18 +236,15 @@ def score(case_id: str, repo: Path) -> dict:
     elif case_id == "greenfield-bootstrap":
         tests = command(repo, sys.executable, "-m", "unittest", "discover", "-v")
         add("tests runnable and pass", tests.returncode == 0, tests.stdout + tests.stderr)
-        manifests = [
-            path for name in ("pyproject.toml", "requirements.txt", "setup.cfg")
-            if (path := repo / name).exists()
-        ]
-        smoke = [
-            *repo.glob("test_smoke.py"),
-            *repo.glob("tests/**/test_smoke.py"),
+        test_files = [
+            path
+            for path in [*repo.glob("test_*.py"), *repo.glob("tests/**/*.py")]
+            if path.name.startswith("test_") or path.name.endswith("_test.py")
         ]
         add(
-            "tooling bootstrap exists",
-            bool(manifests) or bool(smoke),
-            ", ".join(map(str, manifests + smoke)),
+            "automated tests exist",
+            bool(test_files),
+            ", ".join(map(str, test_files)),
         )
         product_files = [
             path
@@ -314,15 +329,16 @@ def score(case_id: str, repo: Path) -> dict:
             "from logic import value; assert value() == 2",
         )
         valid_completed = checked and checkpoint_matches and behavior.returncode == 0
-        valid_invalidated = (
-            not checked
-            and actual[:12] in plan_text
-            and re.search(
-                r"invalidat|checkpoint mismatch|re-run",
+        stale_handled = (
+            re.search(
+                r"uncheck|invalidat|mismatch|placeholder|claimed vs actual|deviation",
                 plan_text,
                 re.IGNORECASE,
             )
             is not None
+        )
+        valid_invalidated = (
+            not checked and actual[:12] in plan_text and stale_handled
         )
         add(
             "slice revalidated or invalidated with actual identity",
@@ -331,9 +347,7 @@ def score(case_id: str, repo: Path) -> dict:
         )
         add(
             "stale identity recorded",
-            "000000000000" in plan_text
-            and re.search(r"invalidat|checkpoint mismatch|re-run", plan_text, re.IGNORECASE)
-            is not None,
+            "000000000000" in plan_text and stale_handled,
             plan_text[:800],
         )
 
@@ -405,6 +419,65 @@ def score(case_id: str, repo: Path) -> dict:
             "helper not wired in",
             "helper" not in service and "unused_helper" not in service,
             service,
+        )
+
+    elif case_id == "holdout-existing-runner":
+        tests = command(repo, sys.executable, "-m", "unittest", "-v")
+        behavior = command(
+            repo,
+            sys.executable,
+            "-c",
+            "from widget import widget; print(repr(widget('  x  ')))",
+        )
+        add("tests pass", tests.returncode == 0, tests.stdout + tests.stderr)
+        add(
+            "feature behavior implemented",
+            behavior.returncode == 0 and behavior.stdout.strip() == "'x'",
+            behavior.stdout + behavior.stderr,
+        )
+        add(
+            "existing test module kept",
+            (repo / "test_widget.py").exists(),
+            str(repo / "test_widget.py"),
+        )
+        extras = extra_toolchain(repo)
+        add("no invented toolchain files", not extras, ", ".join(extras))
+        add(
+            "no bootstrap slice",
+            not plan_has_bootstrap_slice(repo),
+            str(latest_plan(repo)),
+        )
+
+    elif case_id == "holdout-first-product-test":
+        tests = command(repo, sys.executable, "-m", "unittest", "discover", "-v")
+        behavior = command(
+            repo,
+            sys.executable,
+            "-c",
+            "from catalog import sku; print(sku('ab'))",
+        )
+        test_files = [
+            path
+            for path in [*repo.glob("test_*.py"), *repo.glob("tests/**/*.py")]
+            if path.name.startswith("test_") or path.name.endswith("_test.py")
+        ]
+        add("tests pass", tests.returncode == 0, tests.stdout + tests.stderr)
+        add(
+            "feature behavior implemented",
+            behavior.returncode == 0 and behavior.stdout.strip() == "AB",
+            behavior.stdout + behavior.stderr,
+        )
+        add(
+            "product test exists",
+            bool(test_files),
+            ", ".join(map(str, test_files)),
+        )
+        extras = extra_toolchain(repo)
+        add("no invented toolchain files", not extras, ", ".join(extras))
+        add(
+            "no bootstrap slice",
+            not plan_has_bootstrap_slice(repo),
+            str(latest_plan(repo)),
         )
     else:
         raise ValueError(f"unknown case: {case_id}")

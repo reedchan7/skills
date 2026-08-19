@@ -1,7 +1,7 @@
 # Feature Development Skill Pair — Design Specification
 
 - Date: 2026-08-19
-- Revision: 3 (post-eval saturation: hard gates + discriminating oracles)
+- Revision: 4 (anti-overfit: greenfield-only bootstrap + holdout oracles)
 - Research basis: `docs/research/feature-dev-skill-landscape.md`
 - Runtime skills: `feature-design`, `feature-implement`
 - User aliases: `new-feature`
@@ -173,9 +173,11 @@ checked slice's bytes before any product edit.
 ### 1 — Baseline and bounded blast radius
 
 Existing repo: affected baseline, full suite when feasible, otherwise explicit
-CI gate/blind spot. Record failure fingerprints, not names only. Greenfield:
-bootstrap manifest/test runner/smoke check before product behavior, then establish
-baseline. Coverage ledger tracks covered / no material risk / not assessed.
+CI gate/blind spot. Record failure fingerprints, not names only. Greenfield
+only when pickup has no product code and no invocable test command: first
+slice establishes a runner before product behavior. An existing module with
+zero tests is not greenfield — its first test is the product slice.
+Coverage ledger tracks covered / no material risk / not assessed.
 
 ### 2 — Tracer-bullet PLAN
 
@@ -238,9 +240,14 @@ Initial objective cases:
 2. Approved old-test migration: narrow assertion migration, unrelated assertion
    preserved, test green, PLAN trace.
 3. True SPEC conflict: production unchanged; conflict recorded.
-4. Greenfield bootstrap: test infrastructure before product behavior.
+4. Greenfield bootstrap: test infrastructure before product behavior, only
+   on a true empty tree.
 5. Dirty local candidate: unrelated bytes preserved and inventoried.
 6. Resume drift: stale checked slice invalidated.
+7. Holdout existing runner: implement the behavior; adding a bootstrap
+   slice or invented smoke/manifest is a fail (over-ceremony).
+8. Holdout first product test: existing module, no tests; first test is a
+   product slice, not toolchain bootstrap.
 
 Comparative claims require same model/tools/budget, paired no-skill control,
 fresh process, randomized order, at least three runs (five preferred), and
@@ -261,7 +268,8 @@ not acceptance evidence.
 | Candidate identity | committed + index + worktree + untracked + hashes | prevents empty/partial review |
 | Mutation | risk-selected, isolated, byte-verified restore | converts destructive manual protocol into bounded evidence |
 | Delivery state | local/integration/release split | prevents premature Delivered claims |
-| Greenfield | explicit bootstrap baseline | removes empty-repo deadlock |
+| Greenfield | bootstrap only if no product and no runner | avoids forcing S0 onto existing modules |
+| Holdout eval | over-ceremony fails; delta vs control is not the goal | detects overfitting to prior trap cases |
 | Multi-release migration | one dependent SPEC/PLAN per release stage | prevents local all-slices gate from deadlocking on deployed telemetry |
 | Regression scope | credible causal paths + coverage ledger | avoids unbounded shared-seam contracts |
 | Review cap | real Important/Critical cannot be parked into ready | loop bound does not lower quality |

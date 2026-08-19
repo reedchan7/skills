@@ -35,8 +35,8 @@ def main() -> int:
         return 1
 
     manifest = json.loads((ROOT / "cases" / "manifest.json").read_text())
-    if len(manifest["cases"]) != 9:
-        raise AssertionError("expected nine cases")
+    if len(manifest["cases"]) != 11:
+        raise AssertionError("expected eleven cases")
 
     validate_spec = load_module(
         "validate_spec",
@@ -67,13 +67,13 @@ def main() -> int:
                 f"{case['case_id']} status {status!r}, expected {expected!r}"
             )
 
-    for directory in ("migration", "conflict"):
+    for directory in ("migration", "conflict", "holdout-existing-runner"):
         repo = ROOT / "cases" / directory / "repo"
         tests = run(repo, sys.executable, "-m", "unittest", "-v")
         if tests.returncode:
             raise AssertionError(f"{directory} base tests fail:\n{tests.stdout}\n{tests.stderr}")
 
-    print(json.dumps({"cases": 9, "status": "PASS"}, sort_keys=True))
+    print(json.dumps({"cases": 11, "status": "PASS"}, sort_keys=True))
     return 0
 
 

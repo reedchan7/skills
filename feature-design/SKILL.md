@@ -105,7 +105,9 @@ outcome hypothesis, goals/non-goals, global constraints, AC/RC/NFR with
 deferred items, and amendment policy. Regression items cover material,
 credible affected paths — not every behavior sharing a broad dependency.
 Durable SPEC: no implementation file paths or code, except a
-prototype-derived decision snippet. Word budgets (excluding citations/log):
+prototype-derived decision snippet. Express empty sections are one
+`none` / `N/A` / `not measured` line — do not open unused NFR lenses
+or invent research. Word budgets (excluding citations/log):
 Express ≤800, Standard ≤2,000, Deep ≤4,000; overflow → decompose.
 Exit: no placeholder or open decision remains.
 

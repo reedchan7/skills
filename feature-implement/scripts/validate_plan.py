@@ -267,7 +267,7 @@ def validate(spec_path: Path, plan_path: Path, stage: str) -> dict:
     spec_base = (metadata(spec, "Base revision") or "").lower()
     if re.search(
         r"greenfield|empty[ -]repo|empty-tree|empty tree",
-        f"{spec_base}\n{spec}\n{plan}",
+        spec_base,
         re.IGNORECASE,
     ):
         bootstrap_at = re.search(r"bootstrap", slices_section, re.IGNORECASE)

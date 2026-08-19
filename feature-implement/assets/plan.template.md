@@ -62,22 +62,13 @@ execution state; exact paths/commands/checkpoints belong here, not in SPEC.
 
 ## Slices
 
-- [ ] **S0 — Bootstrap** *(keep only when pickup had no test runner; otherwise delete this slice)*
-  - Covers: none — toolchain only
-  - Blocked by: none · Risk: low — runner proof only
-  - Files: create `<smoke test>`; create `<manifest>` only if deps will be declared
-  - Interfaces: produces `<test command>`; consumes none
-  - Oracle order: smoke RED then GREEN; no product AC
-  - Approved test migrations: none
-  - Affected verify: `<test command>` → runner works
-  - Manual/scripted probe: N/A — runner proof only
-  - Rollback: delete bootstrap files
-  - Checkpoint: <sorted path:digest manifest>
-  - Evidence: <commands, exits/results, candidate digest, timestamp>
+Insert a Bootstrap slice before S1 only when pickup is greenfield (no product
+code and no invocable test command). Do not add one for an existing module
+that simply lacks tests.
 
 - [ ] **S1 — <end-to-end behavior>**
   - Covers: AC-001, RC-001, NFR-001
-  - Blocked by: S0 when present · Risk: <low/medium/high + mechanism>
+  - Blocked by: none · Risk: <low/medium/high + mechanism>
   - Files: create `<path>`; modify `<path>`; test `<path>`
   - Interfaces: produces `<exact signature>`; consumes `<exact signature>`
   - Oracle order: <one behavior case at a time>

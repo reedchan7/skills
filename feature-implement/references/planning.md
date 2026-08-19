@@ -34,19 +34,20 @@ AC/RC/NFR.
 
 ### Greenfield bootstrap
 
-An empty repo legitimately has no suite. Phase 1 only records the empty-tree
-hash, toolchain decision, and that S0 is required. Write the first PLAN slice
-as `S0 — Bootstrap` (or `S1 — Bootstrap`) covering no product AC/RC/NFR:
+Use this slice only when pickup has no product code and no invocable test
+command. An existing module with zero tests is not greenfield: its first
+test is the product slice.
 
-- one smoke test (`test_smoke.py` or `tests/test_smoke.py`) proving the
-  runner can go red and green
-- dependency manifest (`pyproject.toml` / `requirements.txt` / `setup.cfg`)
-  when the repo will have declared deps; stdlib-only may omit it
+Phase 1 records the empty-tree hash and toolchain decision. The first PLAN
+slice then establishes a runner — titled Bootstrap — and covers no product
+AC/RC/NFR:
+
+- one smoke proving the chosen runner can go red and green
+- a dependency manifest only when the repo will declare dependencies
 - lint/type/build entry points when applicable
 
-Create those files in that slice, not as unlisted Phase 1 side work. No
-product behavior enters bootstrap. Plan production slices after it. Delete
-the template S0 only when a test runner already existed at pickup.
+Create those files in that slice. No product behavior enters it. Plan
+production slices after it.
 
 ## Bounded blast-radius and coverage ledger
 
@@ -99,9 +100,9 @@ Every completed slice stores:
 Resume recomputes SHA-256 (or commit/tree SHA) for every checkpointed path
 before any product edit. Write claimed vs actual in PLAN. A checked box
 whose bytes do not match is incomplete: uncheck it, invalidate downstream
-gates, and record a Deviation row. Never treat `000000000000` or any
-placeholder digest as a real checkpoint. Rerun only what the dependency
-graph marks affected.
+gates, and record a Deviation row. Never treat a placeholder or all-zero
+digest as a real checkpoint. Rerun only what the dependency graph marks
+affected.
 
 ## Coverage matrix
 
@@ -125,5 +126,6 @@ Run the deterministic validator, then inspect:
 6. Checkpoints are possible under recorded authority.
 
 Express inherits the SPEC approval when plan scope/risk/files stay within it;
-record `gate: inherited`. Any expansion triggers a user gate. Standard/Deep
-present: scope, non-goals, files, risks, compatibility, rollout, and rollback.
+record `gate: inherited`. Empty Express ledger rows are one `none` / `N/A`.
+Any expansion triggers a user gate. Standard/Deep present: scope, non-goals,
+files, risks, compatibility, rollout, and rollback.
