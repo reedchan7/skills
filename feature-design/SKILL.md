@@ -122,7 +122,8 @@ findings, updating normative sections and decision log together. Present:
 
 On approval set `Status: Approved`, record approver/date, and hand off:
 bind the approval entry to the current version + validator-produced normative
-digest, rerun validation, then hand off `/feature-implement <spec path>`.
+digest, rerun validation, then hand off `/feature-implement` (it discovers
+this SPEC; name the path only if several actives exist).
 Never begin implementation in this skill.
 Exit: approved SPEC or Declined decision; no other completion claim.
 

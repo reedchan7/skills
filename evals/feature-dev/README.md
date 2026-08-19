@@ -48,8 +48,9 @@ python3 private/compare_runs.py /tmp/feature-dev-runs
 
 ## P0 acceptance matrix
 
-- Four slash names install and resolve: `feature-design`, `new-feature`,
-  `feature-spec`, `feature-implement`.
+- Three slash names install and resolve: `feature-design`, `new-feature`,
+  `feature-implement`. `feature-implement` discovers the active SPEC when
+  no path is given.
 - SPEC/PLAN validators reject placeholders, missing Verify mappings, missing
   requirements, constraint drift, and nonstandard slice state.
 - Candidate review covers committed, staged, unstaged, and untracked content.

@@ -11,7 +11,7 @@ want to keep across local agents, experiments, and future projects.
 | Skill | Purpose |
 | --- | --- |
 | [`code-review`](./code-review/SKILL.md) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
-| [`feature-design`](./feature-design/SKILL.md) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design`, `/new-feature`, or `/feature-spec`. |
+| [`feature-design`](./feature-design/SKILL.md) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design` or `/new-feature`. |
 | [`feature-implement`](./feature-implement/SKILL.md) | Implement an approved SPEC in tracer-bullet TDD slices; freeze the exact candidate, verify bounded regressions, independently review it, explore applicable surfaces, and report only evidence-supported readiness state. |
 | [`git-commit`](./git-commit/SKILL.md) | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
 | [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
@@ -106,8 +106,7 @@ One script. No args = full smart sync:
 It will:
 
 1. Link every personal skill in this repo (including one-to-many aliases:
-   `code-review` → `code-review-pro`; `feature-design` → `new-feature` +
-   `feature-spec`)
+   `code-review` → `code-review-pro`; `feature-design` → `new-feature`)
 2. Auto-detect a Matt Pocock clone and link those too (`code-review` → `matt-code-review`)
 3. Keep personal names when they already own a hub entry (e.g. `handoff`)
 4. Retire known renames and sweep broken hub symlinks

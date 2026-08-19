@@ -10,13 +10,34 @@ Implement an approved SPEC in small verified slices. Produce bounded evidence
 for requirements and regressions; never claim zero risk or a delivery state
 that external Git/CI/deployment evidence does not support.
 
-## Entry routing — decide FIRST
+## Resolve the target — FIRST
 
-| Input | Run |
+A SPEC path is optional. Resolve one SPEC (and its PLAN if any) before Phase 0.
+
+| User said | Use |
 |---|---|
-| Approved SPEC, no PLAN | Create PLAN in Phase 0; inherit SPEC Assurance (express / standard / deep); run all applicable phases. |
+| A `SPEC.md` or `PLAN.md` path | That file. A PLAN implies its sibling SPEC. |
+| A feature id/slug (`001-export-email`) | `docs/features/<that>/SPEC.md` |
+| Nothing, or “continue / implement this” | Discover below |
+
+Discovery (`docs/features/*/SPEC.md`):
+
+1. **Active** = Status in `Approved`, `In implementation`, `Locally verified`,
+   `Ready for integration`, `Integrated`. Skip Draft / Declined / Released
+   unless the user named that directory.
+2. One active SPEC → that target. PLAN present → resume; else create PLAN.
+3. Several active → prefer the single `In implementation` with an incomplete
+   PLAN. If still several, list path / status / title and ask one question.
+4. Zero active → STOP and hand off to `/feature-design` (or `/new-feature`).
+   Do not draft a SPEC here.
+
+Never invent a SPEC. Never pick silently among several active features.
+
+| Resolved input | Run |
+|---|---|
+| Active SPEC, no PLAN | Create PLAN in Phase 0; inherit SPEC Assurance (express / standard / deep); run all applicable phases. |
 | Existing PLAN | Validate SPEC version/hash, PLAN identity, candidate snapshot, completed-slice checkpoints, and phase evidence; resume at the first invalid/incomplete gate. |
-| No approved SPEC | STOP and hand off to `/feature-design`. Even Express uses a compact SPEC; no inline shadow contract. |
+| No active SPEC | STOP and hand off to `/feature-design`. Even Express uses a compact SPEC; no inline shadow contract. |
 
 Assurance controls depth end-to-end:
 

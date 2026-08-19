@@ -4,7 +4,7 @@
 - Revision: 2 (post-adversarial review)
 - Research basis: `docs/research/feature-dev-skill-landscape.md`
 - Runtime skills: `feature-design`, `feature-implement`
-- User aliases: `new-feature`, `feature-spec`
+- User aliases: `new-feature`
 
 ## Goal
 
@@ -13,7 +13,7 @@ full-stack, and greenfield work:
 
 1. `/feature-design <idea>` challenges and grounds the premise, then produces
    one approved normative SPEC.
-2. `/feature-implement <SPEC>` implements that contract in small verified
+2. `/feature-implement` implements that contract in small verified
    slices, proves a bounded regression surface, independently reviews the exact
    candidate, and advances only to the delivery state supported by Git/CI/deploy
    evidence.
@@ -29,8 +29,7 @@ small feature”. Full sync installs:
 
 - `/feature-design`
 - `/new-feature` → rewritten alias of `feature-design`
-- `/feature-spec` → rewritten alias of `feature-design`
-- `/feature-implement`
+- `/feature-implement` (SPEC path optional; discovers the active feature)
 
 No hidden router decides whether the user wants design or implementation.
 
@@ -159,7 +158,7 @@ approval entry, and word budgets.
 
 Self-review plus assurance-selected independent review. Update normative body and
 log together. User approval sets status Approved; the only next workflow is
-`/feature-implement <SPEC>`.
+`/feature-implement`.
 
 ## feature-implement phases
 

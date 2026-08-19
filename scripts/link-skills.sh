@@ -44,7 +44,6 @@ code-review:code-review-pro
 "
 PERSONAL_EXTRA_ALIASES="
 feature-design:new-feature
-feature-design:feature-spec
 "
 MATT_ALIASES="
 code-review:matt-code-review
@@ -54,6 +53,7 @@ code-review:matt-code-review
 RETIRED="
 writing-great-skills:writing-for-agents
 code-review:code-review-pro
+feature-spec:feature-design
 "
 
 # ---------------------------------------------------------------------------
