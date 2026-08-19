@@ -42,6 +42,10 @@ AGENTS=(
 PERSONAL_ALIASES="
 code-review:code-review-pro
 "
+PERSONAL_EXTRA_ALIASES="
+feature-design:new-feature
+feature-design:feature-spec
+"
 MATT_ALIASES="
 code-review:matt-code-review
 "
@@ -71,6 +75,18 @@ lookup_alias() {
 		fi
 	done <<< "$table"
 	printf '%s\n' "$upstream"
+}
+
+install_extra_aliases() {
+	local source_path="$1" upstream="$2" source_root="$3"
+	local line key install_as
+	while IFS= read -r line; do
+		[[ -z "${line// /}" ]] && continue
+		key="${line%%:*}"
+		install_as="${line#*:}"
+		[[ "$key" == "$upstream" ]] || continue
+		install_skill "$source_path" "$install_as" "$source_root" || true
+	done <<< "$PERSONAL_EXTRA_ALIASES"
 }
 
 realpath_of() {
@@ -336,6 +352,7 @@ full_sync() {
 		[[ -z "$src" ]] && continue
 		install_as="$(lookup_alias "$PERSONAL_ALIASES" "$(basename "$src")")"
 		install_skill "$src" "$install_as" "$REPO_DIR" || true
+		install_extra_aliases "$src" "$(basename "$src")" "$REPO_DIR"
 		n=$((n + 1))
 	done < <(find_personal_skills)
 	echo "  ($n considered)"
@@ -394,7 +411,8 @@ if [[ $# -eq 0 ]]; then
 fi
 
 SOURCE_ARG="$1"
-INSTALL_AS="${2:-}"
+REQUESTED_INSTALL_AS="${2:-}"
+INSTALL_AS="$REQUESTED_INSTALL_AS"
 if ! SOURCE_PATH="$(resolve_skill_arg "$SOURCE_ARG")"; then
 	echo "✗ skill not found: $SOURCE_ARG" >&2
 	exit 1
@@ -417,4 +435,7 @@ if [[ -z "$INSTALL_AS" ]]; then
 fi
 
 install_skill "$SOURCE_PATH" "$INSTALL_AS" "$SOURCE_ROOT"
+if [[ -z "$REQUESTED_INSTALL_AS" && "$SOURCE_ROOT" == "$REPO_DIR" ]]; then
+	install_extra_aliases "$SOURCE_PATH" "$(basename "$SOURCE_PATH")" "$SOURCE_ROOT"
+fi
 echo "Done."

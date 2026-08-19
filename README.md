@@ -11,6 +11,8 @@ want to keep across local agents, experiments, and future projects.
 | Skill | Purpose |
 | --- | --- |
 | [`code-review`](./code-review/SKILL.md) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
+| [`feature-design`](./feature-design/SKILL.md) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design`, `/new-feature`, or `/feature-spec`. |
+| [`feature-implement`](./feature-implement/SKILL.md) | Implement an approved SPEC in tracer-bullet TDD slices; freeze the exact candidate, verify bounded regressions, independently review it, explore applicable surfaces, and report only evidence-supported readiness state. |
 | [`git-commit`](./git-commit/SKILL.md) | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
 | [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
 | [`refactor`](./refactor/SKILL.md) | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. Includes a lightweight Tidy mode for clean-code sweeps (hard-coded values, duplicated literals, dead code, naming). |
@@ -25,7 +27,18 @@ want to keep across local agents, experiments, and future projects.
 |-- docs/
 |   `-- research/
 |-- evals/
-|   `-- code-review/
+|   |-- code-review/
+|   `-- feature-dev/
+|-- feature-design/
+|   |-- SKILL.md
+|   |-- references/
+|   |-- assets/
+|   `-- scripts/
+|-- feature-implement/
+|   |-- SKILL.md
+|   |-- references/
+|   |-- assets/
+|   `-- scripts/
 |-- git-commit/
 |   `-- SKILL.md
 |-- handoff/
@@ -68,10 +81,9 @@ one of them reads that file.
 
 ## Benchmarks
 
-`docs/research/` records how the published code-review candidates were compared
-and what the resulting skill must beat. `evals/` holds the behavioral benchmark
-that decides it — a skill's claims are only as good as its paired no-skill
-baseline.
+`docs/research/` records what published candidates and evidence a skill must
+beat. `evals/` holds deterministic and behavioral benchmarks — a skill's claims
+are only as good as its paired no-skill baseline.
 
 `evals/` is not part of any skill: nothing under it is linked into an agent
 runtime. Its generated case repositories are gitignored and rebuilt on demand:
@@ -79,6 +91,8 @@ runtime. Its generated case repositories are gitignored and rebuilt on demand:
 ```bash
 python3 evals/code-review/private/build_cases.py
 python3 evals/code-review/private/self_check.py
+python3 -m unittest -v evals.feature-dev.test_contracts
+python3 evals/feature-dev/private/self_check.py
 ```
 
 ## Using These Skills
@@ -91,7 +105,9 @@ One script. No args = full smart sync:
 
 It will:
 
-1. Link every personal skill in this repo (with aliases, e.g. `code-review` → `code-review-pro`)
+1. Link every personal skill in this repo (including one-to-many aliases:
+   `code-review` → `code-review-pro`; `feature-design` → `new-feature` +
+   `feature-spec`)
 2. Auto-detect a Matt Pocock clone and link those too (`code-review` → `matt-code-review`)
 3. Keep personal names when they already own a hub entry (e.g. `handoff`)
 4. Retire known renames and sweep broken hub symlinks
@@ -114,8 +130,9 @@ Hub root: `~/.agents/skills`.
 ## Writing Guidelines
 
 - Keep each skill focused on one workflow.
-- Put trigger conditions in `description`; the body loads only after the skill
-  is selected.
+- For model-invoked skills, put trigger branches (not workflow summaries) in
+  `description`; for user-invoked skills, set `disable-model-invocation: true`
+  and keep the description human-facing.
 - Prefer concise instructions and concrete examples over long explanations.
 - Add scripts or references only when they reduce repeated work.
 - Keep `SKILL.md` readable without requiring unrelated files.
