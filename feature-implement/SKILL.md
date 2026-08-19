@@ -32,6 +32,8 @@ Discovery (`docs/features/*/SPEC.md`):
    Do not draft a SPEC here.
 
 Never invent a SPEC. Never pick silently among several active features.
+Several actives and no named path/id → write no PLAN and no code until the
+user picks one.
 
 | Resolved input | Run |
 |---|---|
@@ -51,6 +53,24 @@ Assurance controls depth end-to-end:
   gates, mutation on high-risk decision logic, full applicable exploration.
 
 Discoveries only increase assurance.
+
+## Pickup hard gates — before any product edit
+
+A failed gate is a successful stop, not a reason to improvise.
+
+1. **Authority.** Status is `Approved` or later. `Draft` / `Declined` → STOP.
+   Do not edit production files. Hand off to `/feature-design`. PLAN may
+   record only the stop.
+2. **One target.** Several active SPECs and no named path/id → STOP. List
+   path / status / title. Write no PLAN and no code until the user picks one.
+3. **Resume identity.** Recompute SHA-256 of every checkpointed path before
+   any product edit. Claimed digest ≠ actual bytes → uncheck that slice, write
+   a Deviation row with claimed vs actual, and resume at the first invalid
+   gate. A checked box is never proof of completion.
+4. **Bootstrap slice.** Repo had no test runner at pickup → first PLAN slice
+   is `S0 — Bootstrap` (or `S1 — Bootstrap`) covering no AC/RC/NFR. Copy the
+   template S0; delete S0 only when a runner already existed. Run
+   `validate_plan.py` before any product file.
 
 ## Authority and contract laws
 
@@ -77,9 +97,10 @@ Discoveries only increase assurance.
 
 ### Phase 0 — Pickup, isolate, and create state
 
-Read SPEC fully; require `Status: Approved` with approval bound to current
-version + normative digest. Record assurance, version, normative digest,
-current HEAD, `git status --porcelain -uall`, authority
+Read SPEC fully. `Draft` / `Declined` is pickup gate 1 — stop, do not edit
+production files. Otherwise require `Status: Approved` or later with approval
+bound to current version + normative digest. Record assurance, version,
+normative digest, current HEAD, `git status --porcelain -uall`, authority
 (edit/commit/branch/push/PR/merge/deploy), and changed-file hashes.
 
 Isolation:
@@ -92,7 +113,8 @@ Isolation:
 
 Copy `assets/plan.template.md` immediately to the feature directory and fill
 identity, `Current phase: 1`, authority, SPEC identity, and candidate baseline.
-Resume: re-check every identity/checkpoint; drift invalidates affected gates.
+Resume: apply pickup gate 3 before judging implementability. Drift
+invalidates affected gates.
 **HARD GATE:** create this PLAN before judging implementability, running a
 baseline, or returning a conflict/block report. A conflict still fills identity
 and the Deviation row so the decision survives context loss.
@@ -104,11 +126,11 @@ cannot be established.
 Load `references/planning.md` and `references/deviation.md`. Inventory
 repo-native commands and conventions with evidence. Existing repos: run the
 affected baseline and full suite when feasible; otherwise record the CI/full
-suite gate and blind spot. Greenfield: use the bootstrap protocol to create
-only manifest, test runner, and a failing/empty smoke check, then establish
-the baseline before production code. The first PLAN slice must be titled
-`Bootstrap` (or `S0`/`S1 — Bootstrap`), cover no product AC/RC/NFR, and
-appear before any product slice.
+suite gate and blind spot. Greenfield: Phase 1 records empty-tree/base
+identity and that S0 is required. Do not treat Phase 1 itself as the
+bootstrap slice. Create manifest, runner, and smoke files only as the first
+PLAN slice (`S0 — Bootstrap` or `S1 — Bootstrap`), covering no product
+AC/RC/NFR, before any product slice or product file.
 
 Record normalized failure fingerprints. Map credible affected consumers,
 contracts, data, and operational surfaces; confirm, amend, or retire RCs

@@ -35,8 +35,8 @@ def main() -> int:
         return 1
 
     manifest = json.loads((ROOT / "cases" / "manifest.json").read_text())
-    if len(manifest["cases"]) != 6:
-        raise AssertionError("expected six cases")
+    if len(manifest["cases"]) != 9:
+        raise AssertionError("expected nine cases")
 
     validate_spec = load_module(
         "validate_spec",
@@ -73,7 +73,7 @@ def main() -> int:
         if tests.returncode:
             raise AssertionError(f"{directory} base tests fail:\n{tests.stdout}\n{tests.stderr}")
 
-    print(json.dumps({"cases": 6, "status": "PASS"}, sort_keys=True))
+    print(json.dumps({"cases": 9, "status": "PASS"}, sort_keys=True))
     return 0
 
 

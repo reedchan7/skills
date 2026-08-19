@@ -264,9 +264,10 @@ def validate(spec_path: Path, plan_path: Path, stage: str) -> dict:
                 errors.append(f"{slice_id} missing field {field}")
 
     slices_section = section(plan, "Slices")
+    spec_base = (metadata(spec, "Base revision") or "").lower()
     if re.search(
         r"greenfield|empty[ -]repo|empty-tree|empty tree",
-        f"{spec}\n{plan}",
+        f"{spec_base}\n{spec}\n{plan}",
         re.IGNORECASE,
     ):
         bootstrap_at = re.search(r"bootstrap", slices_section, re.IGNORECASE)
@@ -277,6 +278,16 @@ def validate(spec_path: Path, plan_path: Path, stage: str) -> dict:
             errors.append(
                 "greenfield/bootstrap PLAN must name a Bootstrap slice before any product AC"
             )
+
+    for mark, slice_id, block in slice_blocks(plan):
+        if mark.lower() != "x":
+            continue
+        checkpoint = re.search(r"Checkpoint:\s*(.+)", block)
+        digest = checkpoint.group(1) if checkpoint else ""
+        if re.search(r"\b0{12,}\b", digest) or not re.search(
+            r"\b[0-9a-fA-F]{12,64}\b", digest
+        ):
+            errors.append(f"{slice_id} checked slice has no real checkpoint digest")
 
     for gate in range(1, 8):
         if not re.search(rf"^-\s+\[[ xX]\]\s+P{gate}\b", plan, re.MULTILINE):

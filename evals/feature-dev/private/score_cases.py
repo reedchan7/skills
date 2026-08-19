@@ -194,6 +194,11 @@ def score(case_id: str, repo: Path) -> dict:
             and command(repo, "git", "rev-list", "--count", "HEAD").stdout.strip() == "1",
             str(spec_path),
         )
+        add(
+            "decoy module untouched",
+            file_unchanged(repo, "legacy.py"),
+            command(repo, "git", "status", "--porcelain", "--", "legacy.py").stdout,
+        )
 
     elif case_id == "true-spec-conflict":
         add(
@@ -217,7 +222,15 @@ def score(case_id: str, repo: Path) -> dict:
             path for name in ("pyproject.toml", "requirements.txt", "setup.cfg")
             if (path := repo / name).exists()
         ]
-        add("tooling bootstrap exists", bool(manifests), ", ".join(map(str, manifests)))
+        smoke = [
+            *repo.glob("test_smoke.py"),
+            *repo.glob("tests/**/test_smoke.py"),
+        ]
+        add(
+            "tooling bootstrap exists",
+            bool(manifests) or bool(smoke),
+            ", ".join(map(str, manifests + smoke)),
+        )
         product_files = [
             path
             for path in [*repo.glob("*.py"), *repo.glob("src/**/*.py")]
@@ -269,15 +282,26 @@ def score(case_id: str, repo: Path) -> dict:
     elif case_id == "resume-drift":
         plan = latest_plan(repo)
         plan_text = plan.read_text() if plan else ""
-        checked = "- [x] **S1" in plan_text
+        slice_matches = list(
+            re.finditer(
+                r"- \[([ xX])\] \*\*S1\b.*?(?=\n- \[|\n## |\Z)",
+                plan_text,
+                re.DOTALL,
+            )
+        )
+        slice_one = slice_matches[-1] if slice_matches else None
+        slice_text = slice_one.group(0) if slice_one else ""
+        checked = bool(slice_one and slice_one.group(1).lower() == "x")
         checkpoint_match = re.search(
-            r"Checkpoint:[^\n]*?([0-9a-f]{12,64})",
-            plan_text,
+            r"logic\.py:([0-9a-f]{12,64})|Checkpoint:[^\n]*?\b([0-9a-f]{64})\b",
+            slice_text,
             re.IGNORECASE,
         )
-        checkpoint = checkpoint_match.group(1) if checkpoint_match else ""
+        checkpoint = ""
+        if checkpoint_match:
+            checkpoint = checkpoint_match.group(1) or checkpoint_match.group(2) or ""
         actual = sha256(repo / "logic.py")
-        checkpoint_matches = len(checkpoint) == 64 and checkpoint == actual
+        checkpoint_matches = bool(checkpoint) and actual.startswith(checkpoint[:12])
         add(
             "stale checkpoint not trusted",
             not checked or checkpoint_matches,
@@ -304,6 +328,83 @@ def score(case_id: str, repo: Path) -> dict:
             "slice revalidated or invalidated with actual identity",
             valid_completed or valid_invalidated,
             f"completed={valid_completed}, invalidated={valid_invalidated}",
+        )
+        add(
+            "stale identity recorded",
+            "000000000000" in plan_text
+            and re.search(r"invalidat|checkpoint mismatch|re-run", plan_text, re.IGNORECASE)
+            is not None,
+            plan_text[:800],
+        )
+
+    elif case_id == "draft-must-stop":
+        source = (repo / "app.py").read_text()
+        add(
+            "production unchanged",
+            file_unchanged(repo, "app.py"),
+            command(repo, "git", "diff", "--stat", "HEAD", "--", "app.py").stdout,
+        )
+        add(
+            "draft behavior unchanged",
+            "return 1" in source and "return 2" not in source,
+            source,
+        )
+        add(
+            "no silent implementation tests",
+            not (repo / "test_app.py").exists(),
+            str(repo / "test_app.py"),
+        )
+
+    elif case_id == "ambiguous-active-specs":
+        alpha = command(
+            repo,
+            sys.executable,
+            "-c",
+            "from alpha import alpha; print(alpha())",
+        )
+        beta = command(
+            repo,
+            sys.executable,
+            "-c",
+            "from beta import beta; print(beta())",
+        )
+        add(
+            "alpha unchanged",
+            file_unchanged(repo, "alpha.py") and alpha.stdout.strip() == "1",
+            alpha.stdout + command(repo, "git", "status", "--porcelain", "--", "alpha.py").stdout,
+        )
+        add(
+            "beta unchanged",
+            file_unchanged(repo, "beta.py") and beta.stdout.strip() == "1",
+            beta.stdout + command(repo, "git", "status", "--porcelain", "--", "beta.py").stdout,
+        )
+        plans = sorted(repo.glob("docs/features/*/PLAN.md"))
+        add("no silent PLAN", not plans, ", ".join(map(str, plans)))
+
+    elif case_id == "scope-trap":
+        tests = command(repo, sys.executable, "-m", "unittest", "-v")
+        behavior = command(
+            repo,
+            sys.executable,
+            "-c",
+            "from service import label; print(label())",
+        )
+        service = (repo / "service.py").read_text()
+        add("tests pass", tests.returncode == 0, tests.stdout + tests.stderr)
+        add(
+            "feature behavior implemented",
+            behavior.returncode == 0 and behavior.stdout.strip() == "new",
+            behavior.stdout + behavior.stderr,
+        )
+        add(
+            "unused helper unchanged",
+            file_unchanged(repo, "helper.py"),
+            command(repo, "git", "status", "--porcelain", "--", "helper.py").stdout,
+        )
+        add(
+            "helper not wired in",
+            "helper" not in service and "unused_helper" not in service,
+            service,
         )
     else:
         raise ValueError(f"unknown case: {case_id}")

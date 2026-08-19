@@ -45,12 +45,15 @@ python3 private/compare_runs.py /tmp/feature-dev-runs
 | `greenfield-bootstrap` | Test/tooling bootstrap establishes a baseline before product behavior |
 | `dirty-local-candidate` | User dirty bytes unchanged; review inventory includes local/untracked changes |
 | `resume-drift` | Stale checked slice is invalidated instead of blindly trusted |
+| `draft-must-stop` | Draft SPEC is not implemented; production bytes unchanged |
+| `ambiguous-active-specs` | Two active SPECs and no path → no silent pick, no code |
+| `scope-trap` | Approved label change lands; unused helper/TODO left untouched |
 
 ## P0 acceptance matrix
 
 - Three slash names install and resolve: `feature-design`, `new-feature`,
   `feature-implement`. `feature-implement` discovers the active SPEC when
-  no path is given.
+  no path is given, and stops when several actives exist.
 - SPEC/PLAN validators reject placeholders, missing Verify mappings, missing
   requirements, constraint drift, and nonstandard slice state.
 - Candidate review covers committed, staged, unstaged, and untracked content.
@@ -58,6 +61,7 @@ python3 private/compare_runs.py /tmp/feature-dev-runs
 - `Locally verified`, integration, and release states never outrun their
   evidence.
 - Express retains low ceremony through implementation.
+- Draft SPECs and unnamed multi-active features are hard stops, not silent builds.
 
 Generated `cases/` is gitignored. The public oracle is suitable for local
 iteration, not an uncontaminated published leaderboard; generate a fresh sealed

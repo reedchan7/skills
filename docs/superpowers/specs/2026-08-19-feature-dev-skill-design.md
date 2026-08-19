@@ -1,7 +1,7 @@
 # Feature Development Skill Pair — Design Specification
 
 - Date: 2026-08-19
-- Revision: 2 (post-adversarial review)
+- Revision: 3 (post-eval saturation: hard gates + discriminating oracles)
 - Research basis: `docs/research/feature-dev-skill-landscape.md`
 - Runtime skills: `feature-design`, `feature-implement`
 - User aliases: `new-feature`
@@ -101,9 +101,9 @@ Assurance is stored in SPEC and inherited by PLAN.
 
 | Assurance | Predicate | Design depth | Implementation depth |
 |---|---|---|---|
-| Express | one reversible existing-flow change; no new dependency/model/public contract/trust boundary/migration/authz/money/data-lifecycle behavior | bounded recon; steelman-lite; no external research unless upgraded; one approval gate | affected checks; one review; mutation only if risk appears; runnable-surface exploration; inherited plan gate when scope/risk stays fixed |
+| Express | one reversible existing-flow change or a greenfield single-behavior spike; no new dependency/model/public contract/trust boundary/migration/authz/money/data-lifecycle behavior | bounded recon; steelman-lite; no external research unless upgraded; one approval gate | affected checks; one review; mutation only if risk appears; runnable-surface exploration; inherited plan gate when scope/risk stays fixed |
 | Standard | new capability in an existing product, including bounded work on an existing security/privacy/sensitive-data surface | full recon/interrogation; targeted external research; options + independent review | plan gate; affected checks + final full/CI; independent review; targeted exploration; risk-selected mutation |
-| Deep | greenfield architecture, migration, irreversible/money/multi-service work, or a new trust boundary/authz/sensitive-data lifecycle | external research, NFRs, rollout, independent review mandatory | full compatibility/release gates, high-risk sensitivity, broad applicable exploration |
+| Deep | new architecture; irreversible/migration/money/multi-service work; or a new trust boundary/authz/sensitive-data lifecycle. An empty repo is not Deep by itself. | external research, NFRs, rollout, independent review mandatory | full compatibility/release gates, high-risk sensitivity, broad applicable exploration |
 
 Discoveries only raise assurance.
 
@@ -164,9 +164,11 @@ log together. User approval sets status Approved; the only next workflow is
 
 ### 0 — Freeze input and create PLAN
 
-Require Approved SPEC. Record assurance/version/digest, HEAD, complete Git status,
-task/unrelated file hashes, and authority. Isolate unrelated dirty state. Create
-PLAN immediately. Resume verifies every checked slice's bytes/evidence.
+Require Approved SPEC. Draft/Declined is a hard stop. Several unnamed actives
+is a hard stop: list and ask, write no PLAN. Record assurance/version/digest,
+HEAD, complete Git status, task/unrelated file hashes, and authority. Isolate
+unrelated dirty state. Create PLAN immediately. Resume recomputes every
+checked slice's bytes before any product edit.
 
 ### 1 — Baseline and bounded blast radius
 

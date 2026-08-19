@@ -34,17 +34,19 @@ AC/RC/NFR.
 
 ### Greenfield bootstrap
 
-An empty repo legitimately has no suite. Record empty-tree hash and toolchain
-decision, then perform one approved bootstrap slice containing only:
+An empty repo legitimately has no suite. Phase 1 only records the empty-tree
+hash, toolchain decision, and that S0 is required. Write the first PLAN slice
+as `S0 — Bootstrap` (or `S1 — Bootstrap`) covering no product AC/RC/NFR:
 
-- dependency manifest/toolchain config
-- test runner and directory
-- one smoke test proving the runner can go red and green
+- one smoke test (`test_smoke.py` or `tests/test_smoke.py`) proving the
+  runner can go red and green
+- dependency manifest (`pyproject.toml` / `requirements.txt` / `setup.cfg`)
+  when the repo will have declared deps; stdlib-only may omit it
 - lint/type/build entry points when applicable
 
-No product behavior enters bootstrap. Write this as the first PLAN slice,
-titled `Bootstrap`, covering no product AC/RC/NFR. Run the new commands,
-record the first baseline, then plan production slices after it.
+Create those files in that slice, not as unlisted Phase 1 side work. No
+product behavior enters bootstrap. Plan production slices after it. Delete
+the template S0 only when a test runner already existed at pickup.
 
 ## Bounded blast-radius and coverage ledger
 
@@ -94,9 +96,12 @@ Every completed slice stores:
 - Commands, exit codes, and evidence timestamps.
 - Deviation/amendment IDs.
 
-Resume re-computes identity. Matching checkbox without matching bytes/evidence
-is incomplete. Drift invalidates that slice and all downstream consumers; rerun
-only what the dependency graph marks affected.
+Resume recomputes SHA-256 (or commit/tree SHA) for every checkpointed path
+before any product edit. Write claimed vs actual in PLAN. A checked box
+whose bytes do not match is incomplete: uncheck it, invalidate downstream
+gates, and record a Deviation row. Never treat `000000000000` or any
+placeholder digest as a real checkpoint. Rerun only what the dependency
+graph marks affected.
 
 ## Coverage matrix
 

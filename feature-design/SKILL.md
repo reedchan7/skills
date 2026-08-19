@@ -15,9 +15,9 @@ approved SPEC or a recorded don't-build decision.
 
 | Mode | Trigger | Run |
 |---|---|---|
-| Express | One reversible change to an existing flow; low blast radius; no new dependency, model, public contract, trust boundary, migration, authz, money, or data-lifecycle behavior | Phases 0→1-lite→2-lite→5→6. Ask a keystone question only when a real decision remains. Skip external research and independent review. |
+| Express | One reversible behavior on an existing flow, or a greenfield single-behavior spike; no new dependency, model, public contract, trust boundary, migration, authz, money, or data-lifecycle | Phases 0→1-lite→2-lite→5→6. Ask a keystone question only when a real decision remains. Skip external research and independent review. |
 | Standard | A new capability in an existing product, including a bounded change on an existing security/privacy/sensitive-data surface | All phases. Phase 3 external research only for a named novelty or product-evidence question. |
-| Deep | 0→1 product/subsystem; new architecture; irreversible/migration/money/multi-service work; or a new security/privacy trust boundary, authorization model, or sensitive-data lifecycle | All phases. External research and independent spec review mandatory. NFR and rollout sections mandatory. |
+| Deep | New architecture; irreversible/migration/money/multi-service work; or a new security/privacy trust boundary, authorization model, or sensitive-data lifecycle | All phases. External research and independent spec review mandatory. NFR and rollout sections mandatory. |
 
 One-way ratchet: discoveries upgrade the mode mid-flight, never downgrade.
 When in doubt between two modes, take the heavier one. Multiple independent

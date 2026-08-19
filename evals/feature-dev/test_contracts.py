@@ -272,7 +272,7 @@ class FeatureSkillContracts(unittest.TestCase):
 # Plan — Feature 003 Hello CLI
 
 - SPEC: ./SPEC.md · version: 1 · normative digest: {digest}
-- Assurance: deep
+- Assurance: express
 - Base revision: empty-tree · Branch/worktree: fixture
 - Candidate mode: local-content-manifest
 - Authority: edit yes · commit no · branch no · push no · PR no · merge no · deploy no
@@ -610,8 +610,11 @@ class FeatureSkillContracts(unittest.TestCase):
         skill = (ROOT / "feature-implement" / "SKILL.md").read_text()
         self.assertIn("Edit-only / no-commit: stay in the current worktree", skill)
         self.assertIn("Set SPEC `Status: Locally verified`", skill)
-        self.assertIn("first PLAN slice must be titled", skill)
-        self.assertIn("`Bootstrap`", skill)
+        self.assertIn("Pickup hard gates", skill)
+        self.assertIn("S0 — Bootstrap", skill)
+        self.assertIn("`Draft` / `Declined` → STOP", skill)
+        template = (ROOT / "feature-implement" / "assets" / "plan.template.md").read_text()
+        self.assertIn("**S0 — Bootstrap**", template)
         delivery = (
             ROOT / "feature-implement" / "references" / "delivery.md"
         ).read_text()
@@ -654,6 +657,79 @@ class FeatureSkillContracts(unittest.TestCase):
             EVAL_ROOT / "cases" / "resume" / "repo",
         )
         self.assertEqual(resume["score"], 0)
+
+    def test_plan_validator_rejects_fake_checked_checkpoint(self) -> None:
+        source_path = next(
+            (EVAL_ROOT / "cases" / "migration" / "repo").glob(
+                "docs/features/*/SPEC.md"
+            )
+        )
+        source = source_path.read_text()
+        digest = self.spec_validator.normative_digest(source)
+        self.assertIsNotNone(digest)
+        plan = valid_delivery_plan(digest).replace(
+            "  - Checkpoint: " + "a" * 64,
+            "  - Checkpoint: logic.py:000000000000",
+            1,
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            spec_path = Path(directory) / "SPEC.md"
+            plan_path = Path(directory) / "PLAN.md"
+            spec_path.write_text(source)
+            plan_path.write_text(plan)
+            result = self.plan_validator.validate(spec_path, plan_path, "plan")
+        self.assertFalse(result["valid"])
+        self.assertTrue(
+            any("real checkpoint digest" in item for item in result["errors"]),
+            result["errors"],
+        )
+
+    def test_new_oracles_fail_on_untouched_fixtures(self) -> None:
+        draft = self.scorer.score(
+            "draft-must-stop",
+            EVAL_ROOT / "cases" / "draft" / "repo",
+        )
+        self.assertEqual(draft["score"], 100)
+        ambiguous = self.scorer.score(
+            "ambiguous-active-specs",
+            EVAL_ROOT / "cases" / "ambiguous" / "repo",
+        )
+        self.assertEqual(ambiguous["score"], 100)
+        scope = self.scorer.score(
+            "scope-trap",
+            EVAL_ROOT / "cases" / "scope" / "repo",
+        )
+        self.assertLess(scope["score"], 100)
+        self.assertFalse(
+            next(
+                item["pass"]
+                for item in scope["checks"]
+                if item["name"] == "feature behavior implemented"
+            )
+        )
+
+    def test_resume_scorer_reads_s1_checkpoint_not_bootstrap(self) -> None:
+        source = EVAL_ROOT / "cases" / "resume" / "repo"
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory) / "repo"
+            shutil.copytree(source, repo)
+            (repo / "logic.py").write_text("def value() -> int:\n    return 2\n")
+            actual = hashlib.sha256((repo / "logic.py").read_bytes()).hexdigest()
+            plan = next(repo.glob("docs/features/*/PLAN.md"))
+            plan.write_text(
+                "# Plan — Feature 005 Resume drift\n"
+                "- SPEC: ./SPEC.md · version: 1 · digest: 000000000000\n"
+                "- Assurance: express\n"
+                "- Created: 2026-01-01 · Current phase: 7\n\n"
+                "## Slices\n"
+                "- [x] **S0 — Bootstrap**\n"
+                f"  - Checkpoint: test_smoke.py:{'ab' * 32}\n"
+                "- [x] **S1 — Return value 2**\n"
+                f"  - Checkpoint: logic.py:{actual}\n"
+                "Invalidated placeholder 000000000000 and re-ran S1.\n"
+            )
+            result = self.scorer.score("resume-drift", repo)
+        self.assertEqual(result["score"], 100, result["checks"])
 
     def test_resume_scorer_rejects_fake_checkpoint_summary(self) -> None:
         source = EVAL_ROOT / "cases" / "resume" / "repo"
