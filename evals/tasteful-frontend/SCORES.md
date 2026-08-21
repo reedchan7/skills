@@ -1,5 +1,13 @@
 # Scores — 2026-08-21 (skill v2, invariant architecture)
 
+> **2026-08-21 calibration**: scoring switched from linear `10 − Σ` to
+> band-dominant (see `calibration/FIT.md`, Spearman 0.95 vs blind human
+> anchors). Restated anchor-set scores (model → human): landing-skilled-1
+> 8.5 → 7.5 · landing-baseline 6.5 → 7 · verdant 8.5 → 8 · ondes 8.0 → 7 ·
+> console-skilled-1 8.5 → 7.5 · skillv1p (off-grid hero) 4.0 → 3 ·
+> grok-baseline 2.0 → 3.5 · grok-fixed(corrupted) 1.0 → 1. Weighted-sum
+> figures below predate the calibration; the ledgers remain valid.
+
 Generator: claude-sonnet-5 --effort medium. Weighted violations
 (broken 3 · illegible 2 · inconsistent 1 · bland 0.5), lower is better.
 Reviewed at 1440×900 screen-by-screen + 375px, plus mechanical greps.
@@ -21,6 +29,55 @@ Reviewed at 1440×900 screen-by-screen + 375px, plus mechanical greps.
 | baseline | ~5.5 | `transition: all`, no focus-visible (sev 2), no reduced-motion, strip+badge severity double-encoding, session context leaked into demo data ("reed.chan" avatar) |
 | skilled-1 | ~0.5 | proper table with column headers, quiet severity pills, unified diff with line numbers, destructive action red + confirm, empty/skeleton reachable from visible UI; miss: large idle area in detail column (bland) |
 | skilled-2 | ~1.5 | role-separated mono (data only), metadata row, states via visible toggle; misses: one `transition: all`, center-column dead space |
+
+## component-align (sub-page scope, after Scope section added)
+
+| Run | Weighted | Notes |
+| --- | --- | --- |
+| strict brief, baseline | 0 | single hunk, tokens only, pattern matched to settings rows |
+| strict brief, skilled | 0 | identical solution |
+| loose brief, baseline | 0–1 | merged Slack as a row into the Notifications card (defensible IA; 2 hunks) |
+| loose brief, skilled | 0–1 | identical structural choice, only the button label differs |
+
+Finding: **ties on both variants** — sonnet-5 medium is near-ceiling on
+conformance when the fixture's token system is clean and obvious. The skill
+neither helps nor hurts at this granularity on this fixture. To make the
+brief discriminative, a future fixture needs a *messier* host page
+(inconsistent existing values, tempting nearby "improvements") — that is
+where inherit-direction + zero-expression-budget should separate the arms.
+
+## landing regression (after Scope section)
+
+skilled-4: H1 2 lines anchored at container edge, prices 2734×3 exact,
+pricing CTAs 2839×3 exact (0px datum deviation — better than skilled-3's
+4px), no mono headings, reduced-motion present. **0→1 capability
+unaffected by the scope addition.**
+
+## Direction diversity battery (after Layer 2 derivation procedure)
+
+| World | Theme | Hue census (top non-neutral) | Display face |
+| --- | --- | --- | --- |
+| driftwatch (infra tool, pre-change corpus) | dark | 30° amber | grotesk + mono-as-data |
+| ondes (music festival) | dark `#14130f` (world-earned: night event) | 0–30° vermilion | Fraunces serif |
+| verdant (plant app) | **light** `#fbf8f1` | 120° green + 30° clay | Fraunces serif |
+
+**Amber monoculture broken** — themes, hue families, and personalities
+diverge by world; every page individually clean (H1 ≤2 lines, rm/fv
+present). New convergence found one level down: **Fraunces twice** (the
+model-favorite serif). Fixed the same way — Layer 2 candidates must span
+two display faces, twin test extended to typeface with the favorite faces
+named as calibration. Recheck next battery. Recurring minor: tabular-nums
+missing on stats bands — traced to the mechanic being dropped in the
+architecture rewrite; restored into invariant 2.
+
+## legacy-extend (messy real-world host page)
+
+Both arms: pure insertion, dominant convention (.panel/table.data/
+.btn-blue) correctly chosen over the off-system .card-new, zero new hex,
+demo data tied to existing page names. Skilled −0.5 (one unused `.mono`
+CSS rule); baseline clean. Tie again at sub-page scope with explicit
+instructions — consistent with component-align: the skill's sub-page value
+is downside protection, not lift, on a strong generator.
 
 ## Acceptance vs PROTOCOL
 

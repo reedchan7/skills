@@ -23,8 +23,26 @@ Ship interfaces that look **decided, not generated**.
    the user calls it gaudy or heavy, the fix is less, never more effects.
 
 The context always wins over this file: existing project tokens, components,
-and conventions beat every value below. Extend the system on the surface you
-are touching; never fork a parallel visual language; keep the diff surgical.
+and conventions beat every value below.
+
+## Scope — the same invariants at every size
+
+The skill runs at any granularity: a product, a page, a component, a
+one-line style fix. The invariants are scale-free; what changes with scope
+is where the direction comes from and how much expression is allowed.
+
+| Scope | Direction | Expression budget |
+| --- | --- | --- |
+| New surface (0→1) | Declare it (Layer 2) | One signature move |
+| Redesign of existing product | **Extract** it first — read the product's tokens, type roles, density, depth, accent into the declaration — then name what is actually broken and fix in order: broken > illegible > inconsistent > bland | Keep the identity unless the brief retires it |
+| Page/component improvement, local tuning, style alignment | **Inherit** it — read the neighboring components' actual values (spacing, radius, border treatment, text tiers, states) before editing | **Zero** — conformance is the win; no new visual vocabulary, no new hex, express the fix in existing tokens |
+
+At sub-page scope, "the grid" means the enclosing grid: the component sits
+on its parent's columns and datums, inherits its type roles, density
+register, and accent, and is judged at its seams — in context with the
+header, overlays, and neighbors it lives beside, never as an isolated
+fragment. The diff stays surgical: touch the target only; every changed
+line traces to the request.
 
 ## Layer 1 — Structural invariants
 
@@ -47,8 +65,8 @@ order; each step ends with its own check.
    · 1.25 default · 1.333 expressive). Type roles are fixed — display,
    heading, and body are proportional faces; monospace is a data role (code,
    diffs, metrics, `kbd`) and never a personality choice for headlines or
-   body. *Check: squint — headline, body, and label still separate; no mono
-   outside data.*
+   body; dynamic numbers set `tabular-nums`. *Check: squint — headline,
+   body, and label still separate; no mono outside data.*
 3. **Rhythm.** One spacing scale (4/8 base), one density register per
    surface; visibly more space between groups than within them — a page
    where every gap is equal has decided nothing. A repeated decorative
@@ -97,12 +115,33 @@ A direction may vary **only**:
 
 Everything not on this list is structure, and not available for expression.
 
-The brief's own words always win. Where the brief is silent, do not default:
-derive the direction from the product's world (what materials and light
-would its physical space have?), and steer clear of the recognizable
-generated looks — indigo-gradient SaaS, cream + serif + terracotta,
-near-black + acid glow. Changing the typeface and palette away from these
-is the single highest-leverage move.
+The brief's own words always win. Where the brief is silent, do not
+default — **derive**:
+
+1. **Name the product's world**: who uses it, in what light and mood (a
+   plant shop, a trading desk, a children's classroom, a night studio),
+   what temperature, what energy. Theme follows the world: **light-first
+   is the default for most products**; dark must be earned by the world
+   (night-time use, media, terminal-adjacent work) — never chosen because
+   dark "looks premium".
+2. **Sketch three candidate directions** that all fit that world but
+   differ materially — spanning at least two different hue families, at
+   least two different display typefaces, and both themes unless the
+   world pins one. Every hue and every face is available: nothing is
+   wrong in itself, only the undeviated default is.
+3. **Pick the candidate most specific to this product** and least like
+   what any model would produce for this brief — the twin test, applied
+   at direction time to palette and typeface alike (the model-favorite
+   faces — Inter for neutral, Fraunces or Playfair for a warm serif,
+   Space Grotesk for techy — are exactly the faces a twin would pick;
+   reaching for one means look one step further). Then commit.
+
+Calibration, not bans: the recognizable generated looks (indigo-gradient
+SaaS, cream + serif + terracotta, near-black + acid glow) mark where the
+median lands — arriving near one means re-derive, unless the brief itself
+asks for it. Equally, the palettes and hexes in this skill and its
+references are vocabulary for judging, **never a menu**: a direction
+picked because it appears in these files is a default wearing a costume.
 
 Before writing code, declare the direction in a short visible note: one
 sentence of intent in contrastive vocabulary ("warm like a notebook", not
@@ -117,7 +156,11 @@ Run after building, before delivering. Nothing ships unseen.
 1. **Render at real viewports**: 1440×900 screen by screen — full-page
    thumbnails hide alignment errors — then 375px. Screenshot with a browser
    tool when one is available; otherwise trace each section's box edges and
-   verify the coordinates by hand.
+   verify the coordinates by hand — and compute what is computable without
+   rendering: contrast ratios from the declared colors, and headline wrap
+   (font size × average glyph width × character count against the
+   container's max-width; anything projecting past 3 lines is a bug now,
+   not after someone opens the page).
 2. **One pass per invariant**, in Layer 1 order: edges on the grid → squint
    → gaps and first-screen composition → hue count → depth quiet → motion
    purposes → states and strings.

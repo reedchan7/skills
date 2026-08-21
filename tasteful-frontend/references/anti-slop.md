@@ -38,9 +38,9 @@ failure.
 | Neon glow borders on dark | Awwwards-clone reflex | A deliberate cyber/terminal direction, used once |
 | Pure `#000` / `#fff` fields | Kills depth, harsh contrast edges | Deliberate brutalist/print direction |
 | Glassmorphism everywhere | Decoration without hierarchy | One glass layer where depth means something; solid fallback for reduced-transparency; light mode needs `bg-white/80`+ |
-| Cream `#F4F1EA` + serif + terracotta | Recognizable slop look #1 | Brief names it |
-| Near-black + acid green + glow | Recognizable slop look #2 | Brief names it |
-| Broadsheet hairlines + zero radius everywhere | Recognizable slop look #3 | Genuinely editorial product |
+| Cream `#F4F1EA` + serif + terracotta | Recognizable slop look #1 | The product's world genuinely leads there — then vary its other axes deliberately |
+| Near-black + acid green + glow | Recognizable slop look #2 | The product's world genuinely leads there — then vary its other axes deliberately |
+| Broadsheet hairlines + zero radius everywhere | Recognizable slop look #3 | The product's world genuinely leads there — then vary its other axes deliberately |
 | 3–4px colored left-border strip on cards/alerts | Widely called the single most reliable AI tell | An existing design system that already uses it |
 | Warm and cool grays mixed on one surface | No palette ownership | Never — pick one neutral family |
 | Gray text on colored background | Muddy, low-craft | Never — tint the text with the background hue instead |
@@ -71,6 +71,7 @@ failure.
 | Fake-perfect numbers (`99.99%`, `50%`, `10x`) | Reads as invented | Organic values (`47.2%`, `+38ms`) or real data |
 | Fake version footers (`v1.4.2 · synced 4s ago`) | Fake liveness | Real values wired in |
 | Name-only testimonials, 5-line quotes | Low-effort social proof | Quote ≤3 lines; name + role (+ company) |
+| A five-star row on every testimonial | Fake-perfect social proof | Real ratings data, showing the actual mix |
 | Logo "walls" as styled text spans | Fake brands in real clothes | Real SVG marks from a verified source; invented brands get an invented monogram |
 | Emoji as icons | Uneven rendering, childish register | Deliberate playful brand, sparingly, never for actions |
 

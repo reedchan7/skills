@@ -1,0 +1,7 @@
+Design and build a landing page for "Verdant" — a plant-care companion app that identifies plants from photos, schedules watering and fertilizing, and diagnoses leaf problems. Target audience: home plant owners, mostly beginners.
+
+Requirements:
+- A single, fully self-contained HTML file (inline CSS and JS). Google Fonts via fonts.googleapis.com are allowed; no other external resources.
+- Sections: navigation, hero, a product showcase (show what the app looks/feels like), features, pricing (3 tiers), social proof, footer.
+- Must look good at both desktop (1440px) and mobile (375px) widths.
+- Do NOT use any tools. Output ONLY the complete HTML file content, starting with <!doctype html>. No explanations, no markdown fences.

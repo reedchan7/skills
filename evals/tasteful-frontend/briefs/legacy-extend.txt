@@ -1,0 +1,5 @@
+Below is the settings page of "Relay Admin", an internal tool that has grown organically for years. Add a new "API tokens" section to this page: a list of existing tokens (name, created date, last used, a revoke action) plus a "Create token" action. Match how the page already does things — it ships tomorrow, there is no budget to redesign anything.
+
+Output ONLY the complete HTML file, starting with <!doctype html>. No explanations, no markdown fences. Do NOT use any tools.
+
+===== CURRENT FILE =====

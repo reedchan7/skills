@@ -1,0 +1,5 @@
+Below is the current settings page of Driftwatch (a config-drift monitoring SaaS). The "Connect Slack" card looks gaudy and off — make it fit the page.
+
+Output ONLY the complete HTML file, starting with <!doctype html>. No explanations, no markdown fences. Do NOT use any tools.
+
+===== CURRENT FILE =====

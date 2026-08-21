@@ -1,0 +1,6 @@
+Below is the current settings page of Driftwatch (a config-drift monitoring SaaS). The "Connect Slack" card was added last sprint by another engineer and does not match the rest of the page. Fix that card so it belongs to this page's design system. Do not redesign, restyle, or "improve" anything else — every other line must survive byte-for-byte.
+
+Requirements:
+- Output ONLY the complete corrected HTML file, starting with <!doctype html>. No explanations, no markdown fences. Do NOT use any tools.
+
+===== CURRENT FILE =====

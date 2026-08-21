@@ -1,0 +1,11 @@
+{
+  "_note": "Blind mapping for the 2026-08-21 anchor rating round. Do not peek before rating.",
+  "A": "evals/tasteful-frontend/runs/2026-08-21-landing-skilled-1.html",
+  "B": "evals/tasteful-frontend-audit/runs/2026-08-21-gen-grok46high-baseline.html",
+  "C": "evals/tasteful-frontend/runs/2026-08-21-verdant-landing-skilled-claude.html",
+  "D": "evals/tasteful-frontend/runs/2026-08-21-landing-baseline-1.html",
+  "E": "evals/tasteful-frontend/runs/2026-08-21-console-skilled-1.html",
+  "F": "evals/tasteful-frontend/runs/2026-08-21-ondes-landing-skilled-claude.html",
+  "G": "evals/tasteful-frontend-audit/runs/2026-08-21-gen-grok46high-fixed.html",
+  "H": "evals/tasteful-frontend/runs/2026-08-21-landing-skillv1p-1.html"
+}

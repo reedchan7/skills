@@ -1,0 +1,11 @@
+{
+ "rater": "reed", "method": "blind, anchor-gallery artifact, first-impression 0-10",
+ "A": {"score": 7.5, "note": "还行，过得去"},
+ "B": {"score": 3.5, "note": "不及格，Demo 都算不上，看这个字体简直是伤害我的眼睛，而且大的过分"},
+ "C": {"score": 8, "note": "这一版比较有趣，桌面版看上去还可以，是目前风格最舒服的，但是移动端适配差了点"},
+ "D": {"score": 7, "note": "桌面端还可以，移动端有点不及格了，小问题，Bug 比较多"},
+ "E": {"score": 7.5, "note": ""},
+ "F": {"score": 7, "note": "Hero 那块波浪线，设计的有点抽象，一般"},
+ "G": {"score": 1, "note": "别再给我看这个了，伤害眼睛"},
+ "H": {"score": 3, "note": "不及格，上层设计很差，Hero 区"}
+}
