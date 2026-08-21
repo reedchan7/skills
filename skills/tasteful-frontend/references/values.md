@@ -74,16 +74,20 @@ project's own tokens always win.
 
 ## Motion library
 
+Frequently repeated and keyboard-initiated paths are instant. The ranges below
+apply to occasional interactions; modal/drawer and page/route rows are the only
+low-frequency exceptions to the ordinary ≤300ms ceiling.
+
 | Interaction | Duration | Easing |
 | --- | --- | --- |
 | Button/press feedback | 100–160ms | ease-out |
-| Hover color/opacity | 150–200ms | ease |
+| Hover color/opacity | 150–200ms | ease-out |
 | Tooltip / popover | 125–200ms | ease-out |
-| Dropdown / menu | 150–250ms | ease-out |
+| Dropdown / menu (occasional, pointer-opened) | 150–250ms | ease-out |
 | Modal / drawer in | 200–400ms | strong ease-out |
 | Modal / drawer out | ~2/3 of in | ease-out |
 | Toast | 200–300ms | ease-out |
-| Page/route transition | 300–500ms max | ease-in-out |
+| Deliberate page/route transition | 300–500ms max | ease-in-out |
 
 Named curves:
 

@@ -8,11 +8,23 @@ lands. Claims are only as good as the paired no-skill baseline.
 | Arm | Prompt |
 | --- | --- |
 | baseline | brief only |
-| skilled | full SKILL.md + references/anti-slop.md + references/values.md, then the brief |
+| skilled | full SKILL.md, then the brief |
 
 Generator: `claude -p --model claude-sonnet-5 --effort medium`, no tools,
 single self-contained HTML to stdout. The skilled arm runs **twice** per
 brief (stability sample); baseline once.
+
+This no-tools arm measures first-pass construction, not the Layer 3 render
+loop. A change to render-verification behavior also needs one tool-enabled run
+with its initial render, correction rounds, and final measurements archived.
+References are loaded only when their progressive-disclosure trigger applies;
+`anti-slop.md` is a review aid, not generation input.
+
+**Arm composition v2** (2026-08-21): skilled = SKILL.md only. Runs archived
+under arm v1 (SKILL + both references, everything dated 2026-08-21 and
+earlier in `runs/`) are reference points, not regression baselines — a
+comparison across the boundary needs one bridging battery run under both
+compositions before attributing any delta to a skill change.
 
 ## Briefs
 
@@ -48,8 +60,8 @@ invariant:
 | 3 | Rhythm | equal-gap monotone; dead band in first viewport; decorative device >1 per screen |
 | 4 | Color | >1 accent; mixed gray temperatures; decorative color; pure #000/#fff fields |
 | 5 | Depth | mixed strategies; loud shadows; non-concentric nested radii |
-| 6 | Motion | >300ms UI; ease-in; animated high-frequency path; no reduced-motion; `transition: all` |
-| 7 | Completeness | missing hover/focus/disabled or loading/empty/error; contrast/target floor; fake data |
+| 6 | Motion | >300ms ordinary UI without a documented low-frequency exception; animated high-frequency path; wrong easing role; no reduced-motion; `transition: all` |
+| 7 | Completeness | missing hover/focus/disabled or loading/empty/error; contrast/target floor; filler product-state data; fabricated marketing proof |
 
 Plus a code grep for the mechanical signals:
 `prefers-reduced-motion`, `focus-visible`, `tabular-nums`, `transition: all`,
@@ -72,7 +84,10 @@ Every scored run archives four artifacts under `runs/`: the HTML, a
 1440×900 first-screen screenshot, full-page screenshots at 1440 and 375,
 and the JSON from `private/measure.js` executed in the rendered page at
 1440×900 (it measures H1 wrap, mono-heading roles, peer-row CTA datum
-spread, WCAG contrast failures, a hue census, and the mechanical flags).
+spread, WCAG contrast failures and unmeasurable backgrounds, a hue census,
+and the mechanical flags). Integrity still uses the raw HTML: parsed
+`doctypePresent` confirms presence but cannot count duplicate doctypes that
+the DOM parser has discarded.
 A skill change is compared against the previous version's archived
 artifacts: the measure.js JSONs diff mechanically; the paired screenshots
 answer what numbers can't (composition, expression, coherence).
@@ -119,10 +134,10 @@ The deduction formula's *ledger* is ground truth; its *mapping to a
    more work cycle · 3–4 clearly bad/AI · 0–2 broken) — no analysis, no
    reference to SCORES.md.
 3. Fit: compare human scores to each run's severity-weighted ledger sum.
-   Adjust the mapping, not the ledger — candidate shapes: linear
-   `10 − Σ` (current), diminishing `10·exp(−Σ/k)`, or band-dominant
-   (highest severity present sets the band, lesser findings move within
-   it). Choose whichever maximizes rank agreement with the human scores;
+   Adjust the mapping, not the ledger — candidate shapes: legacy linear
+   `10 − Σ`, diminishing `10·exp(−Σ/k)`, or band-dominant (current: highest
+   severity present sets the band, lesser findings move within it). Choose
+   whichever maximizes rank agreement with the human scores;
    validate on the anchors (Spearman ≥ 0.8 to accept), record the chosen
    mapping here, and re-state all archived scores under it.
 4. Re-calibrate only when the rater disagrees with a fresh score by ≥2

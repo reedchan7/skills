@@ -64,15 +64,22 @@ failure.
 
 ## Content and data
 
+Scope note: these rules govern *synthetic product-state data* (rows in a
+mock table, demo metrics inside a fake console), which may look real.
+Marketing proof — customers, testimonials, certifications, usage metrics,
+business outcomes — is never invented as factual: use supplied facts, or
+label the block as sample/placeholder content, or omit it (see the
+completeness invariant).
+
 | Tell | Why | Override |
 | --- | --- | --- |
 | Div-built fake screenshots | The #1 LLM design tell — uncanny, always | Build the real thing small, or use a real capture/mock image |
-| John Doe / Acme / Nexus / lorem | Instantly fake | Never — realistic locale-appropriate data |
-| Fake-perfect numbers (`99.99%`, `50%`, `10x`) | Reads as invented | Organic values (`47.2%`, `+38ms`) or real data |
+| John Doe / Acme / Nexus / lorem | Instantly fake | Never — realistic locale-appropriate data in product-state mocks |
+| Fake-perfect numbers (`99.99%`, `50%`, `10x`) | Reads as invented | Organic values (`47.2%`, `+38ms`) in product-state mocks; marketing metrics come from supplied facts or are labeled sample |
 | Fake version footers (`v1.4.2 · synced 4s ago`) | Fake liveness | Real values wired in |
-| Name-only testimonials, 5-line quotes | Low-effort social proof | Quote ≤3 lines; name + role (+ company) |
+| Name-only testimonials, 5-line quotes | Low-effort social proof | Real testimonials set as quote ≤3 lines, name + role (+ company); never invent one — use supplied quotes or label the block as sample content |
 | A five-star row on every testimonial | Fake-perfect social proof | Real ratings data, showing the actual mix |
-| Logo "walls" as styled text spans | Fake brands in real clothes | Real SVG marks from a verified source; invented brands get an invented monogram |
+| Logo "walls" as styled text spans | Fake brands in real clothes | Real SVG marks from a verified source; a sample/demo wall uses invented monograms and is labeled as such, never presented as real customers |
 | Emoji as icons | Uneven rendering, childish register | Deliberate playful brand, sparingly, never for actions |
 
 ## Copy register

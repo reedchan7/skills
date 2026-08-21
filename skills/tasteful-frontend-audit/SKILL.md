@@ -49,15 +49,16 @@ to what was actually examined.
 4. **Exercise states** where possible: hover, focus (Tab through it),
    open the overlay, trigger empty/loading/error. Unreachable states are
    reported as "not verifiable", not assumed present.
-5. Without a browser, do static analysis plus coordinate tracing from the
-   layout code, and say so: confidence is lower, and datum-level findings
-   become "suspected" unless the code structure proves them (e.g. content
-   -length-driven positioning with no shared grid rows is provable
-   statically). Two render-level checks are still computable statically
-   and must be attempted: contrast ratios from the declared colors, and
-   headline wrap — estimate lines from font size × average glyph width ×
-   character count against the container's max-width, and flag anything
-   projecting past 3 lines as suspected.
+5. Without a browser, do static analysis and say so: confidence is lower,
+   and datum-level findings become "suspected" unless the code structure
+   proves them (e.g. content-length-driven positioning with no shared grid
+   rows is provable statically). Never report coordinates or line breaks as
+   measured from source alone — but two checks must still be *attempted*,
+   their results labeled suspected: contrast wherever the effective
+   foreground and background colors are knowable from the source, and
+   headline wrap estimated from font size × average glyph width × character
+   count against the container width — a projection past 3 lines is a
+   suspected finding to report, never a check to skip.
 
 ## 3. The rubric — seven invariants
 
@@ -82,13 +83,19 @@ Check in order; every finding names its invariant.
 5. **Depth.** One strategy (hairline / soft shadow / tint), quiet shadows,
    no glows or hard outlines; radii from one scale, nested radii
    concentric; borders the last resort after space and tint.
-6. **Motion.** High-frequency paths instant; the rest ≤300ms ease-out on
-   transform/opacity; no `transition: all`, no ease-in, no unmotivated
-   scroll theatre; `prefers-reduced-motion` handled.
+6. **Motion.** Frequently repeated and keyboard-initiated paths are instant;
+   ordinary feedback and enter/exit stay ≤300ms, with only low-frequency
+   spatial exceptions (modal/drawer ≤400ms, deliberate page/route ≤500ms).
+   Enter/exit uses ease-out; on-screen movement may use ease-in-out. Motion is
+   limited to transform/opacity; no `transition: all`, unmotivated scroll
+   theatre, or missing `prefers-reduced-motion` handling.
 7. **Completeness.** All interactive states (default/hover/focus-visible/
    active/disabled) and data states (loading/empty/error); contrast
    4.5:1 body, 3:1 large/UI; targets ≥24px (44 touch); `cursor-pointer`;
-   real-looking data; copy in one register with no filler clichés.
+   realistic synthetic product-state data; no invented customers,
+   testimonials, certifications, security/compliance claims, usage metrics,
+   or business outcomes presented as factual marketing proof; copy in one
+   register with no filler clichés.
 
 Beyond the invariants, assess **expression** (not scored, reported):
 is there a coherent direction and one signature move, or is it the

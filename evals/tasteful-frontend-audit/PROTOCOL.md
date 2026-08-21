@@ -10,8 +10,9 @@ its findings must be the ones an independent measurement pass also finds.
 2. **Review** — reviewer model + this skill audits the page, producing the
    report contract: score, deduction ledger, triage-ordered fixes.
 3. **Ground truth** — the harness independently measures the same page:
-   datum script (getBoundingClientRect on peer elements), mechanical census
-   (hex/font/duration/`transition: all`/reduced-motion/focus-visible),
+   raw-source integrity, datum script (`getBoundingClientRect` on peer
+   elements), mechanical census (hex/font/duration/`transition: all`/
+   reduced-motion/focus-visible),
    screen-by-screen screenshots at 1440×900 and 375. This yields the
    reference violation list with severities.
 4. **Judge the review** against ground truth:
@@ -20,8 +21,11 @@ its findings must be the ones an independent measurement pass also finds.
    - **Precision**: no fabricated finding presented as measured — every
      "measured" claim must reproduce (one fabricated measurement fails
      the run); suspected/unverifiable findings are exempt if labeled;
-   - **Arithmetic**: score = 10 − Σ ledger weights, and the ledger's
-     severities follow the rubric's definitions.
+   - **Arithmetic**: recompute the band-dominant score from the ledger — worst
+     severity sets the base (none 9.0 · bland-only 8.5 · inconsistent 7.0 ·
+     illegible 4.5 · broken 2.5), subtract 0.25 per additional severity-≥1
+     finding (floor: base − 1.5), then apply the documented ±0.5 expression
+     adjustment — and confirm the ledger's severities follow the rubric.
 5. **Fix** — the generator model applies the review's fixes (surgical).
 6. **Re-review** — the score must improve, and the harness re-measures to
    confirm the claimed fixes are physically present (a score that rises

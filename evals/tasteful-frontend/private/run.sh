@@ -7,14 +7,12 @@ DIR="$(cd "$(dirname "$0")/.." && pwd)"
 SKILL="$(cd "$DIR/../.." && pwd)/skills/tasteful-frontend"
 BRIEF="$DIR/briefs/$1.txt"; ARM="$2"
 CLI="${3:-claude}"; MODEL="${4:-claude-sonnet-5}"; EFFORT="${5:-medium}"
-OUT="$DIR/runs/$(date +%F)-$1-$ARM-${CLI}.html"
+OUT="$DIR/runs/$(date +%F-%H%M%S)-$1-$ARM-${CLI}.html"
 PROMPT="$(mktemp)"
 {
   if [ "$ARM" = skilled ]; then
     echo "You have been given a frontend design skill. Follow it exactly when executing the brief at the end."
     echo; echo "===== SKILL: tasteful-frontend ====="; cat "$SKILL/SKILL.md"
-    echo; echo "===== REFERENCE: anti-slop.md ====="; cat "$SKILL/references/anti-slop.md"
-    echo; echo "===== REFERENCE: values.md ====="; cat "$SKILL/references/values.md"
     echo; echo "===== BRIEF ====="
   fi
   cat "$BRIEF"

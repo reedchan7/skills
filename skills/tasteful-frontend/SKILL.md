@@ -1,6 +1,6 @@
 ---
 name: tasteful-frontend
-description: Build and restyle frontend UI with modern, high-taste, Apple/Linear/Stripe-grade polish. Use when creating a new UI surface or component, refactoring or simplifying visuals, fixing UI the user calls ugly, gaudy, heavy, bland, or AI-looking, choosing typography, color, spacing, depth, or motion values, or reviewing a UI change for visual quality. Covers direction-setting, structural invariants (grid, hierarchy, rhythm, color, depth, motion, states), expression budgeting, render-verification, and anti-AI-slop review for both product UI and marketing surfaces.
+description: Build and restyle frontend UI with modern, high-taste, Apple/Linear/Stripe-grade polish. Use when creating, implementing, redesigning, simplifying, or visually fixing a UI surface or component, including UI the user calls ugly, gaudy, heavy, bland, or AI-looking, or when choosing typography, color, spacing, depth, or motion values. Covers product and marketing UI. For read-only evaluation, scoring, or critique without edits, use tasteful-frontend-audit.
 ---
 
 # tasteful-frontend
@@ -97,20 +97,26 @@ order; each step ends with its own check.
    by space first, tint second, elevation last. Radii come from one scale,
    nested corners concentric (`outer = inner + padding`). *Check: shadows
    barely visible; no hard outlines; radii consistent.*
-6. **Motion.** Gate by frequency first: anything high-frequency (menus,
-   command palettes, keyboard-initiated) is instant. What remains: ≤300ms,
-   ease-out for enter/exit, `transform`/`opacity` only, never
-   `transition: all`, reduced-motion honored. An animation must state its
+6. **Motion.** Gate by frequency first: frequently repeated and
+   keyboard-initiated paths (command palettes, rapid menu traversal) are
+   instant. Ordinary feedback and enter/exit stay ≤300ms; only low-frequency
+   spatial transitions may exceed it (modal/drawer ≤400ms, deliberate
+   page/route transition ≤500ms). Enter/exit uses ease-out; on-screen movement
+   may use ease-in-out. Animate `transform`/`opacity` only, never
+   `transition: all`, and honor reduced motion. An animation must state its
    purpose in one sentence or it does not exist. *Check: purpose per
    animation; nothing moves that the user triggers constantly.*
 7. **Completeness.** Every interactive element has default / hover /
    focus-visible / active / disabled; every data view has loading (skeletons
    shaped like the layout) / empty (one clear action) / error. Floors:
    contrast 4.5:1 body and 3:1 large/UI, targets ≥24px (44 on touch), color
-   never the only signal, `cursor-pointer` on clickables. Demo data looks
-   real — locale-appropriate names, organically messy numbers, never lorem
-   or Acme. *Check: tab through it; break it; read every visible string
-   aloud once.*
+   never the only signal, `cursor-pointer` on clickables. Synthetic
+   product-state data may look real — locale-appropriate names, organically
+   messy numbers, never lorem or Acme. Marketing proof is different: never
+   invent customers, testimonials, certifications or security/compliance
+   claims, usage metrics, or business outcomes. Use facts supplied by the
+   user or source; otherwise label the copy as sample/placeholder or omit it.
+   *Check: tab through it; break it; read every visible string aloud once.*
 
 ## Layer 2 — Expression budget
 
@@ -167,20 +173,21 @@ Run after building, before delivering. Nothing ships unseen.
 
 1. **Render at real viewports**: 1440×900 screen by screen — full-page
    thumbnails hide alignment errors — then 375px. Screenshot with a browser
-   tool when one is available; otherwise trace each section's box edges and
-   verify the coordinates by hand — and compute what is computable without
-   rendering: contrast ratios from the declared colors, and headline wrap
-   (font size × average glyph width × character count against the
-   container's max-width; anything projecting past 3 lines is a bug now,
-   not after someone opens the page).
+   tool when one is available. Without rendering, run a static preflight and
+   mark render verification pending: inspect layout constraints, compute
+   contrast only where the effective foreground and background colors are
+   known, and treat headline-wrap estimates as suspected. Never claim that
+   coordinates or line breaks were verified from source alone.
 2. **One pass per invariant**, in Layer 1 order: edges on the grid → squint
    → gaps and first-screen composition → hue count → depth quiet → motion
    purposes → states and strings.
-3. Fix and re-render. The loop ends when a full pass finds nothing — not
-   when you are tired of looking.
+3. Batch the findings, fix, and re-render, for at most two correction rounds
+   after the initial pass. Stop when the pass is clean, or when every remaining
+   item is explicitly unverified or out of scope; never turn an unverified
+   item into a pass.
 
-For review requests on existing UI, run the same loop and report violations
-by invariant; consult [references/anti-slop.md](references/anti-slop.md) —
+For review-and-fix requests on existing UI, run the same loop and report
+violations by invariant; consult [references/anti-slop.md](references/anti-slop.md) —
 a diagnostic dictionary of known generated-look tells — to name what you
 see. It is a review aid, not a generation input. Numeric ranges (type
 scales, easing curves, shadow recipes, a11y numbers) live in
