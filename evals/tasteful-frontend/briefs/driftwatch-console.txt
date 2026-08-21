@@ -1,0 +1,9 @@
+Design and build the main screen of "Driftwatch Console" — the product UI (a tool, not a landing page) of a SaaS that monitors configuration drift across a fleet of servers. Users are DevOps/SRE engineers who live in this screen daily.
+
+Requirements:
+- Layout: a left sidebar listing monitored hosts (name, environment, drift status), a filter/search bar, a main panel listing the selected host's drift events (time, file, change summary, severity), and a detail area showing the selected event's config diff.
+- Show real states: the main list populated with realistic data, plus a visible empty state for one panel and a skeleton/loading treatment for another (render them side by side or via a small state toggle).
+- Include one dialog or confirm interaction (e.g. "Revert to baseline").
+- A single, fully self-contained HTML file (inline CSS and JS). Google Fonts via fonts.googleapis.com are allowed; no other external resources.
+- Must look good at 1440px; degrade sensibly at narrower widths.
+- Do NOT use any tools. Output ONLY the complete HTML file content, starting with <!doctype html>. No explanations, no markdown fences.

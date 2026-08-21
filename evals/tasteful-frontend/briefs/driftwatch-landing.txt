@@ -1,0 +1,7 @@
+Design and build a landing page for "Driftwatch" — a small SaaS tool that monitors configuration drift across a fleet of servers and alerts the team before drift causes an incident. Target audience: DevOps/SRE engineers.
+
+Requirements:
+- A single, fully self-contained HTML file (inline CSS and JS). Google Fonts via fonts.googleapis.com are allowed; no other external resources.
+- Sections: navigation, hero, a product showcase (show what the product looks/feels like), features, pricing (3 tiers), social proof, footer.
+- Must look good at both desktop (1440px) and mobile (375px) widths.
+- Do NOT use any tools. Output ONLY the complete HTML file content, starting with <!doctype html>. No explanations, no markdown fences.
