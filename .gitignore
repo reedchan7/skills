@@ -9,4 +9,4 @@ __pycache__/
 # committing them would produce broken gitlinks instead of files. Regenerate with
 # `python3 evals/<name>/private/build_cases.py`.
 /evals/*/cases/
-evals/tasteful-frontend/runs/
+evals/*/runs/

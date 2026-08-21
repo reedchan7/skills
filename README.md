@@ -17,6 +17,7 @@ want to keep across local agents, experiments, and future projects.
 | [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
 | [`refactor`](./refactor/SKILL.md) | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. Includes a lightweight Tidy mode for clean-code sweeps (hard-coded values, duplicated literals, dead code, naming). |
 | [`tasteful-frontend`](./tasteful-frontend/SKILL.md) | Build and restyle UI with modern, high-taste polish: direction-setting, typography, layout, color, depth, motion, states, copy, accessibility floors, and anti-AI-slop discipline with concrete values and a 10-item ship gate. |
+| [`tasteful-frontend-audit`](./tasteful-frontend-audit/SKILL.md) | Audit, score, and diagnose existing UI (product / page / component) against the tasteful-frontend invariants: measured evidence, a severity-weighted deduction ledger, and triage-ordered concrete fixes. |
 
 ## Repository Layout
 
@@ -53,6 +54,8 @@ want to keep across local agents, experiments, and future projects.
 |-- tasteful-frontend/
 |   |-- SKILL.md
 |   `-- references/
+|-- tasteful-frontend-audit/
+|   `-- SKILL.md
 |-- LICENSE
 `-- README.md
 ```
