@@ -44,6 +44,18 @@ header, overlays, and neighbors it lives beside, never as an isolated
 fragment. The diff stays surgical: touch the target only; every changed
 line traces to the request.
 
+**The "this looks ugly, fix it" flow.** For a component or one local spot,
+this skill alone is the whole flow: diagnose inline — name which invariant
+the ugliness violates (measure it when a browser is available) before
+touching anything — then fix within the inherited direction and re-verify
+with Layer 3. At page scale and above, or when the complaint is vague
+("looks off", "feels cheap"), get the ledger first: run the
+`tasteful-frontend-audit` skill (or its rubric, when it isn't installed)
+and let its triage-ordered findings drive the work. When an audit report
+is the input, its ledger **is** the work list: fix in its triage order,
+in existing tokens, touching nothing the ledger doesn't name — then
+re-audit; the score must move for the fix to count.
+
 ## Layer 1 — Structural invariants
 
 These hold in every direction, every brand, every surface. Construct in this
