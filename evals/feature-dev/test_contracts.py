@@ -16,6 +16,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[2]
+SKILLS = ROOT / "skills"
 EVAL_ROOT = ROOT / "evals" / "feature-dev"
 
 
@@ -134,11 +135,11 @@ class FeatureSkillContracts(unittest.TestCase):
         )
         cls.spec_validator = load_module(
             "spec_validator",
-            ROOT / "feature-design" / "scripts" / "validate_spec.py",
+            SKILLS / "feature-design" / "scripts" / "validate_spec.py",
         )
         cls.plan_validator = load_module(
             "plan_validator",
-            ROOT / "feature-implement" / "scripts" / "validate_plan.py",
+            SKILLS / "feature-implement" / "scripts" / "validate_plan.py",
         )
         cls.scorer = load_module(
             "feature_dev_scorer",
@@ -147,12 +148,12 @@ class FeatureSkillContracts(unittest.TestCase):
 
     def test_packages_are_user_invoked_and_references_exist(self) -> None:
         for package in ("feature-design", "feature-implement"):
-            skill = (ROOT / package / "SKILL.md").read_text()
+            skill = (SKILLS / package / "SKILL.md").read_text()
             self.assertIn("disable-model-invocation: true", skill)
             for relative in set(
                 re.findall(r"`((?:references|assets)/[^`]+\.md)`", skill)
             ):
-                self.assertTrue((ROOT / package / relative).is_file(), relative)
+                self.assertTrue((SKILLS / package / relative).is_file(), relative)
 
     def test_requested_aliases_are_configured(self) -> None:
         linker = (ROOT / "scripts" / "link-skills.sh").read_text()
@@ -190,7 +191,7 @@ class FeatureSkillContracts(unittest.TestCase):
                 (home / "hub" / "feature-spec").exists(),
                 "feature-spec must not install",
             )
-            implement = (ROOT / "feature-implement" / "SKILL.md").read_text()
+            implement = (SKILLS / "feature-implement" / "SKILL.md").read_text()
             self.assertIn("A SPEC path is optional", implement)
             self.assertIn("Discover below", implement)
 
@@ -219,7 +220,7 @@ class FeatureSkillContracts(unittest.TestCase):
         self.assertTrue(any("AC-001 has no Verify" in item for item in result["errors"]))
 
     def test_spec_validator_rejects_raw_template(self) -> None:
-        template = ROOT / "feature-design" / "assets" / "spec.template.md"
+        template = SKILLS / "feature-design" / "assets" / "spec.template.md"
         result = self.spec_validator.validate(template)
         self.assertFalse(result["valid"])
         self.assertTrue(
@@ -449,7 +450,7 @@ class FeatureSkillContracts(unittest.TestCase):
     def test_plan_validator_rejects_wrong_spec_digest_and_raw_template(self) -> None:
         repo = EVAL_ROOT / "cases" / "migration" / "repo"
         spec_path = next(repo.glob("docs/features/*/SPEC.md"))
-        template = ROOT / "feature-implement" / "assets" / "plan.template.md"
+        template = SKILLS / "feature-implement" / "assets" / "plan.template.md"
         result = self.plan_validator.validate(spec_path, template, "delivery")
         self.assertFalse(result["valid"])
         self.assertTrue(
@@ -606,14 +607,14 @@ class FeatureSkillContracts(unittest.TestCase):
             self.assertRegex(candidate["skill_sha256"], r"^[0-9a-f]{64}$")
             self.assertIn("/skill/SKILL.md", candidate["prompt"])
             self.assertNotIn(
-                str(ROOT / "feature-design" / "SKILL.md"),
+                str(SKILLS / "feature-design" / "SKILL.md"),
                 candidate["prompt"],
             )
             self.assertEqual(manifest["seed"], 17)
 
     def test_runtime_files_are_english_and_have_no_old_contract_terms(self) -> None:
-        runtime = list((ROOT / "feature-design").rglob("*.md"))
-        runtime += list((ROOT / "feature-implement").rglob("*.md"))
+        runtime = list((SKILLS / "feature-design").rglob("*.md"))
+        runtime += list((SKILLS / "feature-implement").rglob("*.md"))
         for path in runtime:
             text = path.read_text()
             self.assertIsNone(re.search(r"[\u4e00-\u9fff]", text), str(path))
@@ -624,23 +625,23 @@ class FeatureSkillContracts(unittest.TestCase):
         self.assertNotIn("approved AC/RC amendment", joined)
         implement = "\n".join(
             path.read_text()
-            for path in (ROOT / "feature-implement").rglob("*")
+            for path in (SKILLS / "feature-implement").rglob("*")
             if path.is_file() and path.suffix in {".md", ".py"}
         )
         self.assertNotIn("validate_spec.py", implement)
         self.assertNotIn("feature-design-skill-dir", implement)
         self.assertNotIn("feature-design/scripts", implement)
-        skill = (ROOT / "feature-implement" / "SKILL.md").read_text()
+        skill = (SKILLS / "feature-implement" / "SKILL.md").read_text()
         self.assertIn("Edit-only / no-commit: stay in the current worktree", skill)
         self.assertIn("Set SPEC `Status: Locally verified`", skill)
         self.assertIn("Pickup hard gates", skill)
         self.assertIn("no product code and no invocable", skill)
         self.assertIn("`Draft` / `Declined` → STOP", skill)
-        template = (ROOT / "feature-implement" / "assets" / "plan.template.md").read_text()
+        template = (SKILLS / "feature-implement" / "assets" / "plan.template.md").read_text()
         self.assertNotIn("**S0 — Bootstrap**", template)
         self.assertIn("Insert a Bootstrap slice before S1 only when pickup is greenfield", template)
         delivery = (
-            ROOT / "feature-implement" / "references" / "delivery.md"
+            SKILLS / "feature-implement" / "references" / "delivery.md"
         ).read_text()
         self.assertIn("self-contained", delivery)
         self.assertIn("expected fail", delivery)
@@ -650,7 +651,7 @@ class FeatureSkillContracts(unittest.TestCase):
         for package in ("feature-design", "feature-implement"):
             runtime.extend(
                 path
-                for path in (ROOT / package).rglob("*")
+                for path in (SKILLS / package).rglob("*")
                 if path.is_file() and path.suffix in {".md", ".py"}
             )
         joined = "\n".join(path.read_text() for path in runtime)

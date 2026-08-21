@@ -13,6 +13,7 @@ import shutil
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = ROOT.parents[1]
+SKILLS_ROOT = REPO_ROOT / "skills"
 
 
 def tree_digest(root: Path) -> str:
@@ -46,7 +47,7 @@ def main() -> int:
     ]
     skill_digests: dict[str, str] = {}
     for skill_name in ("feature-design", "feature-implement"):
-        skill_digests[skill_name] = tree_digest(REPO_ROOT / skill_name)
+        skill_digests[skill_name] = tree_digest(SKILLS_ROOT / skill_name)
 
     rng = random.Random(args.seed)
     work = [
@@ -66,7 +67,7 @@ def main() -> int:
         skill_digest = None
         if variant == "candidate":
             frozen_skill = run_root / "skill"
-            shutil.copytree(REPO_ROOT / case["skill"], frozen_skill)
+            shutil.copytree(SKILLS_ROOT / case["skill"], frozen_skill)
             skill_path = frozen_skill / "SKILL.md"
             skill_digest = tree_digest(frozen_skill)
             if skill_digest != skill_digests[case["skill"]]:

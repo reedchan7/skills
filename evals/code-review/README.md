@@ -53,7 +53,7 @@ PostgreSQL 15 migration whose ordering is safe, and a chunked batch query that
 reads like an N+1 but is bounded and still tenant-scoped. They measure whether a
 reviewer can decline to invent findings.
 
-Severity is adjudicated against the rubric in `code-review/SKILL.md` §6:
+Severity is adjudicated against the rubric in `skills/code-review/SKILL.md` §6:
 `critical` requires irreversible or systemic harm reachable in normal operation.
 Re-adjudicate the oracle when that rubric changes — never to move a score.
 
@@ -122,7 +122,7 @@ Whoever reads `private/` stops being a neutral author for the sealed split. Keep
 that recorded here.
 
 - 2026-07-25 — the oracle and every case body were read while reviewing
-  `code-review/SKILL.md`, and the same session then rewrote that skill and
+  `skills/code-review/SKILL.md`, and the same session then rewrote that skill and
   authored 6 of the 22 cases. The rewrite was kept generic and no case-specific
   wording entered the skill, but a published sealed score from this lineage is
   self-graded. Generate a fresh sealed batch, authored by someone who has not

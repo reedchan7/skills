@@ -4,7 +4,7 @@
 # present) and runs the generator. Prints the output path.
 set -euo pipefail
 DIR="$(cd "$(dirname "$0")/.." && pwd)"
-SKILL="$(cd "$DIR/../.." && pwd)/tasteful-frontend"
+SKILL="$(cd "$DIR/../.." && pwd)/skills/tasteful-frontend"
 BRIEF="$DIR/briefs/$1.txt"; ARM="$2"
 CLI="${3:-claude}"; MODEL="${4:-claude-sonnet-5}"; EFFORT="${5:-medium}"
 OUT="$DIR/runs/$(date +%F)-$1-$ARM-${CLI}.html"

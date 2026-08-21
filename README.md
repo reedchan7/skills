@@ -8,54 +8,42 @@ want to keep across local agents, experiments, and future projects.
 
 ## What's Included
 
-| Skill | Purpose |
-| --- | --- |
-| [`code-review`](./code-review/SKILL.md) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
-| [`feature-design`](./feature-design/SKILL.md) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design` or `/new-feature`. |
-| [`feature-implement`](./feature-implement/SKILL.md) | Implement an approved SPEC in tracer-bullet TDD slices; freeze the exact candidate, verify bounded regressions, independently review it, explore applicable surfaces, and report only evidence-supported readiness state. |
-| [`git-commit`](./git-commit/SKILL.md) | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
-| [`handoff`](./handoff/SKILL.md) | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
-| [`refactor`](./refactor/SKILL.md) | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. Includes a lightweight Tidy mode for clean-code sweeps (hard-coded values, duplicated literals, dead code, naming). |
-| [`tasteful-frontend`](./tasteful-frontend/SKILL.md) | Build and restyle UI with modern, high-taste polish: direction-setting, typography, layout, color, depth, motion, states, copy, accessibility floors, and anti-AI-slop discipline with concrete values and a 10-item ship gate. |
-| [`tasteful-frontend-audit`](./tasteful-frontend-audit/SKILL.md) | Audit, score, and diagnose existing UI (product / page / component) against the tasteful-frontend invariants: measured evidence, a severity-weighted deduction ledger, and triage-ordered concrete fixes. |
+| Skill | Eval | Purpose |
+| --- | --- | --- |
+| [`code-review`](./skills/code-review/SKILL.md) | [`evals/code-review`](./evals/code-review) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
+| [`feature-design`](./skills/feature-design/SKILL.md) | [`evals/feature-dev`](./evals/feature-dev) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design` or `/new-feature`. |
+| [`feature-implement`](./skills/feature-implement/SKILL.md) | [`evals/feature-dev`](./evals/feature-dev) | Implement an approved SPEC in tracer-bullet TDD slices; freeze the exact candidate, verify bounded regressions, independently review it, explore applicable surfaces, and report only evidence-supported readiness state. |
+| [`git-commit`](./skills/git-commit/SKILL.md) | — | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
+| [`handoff`](./skills/handoff/SKILL.md) | — | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
+| [`refactor`](./skills/refactor/SKILL.md) | — | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. Includes a lightweight Tidy mode for clean-code sweeps (hard-coded values, duplicated literals, dead code, naming). |
+| [`tasteful-frontend`](./skills/tasteful-frontend/SKILL.md) | [`evals/tasteful-frontend`](./evals/tasteful-frontend) | Build and restyle UI with modern, high-taste polish: direction-setting, typography, layout, color, depth, motion, states, copy, accessibility floors, and anti-AI-slop discipline with concrete values and a 10-item ship gate. |
+| [`tasteful-frontend-audit`](./skills/tasteful-frontend-audit/SKILL.md) | [`evals/tasteful-frontend-audit`](./evals/tasteful-frontend-audit) | Audit, score, and diagnose existing UI (product / page / component) against the tasteful-frontend invariants: measured evidence, a severity-weighted deduction ledger, and triage-ordered concrete fixes. |
+
+`feature-design` and `feature-implement` share one eval because they are a
+paired workflow, not two independent products.
 
 ## Repository Layout
 
 ```text
 .
-|-- code-review/
-|   |-- SKILL.md
-|   `-- references/
+|-- skills/                      # linked into agent runtimes
+|   |-- code-review/
+|   |-- feature-design/
+|   |-- feature-implement/
+|   |-- git-commit/
+|   |-- handoff/
+|   |-- refactor/
+|   |-- tasteful-frontend/
+|   `-- tasteful-frontend-audit/
+|-- evals/                       # not linked; paired with skills/ by name
+|   |-- code-review/
+|   |-- feature-dev/             # covers feature-design + feature-implement
+|   |-- tasteful-frontend/
+|   `-- tasteful-frontend-audit/
 |-- docs/
 |   `-- research/
-|-- evals/
-|   |-- code-review/
-|   `-- feature-dev/
-|-- feature-design/
-|   |-- SKILL.md
-|   |-- references/
-|   |-- assets/
-|   `-- scripts/
-|-- feature-implement/
-|   |-- SKILL.md
-|   |-- references/
-|   |-- assets/
-|   `-- scripts/
-|-- git-commit/
-|   `-- SKILL.md
-|-- handoff/
-|   `-- SKILL.md
-|-- refactor/
-|   |-- SKILL.md
-|   |-- references/
-|   `-- assets/
 |-- scripts/
-|   `-- link-skills.sh       # one smart linker for personal + Matt + all agents
-|-- tasteful-frontend/
-|   |-- SKILL.md
-|   `-- references/
-|-- tasteful-frontend-audit/
-|   `-- SKILL.md
+|   `-- link-skills.sh           # one smart linker for personal + Matt + all agents
 |-- LICENSE
 `-- README.md
 ```
@@ -63,7 +51,7 @@ want to keep across local agents, experiments, and future projects.
 Each skill lives in its own directory and follows the standard skill shape:
 
 ```text
-skill-name/
+skills/skill-name/
 `-- SKILL.md
 ```
 
@@ -112,7 +100,7 @@ One script. No args = full smart sync:
 
 It will:
 
-1. Link every personal skill in this repo (including one-to-many aliases:
+1. Link every personal skill in `skills/` (including one-to-many aliases:
    `code-review` → `code-review-pro`; `feature-design` → `new-feature`)
 2. Auto-detect a Matt Pocock clone and link those too (`code-review` → `matt-code-review`)
 3. Keep personal names when they already own a hub entry (e.g. `handoff`)

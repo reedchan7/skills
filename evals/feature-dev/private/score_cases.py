@@ -22,7 +22,7 @@ REPO_ROOT = ROOT.parents[1]
 
 
 def load_validator():
-    path = REPO_ROOT / "feature-design" / "scripts" / "validate_spec.py"
+    path = REPO_ROOT / "skills" / "feature-design" / "scripts" / "validate_spec.py"
     spec = importlib.util.spec_from_file_location("validate_spec", path)
     if spec is None or spec.loader is None:
         raise RuntimeError("cannot load SPEC validator")

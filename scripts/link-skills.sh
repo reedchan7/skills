@@ -21,6 +21,7 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILLS_DIR="$REPO_DIR/skills"
 HUB_DIR="${SKILLS_HUB_DIR:-$HOME/.agents/skills}"
 MATT_REPO="${MATT_SKILLS_REPO:-$HOME/Workspaces/github/mattpocock/skills}"
 
@@ -279,7 +280,8 @@ find_skills_under() {
 
 find_personal_skills() {
 	local d
-	for d in "$REPO_DIR"/*/; do
+	[[ -d "$SKILLS_DIR" ]] || return 0
+	for d in "$SKILLS_DIR"/*/; do
 		[[ -f "${d}SKILL.md" ]] || continue
 		printf '%s\n' "${d%/}"
 	done | sort
@@ -380,8 +382,8 @@ resolve_skill_arg() {
 		printf '%s\n' "$arg"
 		return 0
 	fi
-	if [[ -f "$REPO_DIR/$arg/SKILL.md" ]]; then
-		printf '%s\n' "$REPO_DIR/$arg"
+	if [[ -f "$SKILLS_DIR/$arg/SKILL.md" ]]; then
+		printf '%s\n' "$SKILLS_DIR/$arg"
 		return 0
 	fi
 	return 1

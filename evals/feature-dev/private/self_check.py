@@ -40,7 +40,7 @@ def main() -> int:
 
     validate_spec = load_module(
         "validate_spec",
-        REPO_ROOT / "feature-design" / "scripts" / "validate_spec.py",
+        REPO_ROOT / "skills" / "feature-design" / "scripts" / "validate_spec.py",
     )
     for case in manifest["cases"]:
         repo = ROOT / case["repo"]
