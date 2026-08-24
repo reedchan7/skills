@@ -128,4 +128,6 @@ Run the deterministic validator, then inspect:
 Express inherits the SPEC approval when plan scope/risk/files stay within it;
 record `gate: inherited`. Empty Express ledger rows are one `none` / `N/A`.
 Any expansion triggers a user gate. Standard/Deep present: scope, non-goals,
-files, risks, compatibility, rollout, and rollback.
+files, risks, compatibility, rollout, and rollback — inline in the chat
+message, self-contained: any option offered is defined in that same message,
+and the PLAN path is a reference, not required reading.

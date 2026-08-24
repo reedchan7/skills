@@ -1,6 +1,6 @@
 ---
 name: feature-implement
-description: Implement and verify an approved feature SPEC, or resume its existing PLAN.
+description: Implement and verify an approved feature SPEC, or resume its existing PLAN. Use only when explicitly invoked, or when an approved docs/features SPEC covers this ask. Without such a SPEC, not for ordinary implementation requests, bug fixes, or refactors.
 disable-model-invocation: true
 ---
 
@@ -9,6 +9,19 @@ disable-model-invocation: true
 Implement an approved SPEC in small verified slices. Produce bounded evidence
 for requirements and regressions; never claim zero risk or a delivery state
 that external Git/CI/deployment evidence does not support.
+
+## Activation gate — before anything else
+
+This workflow runs only when chosen on purpose: explicit invocation (slash
+command, this skill named by the user or by a standing project rule), or
+when an approved `docs/features/*/SPEC.md` covers this ask — a
+`/feature-design` handoff is the common path, not a precondition.
+However this file came to be loaded, verify that first. Absent both — an
+ordinary "implement X" request, a bug fix, a refactor — say the workflow
+doesn't apply and handle the request directly; do not halt the user's task
+to demand a SPEC. An active SPEC unrelated to the ask does not activate
+this workflow, and every zero-active STOP below applies only when this
+skill was explicitly invoked.
 
 ## Resolve the target — FIRST
 
@@ -28,7 +41,7 @@ Discovery (`docs/features/*/SPEC.md`):
 2. One active SPEC → that target. PLAN present → resume; else create PLAN.
 3. Several active → prefer the single `In implementation` with an incomplete
    PLAN. If still several, list path / status / title and ask one question.
-4. Zero active → STOP and hand off to `/feature-design` (or `/new-feature`).
+4. Zero active → STOP and hand off to `/feature-design`.
    Do not draft a SPEC here.
 
 Never invent a SPEC. Never pick silently among several active features.
@@ -152,8 +165,10 @@ Run `python3 <skill-dir>/scripts/validate_plan.py <SPEC> <PLAN>`.
 Express proceeds without another interruption only when validation passes and
 scope/risk/files do not exceed the approved SPEC; otherwise present the plan
 gate. Standard/Deep present scope, non-goals, files, risks, compatibility,
-and rollout for approval unless pre-authorized. On approval set SPEC
-`Status: In implementation`.
+rollout, and rollback for approval unless pre-authorized — inline in the
+chat message, self-contained: any option offered is defined in that same
+message, and the PLAN path is a reference, not required reading. On
+approval set SPEC `Status: In implementation`.
 Exit: validated PLAN and required approval.
 
 ### Phase 3 — Build one behavior at a time
@@ -244,6 +259,8 @@ Critical/Important finding unresolved.
 
 ## Never
 
+- Run this workflow for an ask with no approved SPEC unless explicitly invoked
+- Ask the user to approve or choose among content that lives only in a file
 - Weaken/delete/skip/special-case a test to manufacture green
 - Review an unfrozen or partial candidate
 - Mutate production files in the primary dirty workspace

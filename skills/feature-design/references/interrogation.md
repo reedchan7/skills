@@ -54,6 +54,9 @@ instead of manufacturing a question. Format:
 ➡️ <your recommended answer, with one line of reasoning>
 ```
 
+The question is self-contained: each choice states what it means and its
+consequence, in the message itself — answerable without opening any file.
+
 Wait for the answer. It typically reshapes everything downstream — asking
 it alone protects the rest of the interview from a wrong premise.
 
@@ -66,6 +69,12 @@ frontier is every question whose prerequisites are settled. Per round:
 - Impact order: scope > security/privacy > user experience > technical.
 - Multiple choice preferred; the user should be able to answer a whole
   round with "1a, 2 yes, 3 your call".
+- Self-contained rounds: every open choice is defined in the round's own
+  message — what it means and its consequence. A one-line recap is enough
+  only for something already decided or defined in full in the immediately
+  preceding messages; never a bare reference to a file. Number questions,
+  letter each question's choices (answers read like "1a, 2 yes"); once a
+  choice is labeled, never relabel it.
 - A question whose answer depends on another open question belongs to a
   later round.
 - "Your call" / "whatever you think" → state your recommendation as the

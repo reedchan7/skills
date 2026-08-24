@@ -149,10 +149,10 @@ Report only:
 4. regression items without a credible causal path, and credible paths omitted
 5. contradictions, unsafe defaults, and scope too large for one plan
 6. strongest evidence-backed case not to build this version
-Rank Blocking / Important / Minor and cite SPEC sections.
+Rank Critical / Important / Minor and cite SPEC sections.
 ```
 
-Fix Blocking/Important findings in the normative body and decision log.
+Fix Critical/Important findings in the normative body and decision log.
 Rejected findings need a falsifiable disproof. One scoped re-check follows.
 When no independent context exists, follow the capability ladder in SKILL.md
 and disclose that limitation; never describe self-review as independent.

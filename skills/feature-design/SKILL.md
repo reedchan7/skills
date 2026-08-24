@@ -1,6 +1,6 @@
 ---
 name: feature-design
-description: Design or specify a feature before implementation, from a small existing-flow change through a 0→1 product.
+description: Design or specify a feature before implementation, from a small existing-flow change through a 0→1 product. Use only when explicitly invoked, or when the user asks for design or spec work before building — the test is that ask, not the change type. Not for changes the user simply wants made (bug fix, debug, refactor, direct edit) with no design ask.
 disable-model-invocation: true
 ---
 
@@ -10,6 +10,18 @@ Turn a raw idea into an approved, evidence-grounded SPEC whose requirements
 are traceable to verification. Challenge the premise before specifying; find
 facts yourself; put decisions to the user. The only terminal states are an
 approved SPEC or a recorded don't-build decision.
+
+## Activation gate — before anything else
+
+This workflow runs only when chosen on purpose: explicit invocation (slash
+command, this skill named by the user or by a standing project rule, or the
+zero-active handoff from `/feature-implement`), or an explicit ask to design
+or spec a change before building it. However this file came to be loaded,
+verify that intent first. The test is the ask, not the task type: a bug
+report, a debugging request, a refactor, or any change the user simply
+wants made is not a design ask — the same task with a design-before-build
+ask is. Absent that intent, say this workflow doesn't apply and handle the
+request directly — no phases, no `docs/features/` artifacts, no SPEC.
 
 ## Mode routing — decide FIRST, announce with reasons
 
@@ -41,6 +53,13 @@ features in one ask → decompose first; one SPEC per feature.
    contract defaults. Other defaults must be sourced, reversible, and
    explicitly visible at the approval gate.
 7. Ceremony scales with the mode; the approval gate never does.
+8. Chat is the decision medium; files are the record. Every message that
+   asks the user to decide defines each open option in that same message
+   with enough substance to choose — never a bare label whose meaning
+   lives only in a file or an earlier message. A one-line recap is enough
+   only for what the user already decided or the immediately preceding
+   messages already defined in full. The user must be able to decide from
+   the message alone.
 
 ## Phases
 
@@ -49,8 +68,9 @@ features in one ask → decompose first; one SPEC per feature.
 Capture the ask verbatim, goal, constraints, artifact destination, and write
 authority. Pick the mode and allocate a collision-free `NNN`. Copy
 `assets/spec.template.md` immediately to
-`docs/features/<NNN>-<slug>/SPEC.md`; fill identity, `Status: Draft`, mode,
-date, base revision, and raw ask. All later write-back targets this file.
+`docs/features/<NNN>-<slug>/SPEC.md`; fill identity, `Status: Draft`,
+`Assurance:` (the chosen mode), date, base revision, and raw ask. All later
+write-back targets this file.
 Exit: the draft exists and can be re-read. Stop: no articulable goal.
 
 ### Phase 1 — Ground the current state
@@ -74,7 +94,8 @@ SPEC and append a dated decision-log entry immediately.
 Exit: the decision frontier is empty or unexplored branches are owned
 deferrals. Stop: user chooses don't-build → set `Status: Declined`, record
 the revisit trigger, replace unneeded template placeholders with
-`N/A — declined before design`, run deterministic lint, and stop successfully.
+`N/A — declined before design`, run deterministic lint
+(`python3 <skill-dir>/scripts/validate_spec.py <SPEC>`), and stop successfully.
 
 ### Phase 3 — Targeted research (conditional)
 
@@ -92,8 +113,16 @@ Produce 2–3 approaches with genuinely different value systems (minimal /
 clean / pragmatic), each with trade-offs, effort, risk, rollout impact, and
 falsifying evidence. Lead with one recommendation. Sketch test seams first:
 existing seams preferred, highest seam possible. For material visual/state
-uncertainty, offer an isolated prototype before choosing. Cover data model,
+uncertainty, offer an isolated prototype before choosing — it carries what
+must be experienced; the message still defines each option. Cover data model,
 public contracts, compatibility, and rollout at decision level.
+Present the options in the chat message itself (iron law 8): per approach a
+name, a 2–4 sentence mechanism, its main trade-off/effort/risk, and when it
+wins; define every label before referencing it, then give the recommendation
+with one reason, then ask. Never ask a bare "choose 1/2/3" where the
+substance lives only in a file. While this gate is open, record options and
+recommendation in the decision log only — do not pre-fill normative
+sections with the recommended approach.
 STOP for the user's choice unless continuation was pre-authorized.
 Exit: one approach and its test seams are approved.
 
@@ -116,12 +145,18 @@ Exit: no placeholder or open decision remains.
 Self-review per `references/spec-writing.md`. Standard/Deep review ladder:
 fresh-context reviewer → independent user-started review → explicitly
 labeled non-independent self-review. A missing independent path requires a
-user waiver and remains in SPEC limitations. Fix Blocking/Important
-findings, updating normative sections and decision log together. Present:
+user waiver and remains in SPEC limitations. Fix Critical/Important
+findings, updating normative sections and decision log together. Present an
+inline approval digest in the chat message — goal, chosen approach, every
+active AC/RC/NFR at one line each (group when the list would drown the
+message; IDs stay visible), key risks and rollout, assumptions and
+deferrals — then ask:
 
-> "SPEC ready at `<path>`. Review Goals, Constraints, AC/RC/NFR, and
-> rollout. Approve version `<n>` for implementation?"
+> "SPEC `<path>` version `<n>` — digest above. Approve for implementation?"
 
+The path is for deeper reading, not a required detour: the user can approve
+or reject from the message alone — unless the digest names a section that
+must be read in full before approving, and says why.
 On approval set `Status: Approved`, record approver/date, and hand off:
 bind the approval entry to the current version + validator-produced normative
 digest, rerun validation, then hand off `/feature-implement` (it discovers
@@ -150,6 +185,9 @@ Never load all references up front.
 
 ## Never
 
+- Run this workflow for any ask — bug fix, debug, refactor, direct
+  change — that never requested design
+- Ask the user to choose among options whose substance lives only in a file
 - Implement production code or let a prototype leak into the target branch
 - Ask the user for a fact a lookup can answer
 - Default a safety/privacy/compliance/retention/external-contract decision
