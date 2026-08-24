@@ -31,20 +31,25 @@ AGENTS=(
 	"$HOME/.grok/skills"
 	"$HOME/.zcode/skills"
 	"$HOME/.kimi-code/skills"
+	"$HOME/.kimi/agent/skills"
 	"$HOME/.pi/agent/skills"
 	"$HOME/.reasonix/skills"
 	"$HOME/.gemini/skills"
 	"$HOME/.gemini/antigravity-cli/skills"
 	"$HOME/.gemini/antigravity-ide/skills"
 	"$HOME/.dsh/skills"
+	"$HOME/.cursor/skills"
+	"$HOME/.agy/skills"
+	"$HOME/.openclaw/skills"
+	"$HOME/.iflow/skills"
+	"$HOME/.qwen/skills"
+	"$HOME/.trae/skills"
+	"$HOME/.continue/skills"
 )
 
 # Per-source install-name overrides: "upstream:install-as"
 PERSONAL_ALIASES="
 code-review:code-review-pro
-"
-PERSONAL_EXTRA_ALIASES="
-feature-design:new-feature
 "
 MATT_ALIASES="
 code-review:matt-code-review
@@ -55,6 +60,7 @@ RETIRED="
 writing-great-skills:writing-for-agents
 code-review:code-review-pro
 feature-spec:feature-design
+new-feature:feature-design
 "
 
 # ---------------------------------------------------------------------------
@@ -76,18 +82,6 @@ lookup_alias() {
 		fi
 	done <<< "$table"
 	printf '%s\n' "$upstream"
-}
-
-install_extra_aliases() {
-	local source_path="$1" upstream="$2" source_root="$3"
-	local line key install_as
-	while IFS= read -r line; do
-		[[ -z "${line// /}" ]] && continue
-		key="${line%%:*}"
-		install_as="${line#*:}"
-		[[ "$key" == "$upstream" ]] || continue
-		install_skill "$source_path" "$install_as" "$source_root" || true
-	done <<< "$PERSONAL_EXTRA_ALIASES"
 }
 
 realpath_of() {
@@ -354,7 +348,6 @@ full_sync() {
 		[[ -z "$src" ]] && continue
 		install_as="$(lookup_alias "$PERSONAL_ALIASES" "$(basename "$src")")"
 		install_skill "$src" "$install_as" "$REPO_DIR" || true
-		install_extra_aliases "$src" "$(basename "$src")" "$REPO_DIR"
 		n=$((n + 1))
 	done < <(find_personal_skills)
 	echo "  ($n considered)"
@@ -437,7 +430,4 @@ if [[ -z "$INSTALL_AS" ]]; then
 fi
 
 install_skill "$SOURCE_PATH" "$INSTALL_AS" "$SOURCE_ROOT"
-if [[ -z "$REQUESTED_INSTALL_AS" && "$SOURCE_ROOT" == "$REPO_DIR" ]]; then
-	install_extra_aliases "$SOURCE_PATH" "$(basename "$SOURCE_PATH")" "$SOURCE_ROOT"
-fi
 echo "Done."

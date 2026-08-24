@@ -11,7 +11,7 @@ want to keep across local agents, experiments, and future projects.
 | Skill | Eval | Purpose |
 | --- | --- | --- |
 | [`code-review`](./skills/code-review/SKILL.md) | [`evals/code-review`](./evals/code-review) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
-| [`feature-design`](./skills/feature-design/SKILL.md) | [`evals/feature-dev`](./evals/feature-dev) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design` or `/new-feature`. |
+| [`feature-design`](./skills/feature-design/SKILL.md) | [`evals/feature-dev`](./evals/feature-dev) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design`. |
 | [`feature-implement`](./skills/feature-implement/SKILL.md) | [`evals/feature-dev`](./evals/feature-dev) | Implement an approved SPEC in tracer-bullet TDD slices; freeze the exact candidate, verify bounded regressions, independently review it, explore applicable surfaces, and report only evidence-supported readiness state. |
 | [`git-commit`](./skills/git-commit/SKILL.md) | — | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
 | [`handoff`](./skills/handoff/SKILL.md) | — | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
@@ -100,12 +100,14 @@ One script. No args = full smart sync:
 
 It will:
 
-1. Link every personal skill in `skills/` (including one-to-many aliases:
-   `code-review` → `code-review-pro`; `feature-design` → `new-feature`)
+1. Link every personal skill in `skills/` (`code-review` publishes as
+   `code-review-pro`)
 2. Auto-detect a Matt Pocock clone and link those too (`code-review` → `matt-code-review`)
 3. Keep personal names when they already own a hub entry (e.g. `handoff`)
 4. Retire known renames and sweep broken hub symlinks
-5. Fan out hub entries to Claude / Codex / Grok / zcode / kimi-code / pi / reasonix / Gemini / Antigravity (CLI + IDE) / dsh
+5. Fan out hub entries to Claude / Codex / Grok / zcode / kimi / pi /
+   reasonix / Gemini / Antigravity (CLI + IDE) / dsh / Cursor / agy /
+   openclaw / iflow / qwen / trae / continue
 
 Optional one-offs:
 

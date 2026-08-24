@@ -157,11 +157,12 @@ class FeatureSkillContracts(unittest.TestCase):
 
     def test_requested_aliases_are_configured(self) -> None:
         linker = (ROOT / "scripts" / "link-skills.sh").read_text()
-        self.assertIn("feature-design:new-feature", linker)
+        self.assertNotIn("feature-design:new-feature", linker)
+        self.assertIn("new-feature:feature-design", linker)
         self.assertNotIn("feature-design:feature-spec", linker)
         self.assertIn("feature-spec:feature-design", linker)
 
-    def test_isolated_sync_installs_design_alias_and_implement(self) -> None:
+    def test_isolated_sync_installs_design_and_implement(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             home = Path(directory)
             env = os.environ | {
@@ -179,7 +180,6 @@ class FeatureSkillContracts(unittest.TestCase):
             )
             for name in (
                 "feature-design",
-                "new-feature",
                 "feature-implement",
             ):
                 skill = home / "hub" / name / "SKILL.md"
@@ -187,6 +187,10 @@ class FeatureSkillContracts(unittest.TestCase):
                 text = skill.read_text()
                 self.assertIn(f"name: {name}\n", text)
                 self.assertIn("disable-model-invocation: true", text)
+            self.assertFalse(
+                (home / "hub" / "new-feature").exists(),
+                "new-feature must not install",
+            )
             self.assertFalse(
                 (home / "hub" / "feature-spec").exists(),
                 "feature-spec must not install",

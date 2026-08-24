@@ -57,9 +57,9 @@ saturation to paper over. Do not retune the skill to fixture names.
 
 ## P0 acceptance matrix
 
-- Three slash names install and resolve: `feature-design`, `new-feature`,
-  `feature-implement`. `feature-implement` discovers the active SPEC when
-  no path is given, and stops when several actives exist.
+- Two slash names install and resolve: `feature-design`, `feature-implement`.
+  `feature-implement` discovers the active SPEC when no path is given, and
+  stops when several actives exist.
 - SPEC/PLAN validators reject placeholders, missing Verify mappings, missing
   requirements, constraint drift, and nonstandard slice state.
 - Candidate review covers committed, staged, unstaged, and untracked content.
