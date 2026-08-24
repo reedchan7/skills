@@ -93,6 +93,7 @@
   // Invariant 1 — peer-row datum raggedness (grid/flex rows of 3–6 peers)
   const ragged = [];
   for (const c of document.querySelectorAll('*')) {
+    if (c.closest('footer,nav')) continue; // link columns are not peer cards
     const d = cs(c).display;
     if (d !== 'grid' && d !== 'flex') continue;
     const kids = [...c.children].filter(k => R(k).width > 60 && R(k).height > 60);
