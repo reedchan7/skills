@@ -1,6 +1,6 @@
 ---
 name: feature-design
-description: Design or specify a feature before implementation, from a small existing-flow change through a 0→1 product. Use only when explicitly invoked, or when the user asks for design or spec work before building — the test is that ask, not the change type. Not for changes the user simply wants made (bug fix, debug, refactor, direct edit) with no design ask.
+description: Spec-first design workflow that ends in an approved SPEC under docs/features/. Run only when the user names feature-design, or explicitly asks to design or spec a change before building it. NEVER self-select for feature requests, bug fixes, refactors, or any change the user simply wants made.
 disable-model-invocation: true
 ---
 

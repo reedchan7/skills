@@ -1,0 +1,5 @@
+interface:
+  display_name: "Feature Implement"
+  short_description: "Implement an approved SPEC in verified slices"
+policy:
+  allow_implicit_invocation: false

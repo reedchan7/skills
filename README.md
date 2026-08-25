@@ -71,8 +71,11 @@ Optional resources can be added only when they are actually useful:
 - `scripts/` for repeatable commands or deterministic helpers
 
 Runtime-specific metadata files (for example Codex's `agents/openai.yaml`) stay
-out of this repository: these skills are linked into several agent CLIs, and only
-one of them reads that file.
+out of this repository, with one exception: user-invoked workflow skills (such as
+`feature-design` and `feature-implement`) carry an `agents/openai.yaml` with
+`policy.allow_implicit_invocation: false`, because Codex ignores
+`disable-model-invocation` and this file is its only switch against
+auto-activation. Model-invoked skills still must not carry it.
 
 ## Benchmarks
 

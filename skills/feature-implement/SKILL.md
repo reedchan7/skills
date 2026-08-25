@@ -1,6 +1,6 @@
 ---
 name: feature-implement
-description: Implement and verify an approved feature SPEC, or resume its existing PLAN. Use only when explicitly invoked, or when an approved docs/features SPEC covers this ask. Without such a SPEC, not for ordinary implementation requests, bug fixes, or refactors.
+description: Implement an approved docs/features SPEC, or resume its PLAN, in verified slices. Run only when the user names feature-implement, or an approved SPEC covers the ask. NEVER self-select for implementation requests, bug fixes, or refactors that have no approved SPEC.
 disable-model-invocation: true
 ---
 

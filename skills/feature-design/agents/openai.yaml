@@ -1,0 +1,5 @@
+interface:
+  display_name: "Feature Design"
+  short_description: "Spec-first design workflow ending in an approved SPEC"
+policy:
+  allow_implicit_invocation: false
