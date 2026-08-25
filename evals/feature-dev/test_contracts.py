@@ -161,6 +161,10 @@ class FeatureSkillContracts(unittest.TestCase):
         self.assertIn("new-feature:feature-design", linker)
         self.assertNotIn("feature-design:feature-spec", linker)
         self.assertIn("feature-spec:feature-design", linker)
+        self.assertIn('"$HOME/.gemini/config/skills"', linker)
+        self.assertIn('"$HOME/.gemini/antigravity/skills"', linker)
+        self.assertIn('"$HOME/.gemini/antigravity-cli/skills"', linker)
+        self.assertIn('"$HOME/.gemini/antigravity-ide/skills"', linker)
 
     def test_isolated_sync_installs_design_and_implement(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -198,6 +202,101 @@ class FeatureSkillContracts(unittest.TestCase):
             implement = (SKILLS / "feature-implement" / "SKILL.md").read_text()
             self.assertIn("A SPEC path is optional", implement)
             self.assertIn("Discover below", implement)
+
+            config_skills = home / ".gemini" / "config" / "skills"
+            ide_alias = home / ".gemini" / "antigravity" / "skills"
+            self.assertTrue(ide_alias.is_symlink(), str(ide_alias))
+            self.assertEqual(ide_alias.resolve(), config_skills.resolve())
+            for name in ("feature-design", "feature-implement", "tasteful-frontend"):
+                for root in (
+                    config_skills,
+                    home / ".gemini" / "antigravity-cli" / "skills",
+                    home / ".gemini" / "antigravity-ide" / "skills",
+                ):
+                    folder = root / name
+                    self.assertTrue(folder.is_dir(), str(folder))
+                    self.assertFalse(folder.is_symlink(), str(folder))
+                    skill = folder / "SKILL.md"
+                    self.assertTrue(skill.is_file(), str(skill))
+                    self.assertIn(f"name: {name}\n", skill.read_text())
+
+    def test_antigravity_views_replace_folder_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            env = os.environ | {
+                "HOME": str(home),
+                "SKILLS_HUB_DIR": str(home / "hub"),
+                "MATT_SKILLS_REPO": str(home / "no-matt"),
+            }
+            script = str(ROOT / "scripts" / "link-skills.sh")
+            subprocess.run(
+                [script, "tasteful-frontend"],
+                cwd=ROOT,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            dest = home / ".gemini" / "config" / "skills" / "tasteful-frontend"
+            self.assertTrue(dest.is_dir())
+            self.assertFalse(dest.is_symlink())
+            shutil.rmtree(dest)
+            dest.symlink_to(home / "hub" / "tasteful-frontend")
+            self.assertTrue(dest.is_symlink())
+            subprocess.run(
+                [script, "tasteful-frontend"],
+                cwd=ROOT,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertTrue(dest.is_dir(), str(dest))
+            self.assertFalse(dest.is_symlink(), str(dest))
+            self.assertTrue((dest / "SKILL.md").is_file())
+            self.assertIn("name: tasteful-frontend\n", (dest / "SKILL.md").read_text())
+
+    def test_antigravity_cli_expands_hub_wholesale_symlink(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory)
+            hub = home / "hub"
+            env = os.environ | {
+                "HOME": str(home),
+                "SKILLS_HUB_DIR": str(hub),
+                "MATT_SKILLS_REPO": str(home / "no-matt"),
+            }
+            script = str(ROOT / "scripts" / "link-skills.sh")
+            subprocess.run(
+                [script, "git-commit"],
+                cwd=ROOT,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            cli = home / ".gemini" / "antigravity-cli" / "skills"
+            shutil.rmtree(cli)
+            cli.symlink_to(hub)
+            extra = hub / "foreign-skill"
+            extra.mkdir()
+            (extra / "SKILL.md").write_text(
+                "---\nname: foreign-skill\ndescription: x\n---\n"
+            )
+            subprocess.run(
+                [script, "tasteful-frontend"],
+                cwd=ROOT,
+                env=env,
+                check=True,
+                capture_output=True,
+                text=True,
+            )
+            self.assertTrue(cli.is_dir(), str(cli))
+            self.assertFalse(cli.is_symlink(), str(cli))
+            for name in ("git-commit", "tasteful-frontend", "foreign-skill"):
+                folder = cli / name
+                self.assertTrue(folder.is_dir(), str(folder))
+                self.assertFalse(folder.is_symlink(), str(folder))
+                self.assertTrue((folder / "SKILL.md").is_file(), str(folder))
 
     def test_every_fixture_spec_is_valid(self) -> None:
         for path in (EVAL_ROOT / "cases").glob("*/repo/docs/features/*/SPEC.md"):

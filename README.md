@@ -109,8 +109,14 @@ It will:
 3. Keep personal names when they already own a hub entry (e.g. `handoff`)
 4. Retire known renames and sweep broken hub symlinks
 5. Fan out hub entries to Claude / Codex / Grok / zcode / kimi / pi /
-   reasonix / Gemini / Antigravity (CLI + IDE) / dsh / Cursor / agy /
+   reasonix / Gemini / Antigravity (Agent + IDE + CLI) / dsh / Cursor / agy /
    openclaw / iflow / qwen / trae / continue
+
+Antigravity Agent reads `~/.gemini/config/skills` (official global path;
+`~/.gemini/antigravity/skills` is kept pointing at the same tree). IDE does
+not discover a skill folder that is itself a symlink, so those destinations
+get a real folder whose inner files stay linked to the hub. Restart the
+Antigravity session after a sync.
 
 Optional one-offs:
 

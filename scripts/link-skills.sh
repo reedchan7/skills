@@ -14,6 +14,7 @@
 #   3. Retires known renames
 #   4. Never overwrites a hub name owned by another source
 #   5. Sweeps broken hub symlinks
+#   6. Materializes Antigravity Agent/IDE/CLI views as real skill folders
 #
 # Env: SKILLS_HUB_DIR, MATT_SKILLS_REPO
 # macOS /bin/bash 3.2 compatible.
@@ -35,6 +36,8 @@ AGENTS=(
 	"$HOME/.pi/agent/skills"
 	"$HOME/.reasonix/skills"
 	"$HOME/.gemini/skills"
+	"$HOME/.gemini/config/skills"
+	"$HOME/.gemini/antigravity/skills"
 	"$HOME/.gemini/antigravity-cli/skills"
 	"$HOME/.gemini/antigravity-ide/skills"
 	"$HOME/.dsh/skills"
@@ -157,15 +160,107 @@ link_or_rewrite_agents() {
 	shopt -u nullglob
 }
 
+# Antigravity Agent reads ~/.gemini/config/skills (official) and
+# ~/.gemini/antigravity/skills (same tree on this machine, or a sibling).
+# Antigravity IDE does not treat a skill-*folder* symlink as a directory, so
+# those destinations get a real folder whose inner files point at the hub.
+is_antigravity_skills_dir() {
+	case "$1" in
+		*/.gemini/config/skills|*/.gemini/antigravity/skills|*/.gemini/antigravity-cli/skills|*/.gemini/antigravity-ide/skills)
+			return 0
+			;;
+		*)
+			return 1
+			;;
+	esac
+}
+
+ensure_antigravity_layout() {
+	local canonical="$HOME/.gemini/config/skills"
+	local ide="$HOME/.gemini/antigravity/skills"
+	mkdir -p "$canonical"
+	if [[ ! -e "$ide" && ! -L "$ide" ]]; then
+		mkdir -p "$(dirname "$ide")"
+		ln -s "$canonical" "$ide"
+	fi
+}
+
+skill_view_replaceable() {
+	local dest="$1" name="$2"
+	[[ -f "$dest/SKILL.md" ]] && grep -q "^name:[[:space:]]*${name}[[:space:]]*$" "$dest/SKILL.md"
+}
+
+materialize_skill_view() {
+	local src="$1" dest="$2"
+	local src_real dest_real hub_real item base name
+
+	[[ -e "$src" || -L "$src" ]] || return 1
+	src_real="$(realpath_of "$src")"
+	hub_real="$(realpath_of "$HUB_DIR")"
+	name="$(basename "$dest")"
+
+	if [[ -L "$dest" ]]; then
+		rm "$dest"
+	elif [[ -d "$dest" ]]; then
+		dest_real="$(realpath_of "$dest")"
+		if [[ "$dest_real" == "$src_real" || "$dest_real" == "$hub_real" ]]; then
+			return 0
+		fi
+		if ! skill_view_replaceable "$dest" "$name"; then
+			echo "  · skip agent view $(basename "$(dirname "$dest")")/$name (not a symlink)"
+			return 0
+		fi
+	elif [[ -e "$dest" ]]; then
+		echo "  · skip agent view $(basename "$(dirname "$dest")")/$name (not a dir)"
+		return 0
+	fi
+
+	mkdir -p "$dest"
+	shopt -s nullglob
+	for item in "$src"/*; do
+		base="$(basename "$item")"
+		ln -sfn "$item" "$dest/$base"
+	done
+	shopt -u nullglob
+}
+
+expand_hub_wholesale() {
+	local agent="$1" hub_real entry
+	hub_real="$(realpath_of "$HUB_DIR")"
+	[[ -L "$agent" && "$(realpath_of "$agent")" == "$hub_real" ]] || return 0
+	rm "$agent"
+	mkdir -p "$agent"
+	shopt -s nullglob
+	for entry in "$HUB_DIR"/*; do
+		[[ -e "$entry/SKILL.md" || -L "$entry/SKILL.md" ]] || continue
+		materialize_skill_view "$entry" "$agent/$(basename "$entry")"
+	done
+	shopt -u nullglob
+}
+
 link_agent_views() {
 	local install_name="$1" hub_entry="$HUB_DIR/$install_name" agent
-	local hub_real
+	local hub_real agent_real seen=""
+
+	ensure_antigravity_layout
 	hub_real="$(realpath_of "$HUB_DIR")"
 	for agent in "${AGENTS[@]}"; do
+		if is_antigravity_skills_dir "$agent"; then
+			expand_hub_wholesale "$agent"
+		fi
 		mkdir -p "$agent"
+		agent_real="$(realpath_of "$agent")"
 		# An agent dir symlinked to the hub itself is already served by the
 		# hub entry; writing through it would turn hub/<name> into a self-loop.
-		if [[ -n "$hub_real" && "$(realpath_of "$agent")" == "$hub_real" ]]; then
+		if [[ -n "$hub_real" && "$agent_real" == "$hub_real" ]]; then
+			continue
+		fi
+		case "|$seen|" in
+			*"|$agent_real|"*) continue ;;
+		esac
+		seen="${seen}|$agent_real"
+		if is_antigravity_skills_dir "$agent"; then
+			materialize_skill_view "$hub_entry" "$agent/$install_name"
 			continue
 		fi
 		if [[ -L "$agent/$install_name" ]]; then
@@ -181,16 +276,27 @@ link_agent_views() {
 unlink_everywhere() {
 	local install_name="$1"
 	local hub_entry="$HUB_DIR/$install_name"
-	local agent
+	local agent dest hub_real dest_real
+	hub_real="$(realpath_of "$HUB_DIR")"
+	for agent in "${AGENTS[@]}"; do
+		dest="$agent/$install_name"
+		if [[ -L "$dest" ]]; then
+			rm "$dest"
+			continue
+		fi
+		[[ -d "$dest" ]] || continue
+		dest_real="$(realpath_of "$dest")"
+		if [[ "$dest_real" == "$hub_real" || "$dest_real" == "$(realpath_of "$hub_entry")" ]]; then
+			continue
+		fi
+		if is_antigravity_skills_dir "$agent" || skill_view_replaceable "$dest" "$install_name"; then
+			rm -rf "$dest"
+		fi
+	done
 	if [[ -L "$hub_entry" || -e "$hub_entry" ]]; then
 		rm -rf "$hub_entry"
 		echo "  ✓ removed hub/$install_name"
 	fi
-	for agent in "${AGENTS[@]}"; do
-		if [[ -L "$agent/$install_name" ]]; then
-			rm "$agent/$install_name"
-		fi
-	done
 }
 
 install_skill() {
