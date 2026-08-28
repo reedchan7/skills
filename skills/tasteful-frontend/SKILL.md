@@ -106,6 +106,12 @@ order; each step ends with its own check.
    `transition: all`, and honor reduced motion. An animation must state its
    purpose in one sentence or it does not exist. *Check: purpose per
    animation; nothing moves that the user triggers constantly.*
+
+   For tabs, segmented controls, hover-tracked peer navigation, shared
+   selection indicators, or morphing panels, read
+   [references/shared-state-motion.md](references/shared-state-motion.md).
+   Use shared material continuity only when motion clarifies the relationship
+   between adjacent states; isolated buttons and ordinary links do not need it.
 7. **Completeness.** Every interactive element has default / hover /
    focus-visible / active / disabled; every data view has loading (skeletons
    shaped like the layout) / empty (one clear action) / error. Floors:
@@ -181,6 +187,10 @@ Run after building, before delivering. Nothing ships unseen.
 2. **One pass per invariant**, in Layer 1 order: edges on the grid → squint
    → gaps and first-screen composition → hue count → depth quiet → motion
    purposes → states and strings.
+   When the design uses shared-state motion, also run the interaction sweep in
+   [references/shared-state-motion.md](references/shared-state-motion.md):
+   traverse distant items, leave the control, press and focus it, and verify
+   that decorative layers neither cover nor intercept neighboring content.
 3. Batch the findings, fix, and re-render, for at most two correction rounds
    after the initial pass. Stop when the pass is clean, or when every remaining
    item is explicitly unverified or out of scope; never turn an unverified
