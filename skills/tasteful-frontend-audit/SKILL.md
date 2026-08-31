@@ -15,7 +15,11 @@ This is the review counterpart of the `tasteful-frontend` skill: its seven
 structural invariants are the rubric here (kept in sync with that skill —
 it is canonical if the two ever drift). When it is installed alongside,
 consult its `references/anti-slop.md` to name known generated-look tells
-and `references/values.md` for target numbers to recommend.
+and `references/values.md` for target numbers to recommend. For tabs,
+segmented controls, hover-tracked peer navigation, shared selection
+indicators, or morphing panels, also read
+[shared-state motion](../tasteful-frontend/references/shared-state-motion.md)
+and apply its interaction sweep; skip it for isolated buttons and links.
 
 ## 1. Scope the audit
 
@@ -48,7 +52,10 @@ to what was actually examined.
    inventory.
 4. **Exercise states** where possible: hover, focus (Tab through it),
    open the overlay, trigger empty/loading/error. Unreachable states are
-   reported as "not verifiable", not assumed present.
+   reported as "not verifiable", not assumed present. For shared-state
+   controls, traverse adjacent and distant items, leave the control, press
+   and keyboard-activate it, enable reduced motion, and probe immediately
+   outside decorative wrappers for hit-test interception.
 5. Without a browser, do static analysis and say so: confidence is lower,
    and datum-level findings become "suspected" unless the code structure
    proves them (e.g. content-length-driven positioning with no shared grid
@@ -88,7 +95,10 @@ Check in order; every finding names its invariant.
    spatial exceptions (modal/drawer ≤400ms, deliberate page/route ≤500ms).
    Enter/exit uses ease-out; on-screen movement may use ease-in-out. Motion is
    limited to transform/opacity; no `transition: all`, unmotivated scroll
-   theatre, or missing `prefers-reduced-motion` handling.
+   theatre, or missing `prefers-reduced-motion` handling. In shared-state
+   controls, durable selection remains legible during preview, decorative
+   silhouettes never filter or intercept real content, optional trails vanish
+   at rest, and touch remains understandable without hover.
 7. **Completeness.** All interactive states (default/hover/focus-visible/
    active/disabled) and data states (loading/empty/error); contrast
    4.5:1 body, 3:1 large/UI; targets ≥24px (44 touch); `cursor-pointer`;
