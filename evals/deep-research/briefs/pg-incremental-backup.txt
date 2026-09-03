@@ -1,0 +1,1 @@
+Does PostgreSQL 17 support incremental backups natively? Explain exactly what shipped, its limits, and how it compares with pgBackRest's incremental backups for a team running a single 2 TB primary with streaming replicas. We need to decide whether to drop pgBackRest. Audience: two senior backend engineers. Format: a short report we can paste into an ADR.

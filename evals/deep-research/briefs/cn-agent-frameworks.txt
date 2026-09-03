@@ -1,0 +1,1 @@
+比较目前（以今天为准）中国团队主导的开源 Agent 框架：至少覆盖 DeerFlow、Qwen-Agent、AgentScope、MetaGPT、OpenManus，以及你在中文社区里发现的其他活跃项目。维度：许可证、最近一次发版日期、GitHub 与 Gitee 活跃度、多 Agent 编排能力、工具/MCP 支持、中文文档质量、主要维护方。输出对比矩阵 + 三条对选型最关键的差异。读者：国内一家 SaaS 公司的架构组。

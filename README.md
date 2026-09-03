@@ -11,6 +11,7 @@ want to keep across local agents, experiments, and future projects.
 | Skill | Eval | Purpose |
 | --- | --- | --- |
 | [`code-review`](./skills/code-review/SKILL.md) | [`evals/code-review`](./evals/code-review) | Run read-only, risk-ranked, evidence-backed code reviews with strict false-positive suppression. |
+| [`deep-research`](./skills/deep-research/SKILL.md) | [`evals/deep-research`](./evals/deep-research) | Evidence-graded research in any domain: triage into tiers, a written brief, a gather loop with SIFT and a disk ledger, claim-level verification with contradictions and ICD-203 confidence, shape-specific reports (explain / compare / decide / verify), domain lenses, and a zero-dependency mechanical gate. |
 | [`feature-design`](./skills/feature-design/SKILL.md) | [`evals/feature-dev`](./evals/feature-dev) | Produce one approved normative SPEC: repository/problem evidence, double-sided steelman, targeted external research, verifiable AC/RC/NFR, and rollout decisions. User-invoked as `/feature-design`. |
 | [`feature-implement`](./skills/feature-implement/SKILL.md) | [`evals/feature-dev`](./evals/feature-dev) | Implement an approved SPEC in tracer-bullet TDD slices; freeze the exact candidate, verify bounded regressions, independently review it, explore applicable surfaces, and report only evidence-supported readiness state. |
 | [`git-commit`](./skills/git-commit/SKILL.md) | — | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
@@ -28,6 +29,7 @@ paired workflow, not two independent products.
 .
 |-- skills/                      # linked into agent runtimes
 |   |-- code-review/
+|   |-- deep-research/
 |   |-- feature-design/
 |   |-- feature-implement/
 |   |-- git-commit/
@@ -37,6 +39,7 @@ paired workflow, not two independent products.
 |   `-- tasteful-frontend-audit/
 |-- evals/                       # not linked; paired with skills/ by name
 |   |-- code-review/
+|   |-- deep-research/
 |   |-- feature-dev/             # covers feature-design + feature-implement
 |   |-- tasteful-frontend/
 |   `-- tasteful-frontend-audit/
