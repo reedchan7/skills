@@ -1,0 +1,1 @@
+一个女士白黄色的托特包，附上三张产品图（assets/handbag-1.jpg 白底正面、assets/handbag-2.jpg 侧面带肩带细节、assets/handbag-3.jpg 模特上身通勤场景），照着这个包做视频

@@ -1,0 +1,4 @@
+{"ts":"2026-09-04T04:00:00Z","service":"tavily","op":"search","query":"navy lunch bag tiktok","result":"8 results","cost":"2 credits","saved":"tavily_1.json"}
+{"ts":"2026-09-04T04:02:00Z","service":"brave","op":"videos/search","query":"lunch bag pack with me","result":"6 results","saved":"brave_1.json"}
+{"ts":"2026-09-04T04:04:00Z","service":"apify","op":"GET /v2/users/me/usage/monthly","result":"used_usd=4.25","cost_usd":0}
+{"ts":"2026-09-04T04:05:00Z","service":"apify","op":"clockworks/tiktok-scraper","run_id":"9fqf1CtjiffwfrpTZ","input":{"resultsPerPage":10},"result":"10 items","cost_usd":0.038,"saved":"tiktok_1.json"}

@@ -1,0 +1,5 @@
+interface:
+  display_name: "Viral Video Prompt"
+  short_description: "Research-backed A/B prompt packs for short-video models"
+policy:
+  allow_implicit_invocation: false

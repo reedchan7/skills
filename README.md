@@ -19,6 +19,7 @@ want to keep across local agents, experiments, and future projects.
 | [`refactor`](./skills/refactor/SKILL.md) | — | Evidence-based, behavior-preserving refactor planning: diagnosis, owner-approved options, phased roadmap, and self-contained executor task files. Includes a lightweight Tidy mode for clean-code sweeps (hard-coded values, duplicated literals, dead code, naming). |
 | [`tasteful-frontend`](./skills/tasteful-frontend/SKILL.md) | [`evals/tasteful-frontend`](./evals/tasteful-frontend) | Build and restyle UI with modern, high-taste polish: direction-setting, typography, layout, color, depth, motion, states, copy, accessibility floors, and anti-AI-slop discipline with concrete values and a 10-item ship gate. |
 | [`tasteful-frontend-audit`](./skills/tasteful-frontend-audit/SKILL.md) | [`evals/tasteful-frontend-audit`](./evals/tasteful-frontend-audit) | Audit, score, and diagnose existing UI (product / page / component) against the tasteful-frontend invariants: measured evidence, a severity-weighted deduction ledger, and triage-ordered concrete fixes. |
+| [`viral-video-prompt`](./skills/viral-video-prompt/SKILL.md) | [`evals/viral-video-prompt`](./evals/viral-video-prompt) | Turn a product description (plus optional images and a reference video) into one timestamped pack: market and viral-reference research, two or more rival concepts each naming its target metric, audience segment and proof, dense change maps rather than shot lists, and paste-ready prompts compiled into each video model's own dialect. User-invoked as `/viral-video-prompt`. |
 
 `feature-design` and `feature-implement` share one eval because they are a
 paired workflow, not two independent products.
@@ -36,13 +37,15 @@ paired workflow, not two independent products.
 |   |-- handoff/
 |   |-- refactor/
 |   |-- tasteful-frontend/
-|   `-- tasteful-frontend-audit/
+|   |-- tasteful-frontend-audit/
+|   `-- viral-video-prompt/
 |-- evals/                       # not linked; paired with skills/ by name
 |   |-- code-review/
 |   |-- deep-research/
 |   |-- feature-dev/             # covers feature-design + feature-implement
 |   |-- tasteful-frontend/
-|   `-- tasteful-frontend-audit/
+|   |-- tasteful-frontend-audit/
+|   `-- viral-video-prompt/
 |-- docs/
 |   `-- research/
 |-- scripts/
@@ -75,8 +78,9 @@ Optional resources can be added only when they are actually useful:
 
 Runtime-specific metadata files (for example Codex's `agents/openai.yaml`) stay
 out of this repository, with one exception: user-invoked workflow skills (such as
-`feature-design` and `feature-implement`) carry an `agents/openai.yaml` with
-`policy.allow_implicit_invocation: false`, because Codex ignores
+`feature-design`, `feature-implement`, and `viral-video-prompt`) carry an
+`agents/openai.yaml` with `policy.allow_implicit_invocation: false`, because
+Codex ignores
 `disable-model-invocation` and this file is its only switch against
 auto-activation. Model-invoked skills still must not carry it.
 
@@ -94,6 +98,7 @@ python3 evals/code-review/private/build_cases.py
 python3 evals/code-review/private/self_check.py
 python3 -m unittest -v evals.feature-dev.test_contracts
 python3 evals/feature-dev/private/self_check.py
+python3 evals/viral-video-prompt/private/test_check_pack.py
 ```
 
 ## Using These Skills

@@ -1,0 +1,53 @@
+{
+  "hailuo": {
+    "aliases": [
+      "minimax",
+      "hailuo-03"
+    ],
+    "max_prompt_chars": 200,
+    "durations": [
+      6,
+      10
+    ],
+    "negative_prompt": false,
+    "forbidden_in_prompt": [
+      "@图片\\d"
+    ],
+    "resolutions": [
+      "480P",
+      "768P"
+    ],
+    "aspect_ratios": [
+      "adaptive",
+      "16:9",
+      "9:16"
+    ]
+  },
+  "universal": {
+    "aliases": [
+      "any 9:16 video model"
+    ],
+    "max_prompt_chars": 2000,
+    "durations": [
+      5,
+      6,
+      8,
+      10
+    ],
+    "negative_prompt": true,
+    "forbidden_in_prompt": [
+      "@图片\\d",
+      "@[Ii]mage\\d"
+    ],
+    "resolutions": [
+      "480p",
+      "720p",
+      "1080p"
+    ],
+    "aspect_ratios": [
+      "9:16",
+      "16:9",
+      "1:1"
+    ]
+  }
+}
