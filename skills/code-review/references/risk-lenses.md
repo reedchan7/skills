@@ -4,17 +4,20 @@ Each item is a triple: the **signal** worth chasing, the condition under which i
 is **not a finding**, and the **check** that settles which one it is. A signal
 whose suppressor you did not test is not a finding yet.
 
-Load only the sections for lenses opened in SKILL.md §4.
+Load only the sections relevant to the changed surfaces in SKILL.md §3.
+A suppressor must cover the actual trigger and failure window; its name or mere
+presence is insufficient. Read these triples as hypotheses to test, not automatic
+findings or automatic exemptions.
 
-| Lens (§4) | Section |
+| Surface | Section |
 |---|---|
-| 2 Correctness and state | State, concurrency, and distributed work |
-| 3 Security and privacy | Trust boundaries and security |
-| 4 Compatibility and integration | APIs, configuration, and integrations |
-| 5 Data and migrations | Data, schema, and migrations |
-| 6 Performance and capacity | Performance and capacity |
-| 7 Tests | Tests |
-| 8 Ownership and complexity | Ownership and complexity |
+| Correctness and state | State, concurrency, and distributed work |
+| Security and privacy | Trust boundaries and security |
+| Compatibility and integration | APIs, configuration, and integrations |
+| Data and migrations | Data, schema, and migrations |
+| Performance and capacity | Performance and capacity |
+| Tests | Tests |
+| Ownership and complexity | Ownership and complexity |
 | changed UI surface | User interfaces and client state |
 | removed guard, unclear invariant | History and prior guidance |
 | version-specific claim | Language and framework details |
@@ -23,23 +26,25 @@ Load only the sections for lenses opened in SKILL.md §4.
 
 - Side effect moved before the record that suppresses it, or an acknowledgement
   moved before the durable write. Not a finding if the effect is idempotent at the
-  receiver, or the mover added a compensating path. Check: follow the error and
-  crash edge out of the new order; ask what a retry sees.
+  receiver across retries and retention windows, or durable compensation covers
+  this exact failure window and restores the required state. Check: follow a crash
+  after success but before acknowledgement; ask what a retry and recovery see.
 - Read-modify-write on shared state without a lock, transaction, or atomic
   operation. Not a finding if the state is per-request, per-thread, or immutable,
-  or the store enforces the invariant with a constraint. Check: find a second
-  writer and name it; no second writer, no race.
+  or the store enforces the invariant with a constraint. Check: demonstrate two
+  overlapping accesses, including two invocations of the same function, and the
+  interleaving that violates the invariant. One writer can also race with readers.
 - Unlocked fast path added in front of a synchronized one. Not a finding if the
-  value is immutable after publication and the container is never mutated in
-  place. Check: find whether any writer mutates the same container rather than
-  replacing it.
+  pinned language/runtime guarantees safe publication and access, and the published
+  state remains immutable. Check: both publication ordering and later mutation;
+  replacing a reference alone does not establish synchronization.
 - Idempotency key derived per attempt rather than per request, or scoped without
   the tenant dimension. Not a finding if the receiver deduplicates on a different
   stable field. Check: read what the external call actually keys on.
 - Unit of atomicity spanning a database write, a queue publish, a cache update,
-  and an external call. Not a finding if a transactional outbox, or a documented
-  reconciliation path, covers the gap. Check: pick the worst interleaving and
-  state what is left inconsistent.
+  and an external call. Not a finding if recovery durably covers the particular
+  gap, including duplicate execution and failed recovery. Check: pick the worst
+  interleaving and prove how the outbox or reconciliation restores the contract.
 - Resource acquired without a deferred or scoped release, or released only on the
   success path. Not a finding if the framework owns the lifecycle or the scope
   exits immediately. Check: follow every early return and error branch out of the
@@ -74,9 +79,10 @@ Load only the sections for lenses opened in SKILL.md §4.
 ## APIs, configuration, and integrations
 
 - Removed, renamed, or retyped field, or stricter parsing, on a surface a consumer
-  reads. Not a finding if every consumer is in this repository and updated in the
-  same change. Check: search for consumers, and say which discovery methods could
-  not see one.
+  reads. Not a finding if all supported consumers and stored messages remain
+  compatible throughout the actual rollout. Check: include old deployed readers,
+  cached clients, queues, and persisted data; a shared repository is not an atomic
+  deployment. State which consumer classes could not be checked.
 - New optional parameter with no default on the read path, so existing callers get
   behavior they did not have. Not a finding if the absent value is handled
   explicitly. Check: trace the request that omits it.
@@ -84,26 +90,29 @@ Load only the sections for lenses opened in SKILL.md §4.
   a finding if the old value is preserved for existing deployments. Check: read
   what an unset key resolves to now versus before.
 - Behavior that differs between old and new code during a rolling deploy. Not a
-  finding if the change is deployed atomically or the format is versioned. Check:
-  evaluate old-reader/new-writer and new-reader/old-writer separately.
-- Dependency version moved. Not a finding if the changelog shows no behavioral
-  change on the paths used. Check: read the lockfile delta and the relevant
-  release notes; runtime behavior, not just compilation.
+  finding if atomic deployment or version negotiation demonstrably prevents
+  incompatible combinations, including retained data. Check: evaluate
+  old-reader/new-writer and new-reader/old-writer separately.
+- Dependency version moved. Check the lockfile delta, release notes, and the used
+  API's behavior in the pinned version. No documented breaking change is not proof
+  of compatibility; report only a concretely affected path.
 - Feature flag added or removed. Not a finding if both flag states are correct at
   every version present during rollout. Check: enumerate the state matrix.
 
 ## Data, schema, and migrations
 
 - Constraint, index, or type changed alongside application code. Not a finding if
-  expand, migrate, and contract are separate deployable steps. Check: ask what the
-  currently-deployed application does against the new schema, and vice versa.
+  the actual expand/migrate/contract order preserves reads and writes across every
+  coexisting version. Check: the deployed application against the new schema and
+  the new application against old data, including rollback and partial backfill.
 - Backfill that maps values without a total mapping — a `CASE` without `ELSE`, a
   lookup without a default. Not a finding if the source domain is closed and every
   member is mapped. Check: ask which writers can produce a value outside the
   mapping while the migration runs.
 - `NULL` compared with `=` or `!=`, or a partial index predicate using `= NULL`.
-  Not a finding when the column is non-nullable. Check: read the column
-  definition, not the surrounding intent.
+  Check SQL three-valued logic and the intended selected rows. A non-nullable
+  column does not make comparison with the NULL literal true; include NULLs
+  introduced by outer joins and expressions.
 - Destructive step — drop column, drop index, delete rows. Not a finding if every
   reader is provably gone and the spec authorizes it. Check: name the release that
   removed the last reader and confirm it is fully deployed.
@@ -113,8 +122,9 @@ Load only the sections for lenses opened in SKILL.md §4.
 - Partial backfill with no restart path, or failed rows swallowed. Not a finding if
   the operation is idempotent and re-runnable. Check: ask what happens when it dies
   at 50%.
-- Query-plan or cardinality claim. Not a finding without an execution plan or
-  stated data volume. Check: get the plan, or drop the claim.
+- Query-plan or cardinality claim. Ground it in a plan, documented volume, or a
+  code-proven bound. If production scale is unknown, state that limit; do not claim
+  measured latency from a query's appearance.
 
 ## Performance and capacity
 
@@ -126,16 +136,18 @@ Load only the sections for lenses opened in SKILL.md §4.
   listeners, file descriptors, response size. Not a finding if an upstream limit
   caps it. Check: find the cap and quote it.
 - Blocking or CPU-heavy work on an event loop, or a lock held across I/O. Not a
-  finding if the path is off the request path. Check: identify the caller and
-  whether it is latency-sensitive.
+  finding if isolation and capacity bound the effect within the required budget.
+  Check request latency, worker throughput, queue age, and shared resources;
+  background work can still exhaust capacity.
 - Any micro-optimization without a hot path. Not a finding, period. Check: if you
   cannot name the hot path and the scale, say nothing.
 
 ## Tests
 
-- Changed behavior with no assertion that would fail if it regressed. Not a
-  finding if an existing test already covers the decisive value. Check: mentally
-  revert the change and name the test that goes red.
+- Changed behavior with no assertion that would fail if it regressed. Check the
+  specific acceptance contract and existing coverage. A missing test alone is not
+  a product defect; identify the regression whose protection is required. Label
+  a proposed test as proposed, not executed.
 - Assertion weakened — an exact value replaced by a called-check, a decisive
   assertion deleted. Not a finding if the value is asserted elsewhere. Check: read
   the whole test file, not the diff hunk.
@@ -153,15 +165,13 @@ Load only the sections for lenses opened in SKILL.md §4.
   a canonical one. Not a finding unless it creates a concrete inconsistency or a
   second source of truth. Check: find the canonical owner and show the two now
   disagree.
-- Hand-rolled implementation of something the standard library, platform, or an
-  installed dependency already provides. Not a finding if the existing option
-  lacks a required property. Check: name the existing API and why it was rejected.
-- Speculative parameter, one-implementation abstraction, pass-through layer, or a
-  branch the task does not require. Not a finding if a caller in this change needs
-  it. Check: count the real call sites.
+- Hand-rolled implementation, speculative parameter, or pass-through layer.
+  Report only a concrete contract violation or behavioral divergence introduced
+  by it. Availability of a shorter library API or lack of callers alone is a design
+  preference, not a defect.
 - Removal that shortens code while dropping a boundary check, type safety, or
-  error isolation. Always a finding; brevity is not a justification. Check: the
-  behavior envelope, not the line count.
+  error isolation. Not a finding if equivalent guarantees cover every affected
+  entry point. Check the invariant and reachable inputs before and after removal.
 
 ## User interfaces and client state
 
@@ -169,13 +179,16 @@ Load only the sections for lenses opened in SKILL.md §4.
   permission-denied. Not a finding if the state cannot occur on this path. Check:
   find the code path that produces it.
 - Rapid repeated action, navigation during async work, or a stale response
-  applied. Not a finding if the request is keyed or cancelled. Check: read the
-  effect's cleanup and the response's identity check.
-- Client-side permission or validation with no server enforcement. Always a
-  finding. Check: read the server handler.
-- Keyboard access, focus, labels, semantic role, or contrast changed. Not a
-  finding if the control's semantics are unchanged. Check: read the rendered
-  element, not the styling.
+  applied. Not a finding if stale results cannot commit after invalidation.
+  Check cleanup, response identity, and late success; a cancellation request alone
+  may not prevent a callback or an already-completed external effect.
+- Client-side permission or validation with no server enforcement. Report when
+  bypassing the client violates a trust or data contract. Check the server handler
+  and downstream enforcement; purely local presentation constraints need not be
+  server-enforced.
+- Keyboard access, focus, labels, semantic role, or contrast changed. Check the
+  rendered element and the affected interaction or visual constraint. Unchanged
+  semantics do not rule out an invisible focus indicator or unreadable contrast.
 
 ## History and prior guidance
 
@@ -183,13 +196,14 @@ Load only the sections for lenses opened in SKILL.md §4.
   finding if the reason it existed is provably gone. Check:
   `git log -S '<removed token>'` and `git log -L` on the region; read the
   introducing commit message before accepting the removal.
-- The same defect appearing again after an earlier fix. Not a finding if the
-  earlier fix addressed a different path and this one is genuinely new. Check:
-  search closed issues, fix commits, and regression tests naming the changed
-  symbol, then compare the triggering path.
-- Change contradicting a comment, docstring, or accepted review note on a prior
-  PR touching these files. Not a finding if the guidance is stale — then the stale
-  guidance is the finding. Check: `gh pr list --state merged --search <path>`.
+- The same defect appearing again after an earlier fix. Check the old trigger
+  against the new path: recurrence or a newly exposed sibling path is reportable
+  when this diff introduces the failure. Similar vocabulary alone does not prove
+  the same root cause.
+- Change contradicting prior guidance. Check whether the contract still applies
+  using history and current consumers. Stale guidance alone is not a finding;
+  report documentation only when this change makes it materially misleading for
+  a supported operation.
 - "This was always broken" versus "this change broke it". Only the second is
   reportable. Check: run the trace against the base revision.
 

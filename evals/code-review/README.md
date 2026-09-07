@@ -53,9 +53,11 @@ PostgreSQL 15 migration whose ordering is safe, and a chunked batch query that
 reads like an N+1 but is bounded and still tenant-scoped. They measure whether a
 reviewer can decline to invent findings.
 
-Severity is adjudicated against the rubric in `skills/code-review/SKILL.md` §6:
-`critical` requires irreversible or systemic harm reachable in normal operation.
-Re-adjudicate the oracle when that rubric changes — never to move a score.
+This legacy oracle retains the severity labels used by its original rubric.
+Do not silently reinterpret them using a later skill revision or rewrite expected
+answers to improve a contender's score. The current skill separates impact,
+completion, and merge recommendation; assess those decisions with an explicitly
+versioned semantic rubric rather than treating the legacy aggregate as acceptance.
 
 ## Blind protocol
 
@@ -204,3 +206,26 @@ declarative `CASES` list. Adding a case requires: a multi-file change, unique
 needle strings, causal anchors in at least two files, and a first alternative in
 every concept group that survives `[a-z0-9_]+` tokenization — bare punctuation
 such as `..` can never match.
+
+
+## Scope collector regression tests
+
+`python3 evals/code-review/test_scope.py` (from the repository root) exercises the
+read-only scope collector in disposable Git repositories: exact endpoints versus
+merge base, staged/unstaged cancellation, untracked filenames, content/index/context
+drift, rename/delete/mode/symlink states, unborn and unmerged states, and submodule
+ignore configuration. These test the helper's behavior, not review quality.
+
+For review-quality comparisons, keep the skill and tasks frozen, use fresh
+conversations with the same model and tools, and judge the actual causal claims,
+merge decisions, coverage limits, and report clarity. A shorter response earns no
+credit if it omits a necessary trigger, consequence, or evidence. Keyword overlap
+or an `asserts_defect` judgement alone does not establish that a finding is true.
+
+
+[2026-09-07 frozen comparison and acceptance results](../../docs/research/code-review-pro-2026-09-07.md)
+include all nine runs, raw reports, independent grading, ambiguity sensitivity,
+and reproducible fixture/probe archives. The comparison found shorter reports
+without observed regressions on the effective cases; it did not demonstrate a
+recall improvement. Treat that disclosed dataset as regression evidence, not a
+future hidden benchmark.
