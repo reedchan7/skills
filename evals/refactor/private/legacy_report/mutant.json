@@ -1,0 +1,4 @@
+{
+  "old": "event['date'] >= end",
+  "new": "event['date'] > end"
+}

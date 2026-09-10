@@ -1,0 +1,15 @@
+{
+  "useful_opportunity": "Consolidate line billing policy while retaining distinct presentation concerns.",
+  "quality_evidence": [
+    "A future line-price policy change has one authoritative arithmetic location.",
+    "Format-specific CSV escaping and JSON shape remain understandable and local.",
+    "Intermediate data and helper APIs have cohesive roles; avoid a framework or general exporter registry for two fixed functions."
+  ],
+  "no_op_policy": "A justified no-op is incomplete because duplicated arithmetic is a concrete maintenance problem.",
+  "major_harms": [
+    "Money rounding or decimal precision changes",
+    "Changed serialization or public API",
+    "Input mutation",
+    "Suppressed invalid input errors"
+  ]
+}

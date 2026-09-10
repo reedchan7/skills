@@ -1,0 +1,4 @@
+{
+  "old": "rounding=ROUND_HALF_UP",
+  "new": "rounding='ROUND_DOWN'"
+}

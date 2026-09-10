@@ -1,0 +1,852 @@
+{
+  "audit_type": "independent_supplementary_structural_and_maintenance_crosscheck",
+  "author_reports_used": false,
+  "network_used": false,
+  "sources_modified": false,
+  "success_gate": null,
+  "scales": {
+    "cohesion_change_locality_proportionality_understandability_and_maintenance_locality": {
+      "0": "obstructs goal",
+      "1": "material unresolved friction",
+      "2": "useful with meaningful residual cost",
+      "3": "coherent and well suited"
+    },
+    "usefulness": {
+      "0": "no useful result",
+      "1": "small useful fragment; core goal largely unserved",
+      "2": "partly serves goal with substantial gaps",
+      "3": "largely serves goal with material residual gap",
+      "4": "goal fully served"
+    }
+  },
+  "summary": "No supported structural separation in this fixed sample. All twelve initial solutions are coherent for their public task and all twelve maintenance changes are local, with one independent policy changed and no collateral production edits.",
+  "records": [
+    {
+      "run_id": "q14-1",
+      "case": "ledger",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "One common billing calculation feeds two distinct serializers; no format-specific arithmetic remains.",
+        "change_locality": "A billing-rate change has one calculation site; output-only changes stay with the relevant serializer.",
+        "proportionality": "One private helper and the existing library/API are sufficient; no classes, plugins, configuration or dependencies are introduced.",
+        "understandability": "The linear calculation preserves conversion and rounding order; the rows/total result is straightforward for two callers.",
+        "usefulness": "The requested removal of duplicated billing policy is fully served within the documented small-library scope."
+      },
+      "initial_code_evidence": {
+        "path": "runs/q14-1/cases/ledger/repo/app.py",
+        "assessment": "app.py:7-26 _calculate_lines owns conversion, negative-quantity validation, tier arithmetic, per-line rounding and total accumulation; both exporters call it at 30 and 45. JSON serialization (31-38) and CSV layout (42-59) remain separate."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/q14-1/cases/ledger/repo/app.py",
+        "assessment": "app.py:17-18 adds wholesale and quantity >= 10 in the shared calculation before the unchanged quantize and total accumulation. Both exporters are byte-identical to the initial output."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_app.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "Member and fallback rates, conversion/validation order, ROUND_HALF_UP per line, sum of rounded lines, JSON/CSV shapes and nonmutation are retained in code. New tests exercise below/at/above 10, separate same-SKU lines, both exporters and rounding before total.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 8,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/q14-1/cases/ledger/repo/test_app.py",
+            "line": 52,
+            "name": "test_wholesale_threshold_applies_to_each_line"
+          },
+          {
+            "path": "maintenance/q14-1/cases/ledger/repo/test_app.py",
+            "line": 74,
+            "name": "test_wholesale_rounds_each_discounted_line_before_total"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "e0c6049c6fe6740cbffe5fba514a93d3b1b795fb98a4f9f88ac3ed7e7c2b1f16",
+        "maintenance": "81070e6f066b7c9c1b5152a0949a32a17ae91a6840403347b057bb1943f68e17"
+      }
+    },
+    {
+      "run_id": "q14-1",
+      "case": "dispatch",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "Eligibility and the two service-specific pricing policies are recognizable coherent blocks, whether local or extracted.",
+        "change_locality": "A rejection rule has an ordered insertion point; service price changes stay in the corresponding service block/helper.",
+        "proportionality": "Straight-line guards and small local helpers fit the offline module; no rule engine or dependencies.",
+        "understandability": "The visible guard sequence exposes precedence without tracing deeply nested else branches; pricing operations keep their documented order.",
+        "usefulness": "The requested branching-policy readability and maintainability goal is fully served for documented ordinary inputs."
+      },
+      "initial_code_evidence": {
+        "path": "runs/q14-1/cases/dispatch/repo/app.py",
+        "assessment": "app.py:5-27 gives the rejection order directly; app.py:28-46 keeps each service price block together. _rejected at 1-2 centralizes the rejection shape without a framework."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/q14-1/cases/dispatch/repo/app.py",
+        "assessment": "app.py:28-29 adds one final express guard; both existing pricing blocks are unchanged."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_app.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "New rejection is reached only for express after every old rejection, requires >10000 and any fragile item, and uses _rejected. Standard pricing, exactly-10000 express pricing and other express pricing remain unchanged in code. Added tests cover boundary weights, both countries, standard/nonfragile controls and precedence.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 9,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/q14-1/cases/dispatch/repo/test_app.py",
+            "line": 35,
+            "name": "test_express_fragile_weight_boundaries"
+          },
+          {
+            "path": "maintenance/q14-1/cases/dispatch/repo/test_app.py",
+            "line": 52,
+            "name": "test_heavy_express_without_fragile_items_is_unchanged"
+          },
+          {
+            "path": "maintenance/q14-1/cases/dispatch/repo/test_app.py",
+            "line": 60,
+            "name": "test_fragile_standard_shipping_is_unchanged"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "7b745e8938950c7d4d67739cd307a67e83f6f3f2b4e9c6d3b0db12580e16f1ea",
+        "maintenance": "e24c43e26a4c6e0b3beb7bd620d42e3de9f49da89ddca713d2c30a8e148bf4e8"
+      }
+    },
+    {
+      "run_id": "q14-2",
+      "case": "ledger",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "One common billing calculation feeds two distinct serializers; no format-specific arithmetic remains.",
+        "change_locality": "A billing-rate change has one calculation site; output-only changes stay with the relevant serializer.",
+        "proportionality": "One private helper and the existing library/API are sufficient; no classes, plugins, configuration or dependencies are introduced.",
+        "understandability": "The linear calculation preserves conversion and rounding order; the rows/total result is straightforward for two callers.",
+        "usefulness": "The requested removal of duplicated billing policy is fully served within the documented small-library scope."
+      },
+      "initial_code_evidence": {
+        "path": "runs/q14-2/cases/ledger/repo/app.py",
+        "assessment": "app.py:7-26 _calculate_invoice owns conversion, negative-quantity validation, tier arithmetic, per-line rounding and total accumulation; both exporters call it at 30 and 45. JSON serialization (31-38) and CSV layout (42-59) remain separate."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/q14-2/cases/ledger/repo/app.py",
+        "assessment": "app.py:17-18 adds wholesale and quantity >= 10 in the shared calculation before the unchanged quantize and total accumulation. Both exporters are byte-identical to the initial output."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_wholesale.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "Member and fallback rates, conversion/validation order, ROUND_HALF_UP per line, sum of rounded lines, JSON/CSV shapes and nonmutation are retained in code. New tests exercise below/at/above 10, separate same-SKU lines, both exporters and rounding before total.",
+      "tests": {
+        "initial_count": 7,
+        "initial_exit_code": 0,
+        "maintenance_count": 10,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/q14-2/cases/ledger/repo/test_wholesale.py",
+            "line": 22,
+            "name": "test_threshold_and_other_tiers"
+          },
+          {
+            "path": "maintenance/q14-2/cases/ledger/repo/test_wholesale.py",
+            "line": 33,
+            "name": "test_threshold_is_per_line_even_for_same_sku"
+          },
+          {
+            "path": "maintenance/q14-2/cases/ledger/repo/test_wholesale.py",
+            "line": 39,
+            "name": "test_wholesale_rounds_each_discounted_line_before_total"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "a77971f0c08754a8a880e2b3fb24ec886d2b668f15552182924181d61eba86ff",
+        "maintenance": "dd01fe04e01e027ddf52db98b39a4be0ccc148f28c05f219b602887581cde3df"
+      }
+    },
+    {
+      "run_id": "q14-2",
+      "case": "dispatch",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "Eligibility and the two service-specific pricing policies are recognizable coherent blocks, whether local or extracted.",
+        "change_locality": "A rejection rule has an ordered insertion point; service price changes stay in the corresponding service block/helper.",
+        "proportionality": "Straight-line guards and small local helpers fit the offline module; no rule engine or dependencies.",
+        "understandability": "The visible guard sequence exposes precedence without tracing deeply nested else branches; pricing operations keep their documented order.",
+        "usefulness": "The requested branching-policy readability and maintainability goal is fully served for documented ordinary inputs."
+      },
+      "initial_code_evidence": {
+        "path": "runs/q14-2/cases/dispatch/repo/app.py",
+        "assessment": "app.py:33-56 owns precedence while _quote_express (5-16) and _quote_standard (19-30) own service pricing. Each helper is meaningful and the extra two local calls are easy to follow."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/q14-2/cases/dispatch/repo/app.py",
+        "assessment": "app.py:42-47 collects fragile beside hazardous; app.py:58-59 rejects after express_hazmat. These are two edit regions for one policy in one function; pricing helpers remain byte-identical."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 2,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "Two nearby collection/use regions in one function; one policy and no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_fragile_shipping.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "New rejection is reached only for express after every old rejection, requires >10000 and any fragile item, and uses _rejected. Standard pricing, exactly-10000 express pricing and other express pricing remain unchanged in code. Added tests cover boundary weights, both countries, standard/nonfragile controls and precedence.",
+      "tests": {
+        "initial_count": 7,
+        "initial_exit_code": 0,
+        "maintenance_count": 11,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/q14-2/cases/dispatch/repo/test_fragile_shipping.py",
+            "line": 13,
+            "name": "test_express_fragile_weight_boundary"
+          },
+          {
+            "path": "maintenance/q14-2/cases/dispatch/repo/test_fragile_shipping.py",
+            "line": 30,
+            "name": "test_standard_fragile_orders_keep_pricing"
+          },
+          {
+            "path": "maintenance/q14-2/cases/dispatch/repo/test_fragile_shipping.py",
+            "line": 42,
+            "name": "test_express_without_fragile_items_remains_available"
+          },
+          {
+            "path": "maintenance/q14-2/cases/dispatch/repo/test_fragile_shipping.py",
+            "line": 50,
+            "name": "test_existing_rejections_take_priority"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "1cecd0758ce13509b7f47be3b20ab6a40ce6cc5f82efb46dee3fb5855e7a248b",
+        "maintenance": "f12af8110d93ef11c84e2396afd2378ecc1a089bad0aaae66da48fffbf65f0e5"
+      }
+    },
+    {
+      "run_id": "d62-1",
+      "case": "ledger",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "One common billing calculation feeds two distinct serializers; no format-specific arithmetic remains.",
+        "change_locality": "A billing-rate change has one calculation site; output-only changes stay with the relevant serializer.",
+        "proportionality": "One private helper and the existing library/API are sufficient; no classes, plugins, configuration or dependencies are introduced.",
+        "understandability": "The linear calculation preserves conversion and rounding order; the rows/total result is straightforward for two callers.",
+        "usefulness": "The requested removal of duplicated billing policy is fully served within the documented small-library scope."
+      },
+      "initial_code_evidence": {
+        "path": "runs/d62-1/cases/ledger/repo/app.py",
+        "assessment": "app.py:7-26 _calculate_lines owns conversion, negative-quantity validation, tier arithmetic, per-line rounding and total accumulation; both exporters call it at 30 and 45. JSON serialization (31-38) and CSV layout (42-59) remain separate."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/d62-1/cases/ledger/repo/app.py",
+        "assessment": "app.py:17-18 adds wholesale and quantity >= 10 in the shared calculation before the unchanged quantize and total accumulation. Both exporters are byte-identical to the initial output."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_app.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "Member and fallback rates, conversion/validation order, ROUND_HALF_UP per line, sum of rounded lines, JSON/CSV shapes and nonmutation are retained in code. New tests exercise below/at/above 10, separate same-SKU lines, both exporters and rounding before total.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 8,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/d62-1/cases/ledger/repo/test_app.py",
+            "line": 50,
+            "name": "test_wholesale_threshold_applies_to_each_line"
+          },
+          {
+            "path": "maintenance/d62-1/cases/ledger/repo/test_app.py",
+            "line": 72,
+            "name": "test_wholesale_rounds_discounted_lines_before_total"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "e0c6049c6fe6740cbffe5fba514a93d3b1b795fb98a4f9f88ac3ed7e7c2b1f16",
+        "maintenance": "81070e6f066b7c9c1b5152a0949a32a17ae91a6840403347b057bb1943f68e17"
+      }
+    },
+    {
+      "run_id": "d62-1",
+      "case": "dispatch",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "Eligibility and the two service-specific pricing policies are recognizable coherent blocks, whether local or extracted.",
+        "change_locality": "A rejection rule has an ordered insertion point; service price changes stay in the corresponding service block/helper.",
+        "proportionality": "Straight-line guards and small local helpers fit the offline module; no rule engine or dependencies.",
+        "understandability": "The visible guard sequence exposes precedence without tracing deeply nested else branches; pricing operations keep their documented order.",
+        "usefulness": "The requested branching-policy readability and maintainability goal is fully served for documented ordinary inputs."
+      },
+      "initial_code_evidence": {
+        "path": "runs/d62-1/cases/dispatch/repo/app.py",
+        "assessment": "app.py:5-24 presents ordered guards; app.py:25-35 keeps both pricing branches explicit and app.py:37 shares the success envelope. any at 13 expresses the documented existential hazmat test directly."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/d62-1/cases/dispatch/repo/app.py",
+        "assessment": "app.py:25-27 inserts the final express guard. Pricing and the shared success envelope are unchanged."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_app.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "New rejection is reached only for express after every old rejection, requires >10000 and any fragile item, and uses _rejected. Standard pricing, exactly-10000 express pricing and other express pricing remain unchanged in code. Added tests cover boundary weights, both countries, standard/nonfragile controls and precedence.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 8,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/d62-1/cases/dispatch/repo/test_app.py",
+            "line": 34,
+            "name": "test_fragile_express_weight_threshold"
+          },
+          {
+            "path": "maintenance/d62-1/cases/dispatch/repo/test_app.py",
+            "line": 50,
+            "name": "test_fragile_rule_leaves_other_orders_unchanged"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "8831df081ac9cae5a850e572768df9f15dc72817cc1c69d9b987b5fff115e159",
+        "maintenance": "b01950fc710055da0d1a3b0660d7603a85f172b466a398d1d6113f4db705fc22"
+      }
+    },
+    {
+      "run_id": "d62-2",
+      "case": "ledger",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "One common billing calculation feeds two distinct serializers; no format-specific arithmetic remains.",
+        "change_locality": "A billing-rate change has one calculation site; output-only changes stay with the relevant serializer.",
+        "proportionality": "One private helper and the existing library/API are sufficient; no classes, plugins, configuration or dependencies are introduced.",
+        "understandability": "The linear calculation preserves conversion and rounding order; the rows/total result is straightforward for two callers.",
+        "usefulness": "The requested removal of duplicated billing policy is fully served within the documented small-library scope."
+      },
+      "initial_code_evidence": {
+        "path": "runs/d62-2/cases/ledger/repo/app.py",
+        "assessment": "app.py:7-26 _calculate_lines owns conversion, negative-quantity validation, tier arithmetic, per-line rounding and total accumulation; both exporters call it at 30 and 45. JSON serialization (31-38) and CSV layout (42-59) remain separate."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/d62-2/cases/ledger/repo/app.py",
+        "assessment": "app.py:17-18 adds wholesale and quantity >= 10 in the shared calculation before the unchanged quantize and total accumulation. Both exporters are byte-identical to the initial output."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_app.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "Member and fallback rates, conversion/validation order, ROUND_HALF_UP per line, sum of rounded lines, JSON/CSV shapes and nonmutation are retained in code. New tests exercise below/at/above 10, separate same-SKU lines, both exporters and rounding before total.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 8,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/d62-2/cases/ledger/repo/test_app.py",
+            "line": 58,
+            "name": "test_wholesale_threshold_is_per_line_in_both_formats"
+          },
+          {
+            "path": "maintenance/d62-2/cases/ledger/repo/test_app.py",
+            "line": 81,
+            "name": "test_wholesale_rounds_each_discounted_line_before_total"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "e0c6049c6fe6740cbffe5fba514a93d3b1b795fb98a4f9f88ac3ed7e7c2b1f16",
+        "maintenance": "81070e6f066b7c9c1b5152a0949a32a17ae91a6840403347b057bb1943f68e17"
+      }
+    },
+    {
+      "run_id": "d62-2",
+      "case": "dispatch",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "Eligibility and the two service-specific pricing policies are recognizable coherent blocks, whether local or extracted.",
+        "change_locality": "A rejection rule has an ordered insertion point; service price changes stay in the corresponding service block/helper.",
+        "proportionality": "Straight-line guards and small local helpers fit the offline module; no rule engine or dependencies.",
+        "understandability": "The visible guard sequence exposes precedence without tracing deeply nested else branches; pricing operations keep their documented order.",
+        "usefulness": "The requested branching-policy readability and maintainability goal is fully served for documented ordinary inputs."
+      },
+      "initial_code_evidence": {
+        "path": "runs/d62-2/cases/dispatch/repo/app.py",
+        "assessment": "app.py:23-45 owns precedence; _standard_quote (5-11) and _express_quote (14-20) own independent price formulas. The public flow remains short enough to read together with these helpers."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/d62-2/cases/dispatch/repo/app.py",
+        "assessment": "app.py:44-47 inserts a guard after express_hazmat and before _express_quote. Both pricing helpers are unchanged."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_app.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "New rejection is reached only for express after every old rejection, requires >10000 and any fragile item, and uses _rejected. Standard pricing, exactly-10000 express pricing and other express pricing remain unchanged in code. Added tests cover boundary weights, both countries, standard/nonfragile controls and precedence.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 8,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/d62-2/cases/dispatch/repo/test_app.py",
+            "line": 38,
+            "name": "test_fragile_weight_boundary_and_standard_shipping"
+          },
+          {
+            "path": "maintenance/d62-2/cases/dispatch/repo/test_app.py",
+            "line": 62,
+            "name": "test_heavy_express_without_fragile_items_is_unchanged"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "79ec76e053ab17c69f140e360442e3e44306fd286f06f7e1f02e3d31e55835d2",
+        "maintenance": "630835545ac38bc5bfe6932c62001f8bf1d11bcac0294eec941c007148ef21e8"
+      }
+    },
+    {
+      "run_id": "s37-1",
+      "case": "ledger",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "One common billing calculation feeds two distinct serializers; no format-specific arithmetic remains.",
+        "change_locality": "A billing-rate change has one calculation site; output-only changes stay with the relevant serializer.",
+        "proportionality": "One private helper and the existing library/API are sufficient; no classes, plugins, configuration or dependencies are introduced.",
+        "understandability": "The linear calculation preserves conversion and rounding order; the rows/total result is straightforward for two callers.",
+        "usefulness": "The requested removal of duplicated billing policy is fully served within the documented small-library scope."
+      },
+      "initial_code_evidence": {
+        "path": "runs/s37-1/cases/ledger/repo/app.py",
+        "assessment": "app.py:7-26 _calculate_invoice owns conversion, negative-quantity validation, tier arithmetic, per-line rounding and total accumulation; both exporters call it at 30 and 45. JSON serialization (31-38) and CSV layout (42-59) remain separate."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/s37-1/cases/ledger/repo/app.py",
+        "assessment": "app.py:17-18 adds wholesale and quantity >= 10 in the shared calculation before the unchanged quantize and total accumulation. Both exporters are byte-identical to the initial output."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_wholesale.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "Member and fallback rates, conversion/validation order, ROUND_HALF_UP per line, sum of rounded lines, JSON/CSV shapes and nonmutation are retained in code. New tests exercise below/at/above 10, separate same-SKU lines, both exporters and rounding before total.",
+      "tests": {
+        "initial_count": 7,
+        "initial_exit_code": 0,
+        "maintenance_count": 11,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/s37-1/cases/ledger/repo/test_wholesale.py",
+            "line": 28,
+            "name": "test_quantity_threshold"
+          },
+          {
+            "path": "maintenance/s37-1/cases/ledger/repo/test_wholesale.py",
+            "line": 36,
+            "name": "test_threshold_is_per_line_even_for_same_sku"
+          },
+          {
+            "path": "maintenance/s37-1/cases/ledger/repo/test_wholesale.py",
+            "line": 43,
+            "name": "test_other_tiers_keep_their_rates"
+          },
+          {
+            "path": "maintenance/s37-1/cases/ledger/repo/test_wholesale.py",
+            "line": 52,
+            "name": "test_discount_precedes_line_rounding_and_total_sums_rounded_lines"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "1bcac5d664d18a79b41b3889a9628d390e2ead02afdebdc75e8e0d7adb5f4e8e",
+        "maintenance": "b556d4052623687ca0083d9118257361c04de52f4bed9c1638a37ee6d9ca76b5"
+      }
+    },
+    {
+      "run_id": "s37-1",
+      "case": "dispatch",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "Eligibility and the two service-specific pricing policies are recognizable coherent blocks, whether local or extracted.",
+        "change_locality": "A rejection rule has an ordered insertion point; service price changes stay in the corresponding service block/helper.",
+        "proportionality": "Straight-line guards and small local helpers fit the offline module; no rule engine or dependencies.",
+        "understandability": "The visible guard sequence exposes precedence without tracing deeply nested else branches; pricing operations keep their documented order.",
+        "usefulness": "The requested branching-policy readability and maintainability goal is fully served for documented ordinary inputs."
+      },
+      "initial_code_evidence": {
+        "path": "runs/s37-1/cases/dispatch/repo/app.py",
+        "assessment": "app.py:5-26 makes rejection priority linear; app.py:27-49 keeps the two simple pricing blocks readable in place. No additional dispatch layer is needed for this scope."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/s37-1/cases/dispatch/repo/app.py",
+        "assessment": "app.py:27-30 inserts one final express guard. Standard and express price calculations remain unchanged."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_fragile.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "New rejection is reached only for express after every old rejection, requires >10000 and any fragile item, and uses _rejected. Standard pricing, exactly-10000 express pricing and other express pricing remain unchanged in code. Added tests cover boundary weights, both countries, standard/nonfragile controls and precedence.",
+      "tests": {
+        "initial_count": 7,
+        "initial_exit_code": 0,
+        "maintenance_count": 11,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/s37-1/cases/dispatch/repo/test_fragile.py",
+            "line": 13,
+            "name": "test_fragile_express_weight_boundary"
+          },
+          {
+            "path": "maintenance/s37-1/cases/dispatch/repo/test_fragile.py",
+            "line": 26,
+            "name": "test_heavy_nonfragile_express_is_unchanged"
+          },
+          {
+            "path": "maintenance/s37-1/cases/dispatch/repo/test_fragile.py",
+            "line": 34,
+            "name": "test_heavy_fragile_standard_is_unchanged"
+          },
+          {
+            "path": "maintenance/s37-1/cases/dispatch/repo/test_fragile.py",
+            "line": 45,
+            "name": "test_all_existing_rejections_keep_precedence"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "22bb4ab34cbbc345e4c7ff4fe1711d41868d6ac0eff19b768acf48612f683b92",
+        "maintenance": "9d69eb48c59a9914039fa2174d7f252dd4bad6c5699f7bdf2c13f0bc28e7a652"
+      }
+    },
+    {
+      "run_id": "s37-2",
+      "case": "ledger",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "One common billing calculation feeds two distinct serializers; no format-specific arithmetic remains.",
+        "change_locality": "A billing-rate change has one calculation site; output-only changes stay with the relevant serializer.",
+        "proportionality": "One private helper and the existing library/API are sufficient; no classes, plugins, configuration or dependencies are introduced.",
+        "understandability": "The linear calculation preserves conversion and rounding order; the rows/total result is straightforward for two callers.",
+        "usefulness": "The requested removal of duplicated billing policy is fully served within the documented small-library scope."
+      },
+      "initial_code_evidence": {
+        "path": "runs/s37-2/cases/ledger/repo/app.py",
+        "assessment": "app.py:7-26 _calculate_lines owns conversion, negative-quantity validation, tier arithmetic, per-line rounding and total accumulation; both exporters call it at 30 and 45. JSON serialization (31-38) and CSV layout (42-59) remain separate."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/s37-2/cases/ledger/repo/app.py",
+        "assessment": "app.py:17-18 adds wholesale and quantity >= 10 in the shared calculation before the unchanged quantize and total accumulation. Both exporters are byte-identical to the initial output."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_wholesale.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "Member and fallback rates, conversion/validation order, ROUND_HALF_UP per line, sum of rounded lines, JSON/CSV shapes and nonmutation are retained in code. New tests exercise below/at/above 10, separate same-SKU lines, both exporters and rounding before total.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 8,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/s37-2/cases/ledger/repo/test_wholesale.py",
+            "line": 11,
+            "name": "test_threshold_is_per_line_and_preserves_other_tiers"
+          },
+          {
+            "path": "maintenance/s37-2/cases/ledger/repo/test_wholesale.py",
+            "line": 23,
+            "name": "test_wholesale_rounds_each_discounted_line_before_total"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "8ede0802fb53ca9f72738eb1b48eb3745ea8bed215c0a0cb02833e387447dc5e",
+        "maintenance": "d35a6825f01c03ab252d68ef8d8e64c1cda85ef6b3731166b26d5d5649cccfd2"
+      }
+    },
+    {
+      "run_id": "s37-2",
+      "case": "dispatch",
+      "initial_scores": {
+        "cohesion": 3,
+        "change_locality": 3,
+        "proportionality": 3,
+        "understandability": 3,
+        "usefulness": 4
+      },
+      "initial_score_rationale": {
+        "cohesion": "Eligibility and the two service-specific pricing policies are recognizable coherent blocks, whether local or extracted.",
+        "change_locality": "A rejection rule has an ordered insertion point; service price changes stay in the corresponding service block/helper.",
+        "proportionality": "Straight-line guards and small local helpers fit the offline module; no rule engine or dependencies.",
+        "understandability": "The visible guard sequence exposes precedence without tracing deeply nested else branches; pricing operations keep their documented order.",
+        "usefulness": "The requested branching-policy readability and maintainability goal is fully served for documented ordinary inputs."
+      },
+      "initial_code_evidence": {
+        "path": "runs/s37-2/cases/dispatch/repo/app.py",
+        "assessment": "app.py:5-26 makes priority linear; app.py:27-45 keeps rates, surcharge order and discounts visible in two local service blocks. _rejected (1-2) shares only a genuinely common response shape."
+      },
+      "maintenance_locality": 3,
+      "maintenance_code_evidence": {
+        "path": "maintenance/s37-2/cases/dispatch/repo/app.py",
+        "assessment": "app.py:27-29 inserts the final express guard. Both pricing blocks remain unchanged."
+      },
+      "maintenance_burden": {
+        "independent_business_policies_changed": 1,
+        "production_edit_regions": 1,
+        "production_functions_changed": 1,
+        "serializers_or_price_helpers_changed": 0,
+        "coordination": "One policy insertion, no signature/caller coordination.",
+        "collateral_production_changes": [],
+        "other_changed_files": [
+          "README.md",
+          "test_fragile.py"
+        ],
+        "other_changes_assessment": "Focused public contract documentation and tests; no unrelated production edits."
+      },
+      "contract_assessment": "New rejection is reached only for express after every old rejection, requires >10000 and any fragile item, and uses _rejected. Standard pricing, exactly-10000 express pricing and other express pricing remain unchanged in code. Added tests cover boundary weights, both countries, standard/nonfragile controls and precedence.",
+      "tests": {
+        "initial_count": 6,
+        "initial_exit_code": 0,
+        "maintenance_count": 9,
+        "maintenance_exit_code": 0,
+        "original_public_test_methods_unchanged": true,
+        "new_maintenance_test_locations": [
+          {
+            "path": "maintenance/s37-2/cases/dispatch/repo/test_fragile.py",
+            "line": 8,
+            "name": "test_express_fragile_weight_boundary"
+          },
+          {
+            "path": "maintenance/s37-2/cases/dispatch/repo/test_fragile.py",
+            "line": 21,
+            "name": "test_standard_fragile_and_express_nonfragile_are_unchanged"
+          },
+          {
+            "path": "maintenance/s37-2/cases/dispatch/repo/test_fragile.py",
+            "line": 37,
+            "name": "test_existing_rejections_have_priority"
+          }
+        ]
+      },
+      "source_sha256": {
+        "initial": "df4c063e5495c514947e0880f2749cd9b682d8d81cb4b2ed600431bc8cd13f2b",
+        "maintenance": "b9e39dee1b83e3cc55f9d109413343f75011f1f56061c3884807c8cd56e81282"
+      }
+    }
+  ],
+  "limitations": [
+    "This is a fixed two-case, six-run supplementary structural audit. It neither substitutes for the primary rubric nor defines a success gate; no arm identities were inferred.",
+    "Initial code and public contracts were read before initial scores were saved in crosscheck-work/initial-judgments.json. Maintenance code was first read only after MAINTENANCE_COMPLETE was observed. Author reports, private probes, primary grades, protocol, skill versions, baseline/candidate directories and other-agent sessions were not read.",
+    "An initial path inventory exposed filenames outside the fixed two-case sample; their contents were not opened or used. Subsequent reads were scoped to the authorized public originals and twelve frozen initial/maintenance pairs.",
+    "All tests were run only on disposable copies under crosscheck-work. Existing repository tests include author-added public tests; passing them is finite evidence, not an exhaustive independent behavioral proof. The original supplied test methods are AST-identical in every maintenance repository.",
+    "No new behavioral probes were invented. Numeric NaN/custom comparison objects, stateful item mappings or one-shot item iterators are not clearly specified by the public valid-input contract; guard inversion, any short-circuiting and repeated/eager item scanning could differ for such inputs. These are explicit scope ambiguities, not established contract failures and did not lower structural scores.",
+    "All ledger implementations now materialize calculated rows before CSV rendering. That is a real memory/traversal tradeoff versus emitting rows during the original calculation, but the public small-library goal specifies no streaming or scale requirement. No performance claim or penalty is made.",
+    "Only one maintenance change per case was observed. Results establish locality for these concrete changes, not arbitrary future changes. Identical scores reflect the coarse anchored rubric and coherent small solutions, not a preference for a particular helper count, pattern or file count."
+  ],
+  "test_totals": {
+    "initial": 76,
+    "maintenance": 109,
+    "failed_runs": 0
+  }
+}

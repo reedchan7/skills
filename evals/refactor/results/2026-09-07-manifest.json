@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "arm_mapping": {
+    "q14": "baseline",
+    "d62": "no-skill",
+    "s37": "candidate"
+  },
+  "quality_gate": {
+    "met": false,
+    "structural_gain_vs_baseline": 0,
+    "cases_with_gain": 0,
+    "maintenance_types_with_gain": 0
+  },
+  "skill_freeze": {
+    "baseline": {
+      "files": {
+        "SKILL.md": "74729ef2fc1ae63d530de4648359079fff2fc317c0e7be4d70a9fd402b887263",
+        "assets/assessment.template.md": "dfb6bf383eb9ad6ffeb48df618e811690de55a88748442ca468b3dccc4a7688d",
+        "assets/roadmap.template.md": "933cb3a391f4fe8ece3ff913b4e74f57570d117676dac4583bfeefb603374192",
+        "assets/rt-task.template.md": "4b9e691e83e968a320610e305425ee4cf2a87d44424715d7bdf946edcfa949bc",
+        "references/architecture.md": "79c652b416a54055fdb3c485e9acbf8eb4d0734db37ada21451c79a466bc9486",
+        "references/diagnose.md": "85d46b6c9091afce73772817d4b756f38513f70b1420189a11aeb80de08ee9d8",
+        "references/execution.md": "8d67411726bc07d863cb11a2dcdec9df9f3de6a74ca450910ae61ed127af46d6",
+        "references/safety.md": "b9f2a8a19af991ba0d31d0dfe1c1a108b5973ffe5851677a6ce3bca2bb1dfc7f",
+        "references/tidy.md": "c1111d9f89391995e514ad76525faa64ab3eab0c826e6ce0b8c6b0858420ce07"
+      },
+      "sha256": "748e6c97f515208f35e83defa67141c1e6f8afdca4b0623d4fecf1bbc351704d"
+    },
+    "candidate": {
+      "files": {
+        "SKILL.md": "7d13122067987068ae02754c266df83bdfd4adbccd459374b2e76e284a40a62a",
+        "assets/assessment.template.md": "d63ad2cf95573d3dd52b926da0b952dcbcc96864d0553b5f6ce6f5b693a33842",
+        "assets/roadmap.template.md": "6246672d0271b8969719c64b2623c5a77f7cdd851d86b22f2dcc9dd04c03988e",
+        "assets/rt-task.template.md": "4956e29c1c7fa03dacd2bd77406572feb8423ebd9b7dc781ef137c84736d1df7",
+        "references/architecture.md": "78ccb82bcc712a770bd7475b4ae25a765ee17d9bf910cc9d8ba6220057452c10",
+        "references/diagnose.md": "7e88e3679062cb21abf80a014ef2f1e2dc74eb6bd3cb44ace24ebc65945030e6",
+        "references/execution.md": "45961265caed552aff19fc0408d7ebcc02d9d6986486314561e45bd93008349b",
+        "references/quality.md": "c56f1036b0a06fe076ec7d1abf5e3575a798df6da0a56bde57bee9885be88c7f",
+        "references/safety.md": "e613a40f6d806fa96e3e034337e65a3a79894e8d545969958b38451566f9caff",
+        "references/security.md": "45930ee2c70a3cba61648f0b5c4c848f44e81fd76339cc06be300e613be1fc72",
+        "references/sources.md": "cb576e40c34eabc985f6e5091a2ac1d0e1bba1d68488dd9d3b84bc6bef35e47c",
+        "references/tidy.md": "800ff44927888a8e15f263936f14fc0bd570bd491e4a8e566cbd791d98481c6d"
+      },
+      "sha256": "78836e680ea0343ae26c14154971af41342d4cd8bfe216e51897b96b1573fd42"
+    }
+  },
+  "archives": {
+    "initial-outputs.zip": {
+      "bytes": 951255,
+      "sha256": "f3cb99920ee60874c3cf972bd542f6fe812596c191a81bb3d5f506ccb2b9cd74"
+    },
+    "inputs.zip": {
+      "bytes": 132211,
+      "sha256": "07d9e0838e5ffe06504d7247fa2c11e8722048826da0c278a631dd01c06beb5d"
+    },
+    "maintenance-outputs.zip": {
+      "bytes": 302266,
+      "sha256": "24688f173f0c23f5811b7fa7b95ed48e1bfcb7c4b8b150980113a4bc3178fa55"
+    },
+    "skill-snapshots.zip": {
+      "bytes": 49939,
+      "sha256": "d006723cf7d670566bb4174b30524ff0582a609c1f4aa9a6c8a63e2baaf0f0af"
+    }
+  },
+  "mechanical_checks": {
+    "baseline": {
+      "files": 9,
+      "lines": 873,
+      "bytes": 38263,
+      "entry_lines": 153,
+      "entry_bytes": 8349
+    },
+    "candidate": {
+      "files": 12,
+      "lines": 947,
+      "bytes": 59647,
+      "entry_lines": 153,
+      "entry_bytes": 9072
+    },
+    "credential_scan": {
+      "synthetic_only": true,
+      "old_prints_value": true,
+      "candidate_prints_value": false,
+      "candidate_retains_file_location": true
+    },
+    "rollback_counterexample": {
+      "isolated_fixture": true,
+      "old_template_command_loses_initial_edit": true,
+      "task_owned_reverse_edit_preserves_initial_and_later_edit": true,
+      "limitation": "Demonstrates recovery mechanism, not a model automatically doing it correctly."
+    },
+    "config_counterexample": {
+      "same_default": true,
+      "override_present_changes_effective_value": true,
+      "limitation": "Adding configuration is permitted behavior change only when separately requested."
+    }
+  },
+  "primary_grading_freeze_digest": "662143543499bb1bb8e5c089f5d481391315dd72f20141e27b3183c6866e32c5",
+  "artifact_path_note": "Raw logs and original frozen grading are in runs/2026-09-07/primary-grading. Source/output trees are in the listed zip archives. runs/ is gitignored.",
+  "archive_replay": {
+    "artifacts": 48,
+    "public_private_failures": 0,
+    "record": "runs/2026-09-07/archive-replay.json"
+  },
+  "portable_selfcheck": {
+    "cases": "/var/folders/pl/51j2tjb91859hywrhdxsf9k00000gn/T/refactor-self-check-6sc8xj0w/cases",
+    "output": "/var/folders/pl/51j2tjb91859hywrhdxsf9k00000gn/T/refactor-self-check-6sc8xj0w",
+    "results": [
+      {
+        "id": "ledger",
+        "public_baseline_pass": true,
+        "private_baseline_pass": true,
+        "mutant_detected": true,
+        "heldout_missing_feature_detected": true,
+        "heldout_positive_control_pass": true
+      },
+      {
+        "id": "dispatch",
+        "public_baseline_pass": true,
+        "private_baseline_pass": true,
+        "mutant_detected": true,
+        "heldout_missing_feature_detected": true,
+        "heldout_positive_control_pass": true
+      },
+      {
+        "id": "credentials",
+        "public_baseline_pass": true,
+        "private_baseline_pass": true,
+        "mutant_detected": true
+      },
+      {
+        "id": "legacy_report",
+        "public_baseline_pass": true,
+        "private_baseline_pass": true,
+        "mutant_detected": true
+      },
+      {
+        "id": "labels",
+        "public_baseline_pass": true,
+        "private_baseline_pass": true,
+        "mutant_detected": true
+      },
+      {
+        "id": "credits",
+        "public_baseline_pass": true,
+        "private_baseline_pass": true,
+        "mutant_detected": true
+      }
+    ],
+    "existing_output_overwrite_refused": true,
+    "original_inputs_unchanged": true
+  }
+}

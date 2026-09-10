@@ -1,0 +1,15 @@
+{
+  "useful_opportunity": "Share the actual normalization policy while keeping the two small ordering contracts obvious.",
+  "quality_evidence": [
+    "Normalization semantics have one maintained implementation.",
+    "Search sorting and display encounter order remain easily distinguishable.",
+    "No unnecessary class, strategy, configuration, or broad API change; overhead stays proportionate."
+  ],
+  "no_op_policy": "No-op/cosmetic-only does not satisfy requested cleanup.",
+  "major_harms": [
+    "Changed Unicode or whitespace semantics",
+    "Changed ordering or return types",
+    "Double consumption of iterable",
+    "State leakage across calls"
+  ]
+}

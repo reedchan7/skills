@@ -1,0 +1,15 @@
+{
+  "useful_opportunity": "Expose policy order and separate success pricing from rejection decisions without hiding the rules behind machinery.",
+  "quality_evidence": [
+    "Readers can locate and change a rejection rule without tracing nested success branches.",
+    "Precedence is explicit and base fees/surcharges remain understandable.",
+    "Helpers or tables, if used, carry actual policy concepts rather than one wrapper per statement."
+  ],
+  "no_op_policy": "Unchanged branching or cosmetic reformatting alone is incomplete.",
+  "major_harms": [
+    "Wrong rejection priority",
+    "Changed fee threshold or member discount",
+    "Input mutation",
+    "API or reason-code change"
+  ]
+}

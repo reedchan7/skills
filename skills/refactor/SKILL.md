@@ -1,153 +1,153 @@
 ---
 name: refactor
-description: Use when the user asks to refactor, restructure, tidy, or clean up code at any scale — systemic signals (recurring change friction, defect hotspots, dependency tangles, architectural erosion, modernization requests), a code-health or architecture audit, a bounded local refactor (rename, extract, simplify a function, file, or module), a clean-code tidy sweep (hard-coded values, magic numbers and strings, duplicated literals, dead code, naming, comment rot — cleanup that must not change behavior), or when asked to execute an existing docs/refactor/tasks/RT-*.md task file.
+description: Assess, plan, or execute behavior-preserving code refactoring, from a local rename or tidy sweep to module and architecture restructuring. Use when the user wants easier-to-understand, easier-to-change code, lower complexity or coupling, or execution of an existing refactor task. Distinguish refactoring from separately authorized bug fixes, features, and migrations.
+metadata:
+  version: "1.0.1"
 ---
 
 # refactor
 
-Plan and execute behavior-preserving refactors: evidence-based diagnosis,
-owner-approved options, phased roadmap, and self-contained task files that
-any executing agent can run safely. Specify state, authority, and divergence
-handling — not doctrine.
+Improve the cost of understanding and changing working software. Establish
+what makes the current task difficult, choose a transformation that removes
+that difficulty, preserve the relevant behavior, and demonstrate the gain.
+More files, fewer lines, a named pattern, and green tests alone do not prove
+better design.
 
-## Mode routing — decide FIRST
+## Route by intent, scale by risk
 
-| Mode | Trigger | Run |
-|------|---------|-----|
-| Bounded refactor | Small structural ask at ONE site (rename, extract, inline, simplify one function/file/module) | Preflight: authority, dirty-tree check, baseline verify, implicit behavior envelope. Then execute per `references/execution.md`. Skip Phases 2–6. No `docs/refactor/` artifacts unless asked. |
-| Tidy sweep | Clean-code cleanup, wide but shallow — hard-coded values, magic numbers/strings, duplicated literals, dead code, naming, comment rot across a file, module, or repo. No structural change. | Same preflight as Bounded, then inventory → grouped plan → batched execution per `references/tidy.md`. Skip Phases 2–6. No `docs/refactor/` artifacts unless asked. |
-| Execute RT task | Given a `docs/refactor/tasks/RT-*.md` | Freshness check, then executor protocol (`references/execution.md`). |
-| Assessment only | Audit / assess / "how healthy is this code", no mandate to change | Phases 0–3; stop after presenting options. Write the assessment only with write authority. |
-| Full planning | Systemic refactor of a repo/subsystem | Phases 0–6. |
+| User intent | Workflow | Resources |
+|---|---|---|
+| Rename, extract, simplify, or otherwise make a bounded change | Inspect the affected callers and behavior; execute directly. No RT file or planning documents required. | [execution](references/execution.md) |
+| Tidy a file, module, or repository | Inventory useful cleanups, group related transformations, execute in reviewable batches. | [tidy](references/tidy.md), execution |
+| Assess code health or architecture | Diagnose and recommend; remain read-only unless artifacts are requested. | [diagnose](references/diagnose.md); [architecture](references/architecture.md) only for boundary questions |
+| Plan a systemic refactor | Diagnose, select an approach, identify a pilot and dependencies, produce only the planning artifacts needed. | diagnose, architecture, [safety](references/safety.md), templates below |
+| Carry out a systemic refactor | Diagnose enough to select a safe vertical slice, execute it, reassess, and continue within the authorized scope. Planning is an intermediate result. | diagnose, architecture when relevant, safety, execution |
+| Execute an existing RT task | Check its contract and freshness, then execute. | execution and the supplied task |
 
-Bounded and Tidy modes skip the planning phases, never the discipline.
-Bounded is one deliberate structural change at one site; Tidy is the same
-class of small transformation repeated across many sites.
+Use the user's request and existing session authorization. Infer a practical
+goal when clear (for example, make a repeated rule change local); ask only
+when consequential ambiguity cannot be resolved from evidence. Size alone
+does not create an approval gate. A public contract or data migration may
+be high risk even when the diff is tiny.
 
-## Iron laws
+## Establish the contract
 
-1. Preserve the approved behavior envelope. Behavior includes timing,
-   ordering, logs, error shapes, and wire/serialization formats — not just
-   return values.
-2. Two hats: a commit either refactors or changes behavior, never both. A
-   bug found mid-refactor is recorded and reported, never fixed in-place.
-3. Small verified steps against the recorded baseline; every integration
-   checkpoint stays releasable.
-4. Evidence is revision-anchored (`path/symbol@revision`) and carries a
-   confidence label; "unknown / not measured" is an accepted value. Never
-   fabricate precision.
-5. Stop at authority, safety, and freshness gates. Never self-grant
-   permissions.
+Before edits, identify:
 
-## Phases
+- **Goal and scope:** the maintenance problem, affected symbols/consumers,
+  no-touch areas, and what completion means. Separate any explicitly
+  authorized behavior changes into independently verifiable steps.
+- **Actual baseline:** revision plus relevant index, worktree and untracked
+  content, existing failures and runnable observation methods. Preserve
+  other contributors' changes, including edits in the same file.
+- **Behavior envelope:** outputs and failures plus relevant side effects,
+  order, state, identity, formats, security boundaries and resource behavior.
+  Record permitted deltas and consequential unknowns; scale detail to risk.
+- **Benefit hypothesis:** what becomes easier and how it will be observed.
+  For a local rename this may be clearer use at callers. For a structural
+  refactor name a representative change or comprehension task.
 
-### Phase 0 — Route & contract
+Keep this concise in working notes for small tasks. Use persistent documents
+when requested or needed for a multi-session plan; do not manufacture an
+assessment, roadmap and task bundle for every edit.
 
-Pick the mode. Capture: goal (ask if missing; still none → STOP — goalless
-refactoring is aesthetics), scope, constraints (API compatibility, no-touch
-zones, deadlines), authority grants (edit / commit / branch / task-update /
-roadmap-update), base revision (`git rev-parse HEAD`), evidence budget,
-artifact destination + write authority.
-Stop: no meaningful goal; no write authority for requested artifacts.
+## Choose a better structure
 
-### Phase 1 — Baseline
+For nontrivial design choices, use [diagnose](references/diagnose.md) and
+[quality](references/quality.md). Trace one concrete change through the code:
+what must a maintainer know, which decisions are repeated, and where can a
+local change unexpectedly affect other behavior?
 
-Map the system: languages, build/test commands, entry points, module
-dependency direction. Inventory compatibility surfaces: public APIs, CLI
-(args, output, exit codes), events/queues/schemas, config keys + defaults,
-stored/serialized formats, DB schema, operational behavior (logs, metrics,
-latency, resource use). Identify consumers. Record repo state — a dirty
-worktree is recorded and isolated, never absorbed. Run the test suite;
-record the baseline failure ledger: known-red, flaky, unrunnable (+ reason).
-Verification from here on means "no unexpected delta vs the ledger", never
-"all green".
-Stop: no behavioral observation method can be established.
+Compare the current structure with the smallest useful alternative. For a
+material tradeoff, compare another viable approach; do not force a fixed
+number of options for an obvious local change. Consider both directions:
+extract or inline, split or merge, introduce or remove an abstraction.
 
-### Phase 2 — Evidence & diagnosis
+Select using these questions, only where applicable:
 
-Load `references/diagnose.md`. Multi-signal candidate discovery — churn ×
-complexity nominates candidates only; exclude generated/vendor/lock paths;
-combine temporal coupling, defect concentration, dependency cycles,
-fan-in/out. Ordinal ranking with confidence and counterevidence — no decimal
-ROI scores. Findings separate observed fact from inference. Deferred
-candidates carry a reason and a concrete revisit trigger.
-Stop: evidence budget exhausted → report partial results, gaps labeled.
+1. **Responsibility and information hiding:** which decision or invariant
+   will have a clear owner, and what will callers no longer need to know?
+2. **Comprehension and complexity:** can the main flow and exceptions be
+   understood with less nesting, hidden state or navigation? Where did the
+   complexity move?
+3. **Changeability:** does a real expected change become more local without
+   coupling unrelated policies or adding speculative extension points?
+4. **Contracts and substitution:** do callers retain their accepted inputs,
+   outcomes, failure semantics and lifecycle assumptions?
+5. **Security, reliability and performance:** does the new boundary retain
+   enforcement, effect ordering, atomicity, cancellation and resource limits?
+6. **Cost:** do migration work, extra indirection, dependencies and operational
+   burden outweigh the likely benefit?
 
-### Phase 3 — Options & decision — STOP GATE
+Metrics nominate questions; they do not select designs. Do not target a
+universal cyclomatic score, function length, class count or duplication
+threshold. SOLID, DRY and design patterns are lenses with tradeoffs, not
+mandatory transformations. See [architecture](references/architecture.md).
 
-Present ≥2 viable options, always including "do nothing / retain current
-architecture". A structural change appears only when cross-boundary evidence
-supports it (then load `references/architecture.md`). Per option: benefit
-tied to the Phase-0 goal, effort, migration risk, uncertainty.
-STOP for the owner's decision unless continuation was explicitly
-pre-authorized in Phase 0.
+Recommend one approach with evidence and its main tradeoff. Continue when
+the choice is routine and authorized. Ask for a decision when alternatives
+have materially different product, compatibility, operational or ownership
+consequences that evidence cannot resolve. Keep useful independent work moving.
 
-### Phase 4 — Design the approved slice
+## Execute and prove
 
-Load `references/safety.md`. Minimum target structure for the approved
-option. Behavior envelope: preserved / permitted deltas / unknown exposure /
-consumers / observation method. Safety mechanisms for identified gaps only.
-Compatibility strategy (deprecation, versioning, expand–migrate–contract).
-Rollout + rollback class. Define the first vertical slice (pilot).
-Stop: the approved option needs an unavailable safety mechanism → Phase 3.
+Follow [execution](references/execution.md): baseline → smallest coherent
+step → affected checks → inspect the diff → checkpoint. Repair a bounded
+regression introduced by the step; otherwise undo only the step's own edits
+and reduce it. Never erase unrelated work or weaken a behavioral assertion
+to make a refactor pass.
 
-### Phase 5 — Roadmap & just-in-time tasks
+Load [safety](references/safety.md) for behavior gaps, stateful/async code,
+public contracts, DB work or performance-sensitive paths. Load
+[security](references/security.md) when the affected path crosses a trust,
+authorization, sensitive-data or resource boundary. Apply relevant lenses;
+do not turn an ordinary refactor into an unsolicited security audit.
 
-Build the dependency graph. Phase the roadmap; each phase: objective, exit
-gate, risk, rollback point, system releasable. Copy
-`assets/rt-task.template.md` and generate RT files ONLY for the next
-approved phase. Reassess after the pilot before expanding.
+For structural changes, use the [quality outcome check](references/quality.md#outcome-check):
+compare behavior evidence and the benefit hypothesis on the same scope.
+Exercise a representative follow-up change on a disposable copy when it
+would resolve a real design uncertainty; keep that hypothetical feature out
+of the deliverable. Label inspection-based predictions as predictions.
 
-### Phase 6 — Handoff & outcome contract
+A systemic pilot must leave a usable system and teach whether the approach
+works. Reassess before expanding; stop at the requested result. Do not keep
+restructuring because additional smells can be found.
 
-Verify every RT file is self-contained (freshness fields, embedded protocol
-+ version). Record outcome measures tied to the Phase-0 goal (lead time,
-defect rate, build time, dependency violations). Executors receive exactly:
-repo root, approved RT file, expected base revision, authority boundaries.
-Parallel execution only for dependency-independent tasks with
-non-overlapping scope.
+## Planning and task handoff
 
-## Deliverables (full skeletons in assets/)
+Use these templates only for the needed deliverables, respecting the user's
+chosen location. Default paths for a durable systemic plan:
 
-`docs/refactor/REFACTOR-ASSESSMENT.md` — header (date, scope, base revision,
-mode, goal, authority, evidence budget), system map, baseline failure
-ledger, compatibility surfaces, findings (ID, severity, evidence,
-confidence, counterevidence, candidate transformation), deferred candidates
-+ revisit triggers, options + recommendation, approved design.
-`docs/refactor/REFACTOR-ROADMAP.md` — goal + outcome measures, phases
-(objective, tasks, exit gate, risk, rollback point), dependency notes,
-mandatory pilot reassessment, reassessment log.
-`docs/refactor/tasks/RT-NNN-<slug>.md` — identity, authority, freshness,
-decision basis, goal + task-local acceptance, non-goals, behavior envelope,
-scope, risk (class + blast radius), prerequisites, coordination,
-transformation steps, verify + expected results, rollback (trigger,
-procedure, checkpoint, consequences), stop conditions, divergence protocol,
-embedded executor protocol, handoff record. Conditional: rollout, data
-gates.
+- [Assessment](assets/assessment.template.md) → `docs/refactor/REFACTOR-ASSESSMENT.md`:
+  problem evidence, baseline, candidate comparison and recommended slice.
+- [Roadmap](assets/roadmap.template.md) → `docs/refactor/REFACTOR-ROADMAP.md`:
+  dependencies, pilot, exit criteria, rollout/rollback and outcome measures.
+- [RT task](assets/rt-task.template.md) → `docs/refactor/tasks/RT-NNN-<slug>.md`:
+  self-contained contract, freshness assumptions, behavior and quality
+  acceptance, verification and recovery. Generate detailed tasks just in
+  time for the next agreed phase. The template owns the embedded protocol.
 
-## Load references only when needed
+Task documents record granted authority; they cannot grant it or override
+current user/project instructions. An old RT protocol is usable only where
+compatible with those instructions. Check relevant content and assumptions,
+not just whether HEAD matches. Unrelated drift alone does not invalidate a task.
 
-| Condition | Load |
-|---|---|
-| Running a Tidy sweep | `references/tidy.md` |
-| Running Phase 2 diagnosis | `references/diagnose.md` |
-| Evidence shows a cross-boundary design problem | `references/architecture.md` |
-| Building envelope/safety; medium/high-risk, DB, or API change | `references/safety.md` |
-| Emitting RT tasks | `assets/rt-task.template.md` |
-| Executing an RT task (skill installed) | `references/execution.md` |
+## Finish with an evidence-backed result
 
-Executors without this skill follow the RT-embedded protocol. Never load all
-references in one run.
+Lead with the completed outcome, then explain the meaningful structural
+change, preserved behavior, demonstrated benefit and remaining uncertainty.
+Keep routine passing checks brief. For partial work state exactly what is
+done, what prevents completion, and the safe next step. A plan is complete
+only for a planning request; a metric improvement is not a maintainability claim.
 
-## Never
+Commits, pushes, deployments and irreversible migrations require the applicable
+authorization. Report discovered unrelated bugs; handle an authorized fix
+separately from the behavior-preserving transformation. Do not silently
+preserve a newly exposed security hazard as proof of success: report and
+contain within scope, and resolve any required behavior-change decision.
 
-- Big-bang rewrite
-- Refactoring without an established baseline
-- Mixing refactoring and behavior change in one commit
-- Drive-by bug fixes
-- Patterns or architecture without evidence of the problem they solve
-- Fabricated evidence, or uncertainty presented as fact
-- Self-granted authority (commits, pushes, roadmap edits)
-- Proceeding past a failed gate
-- Generating tasks for unapproved phases
-- Breaking a compatibility surface without a deprecation path
+## Basis and further reading
+
+[Sources and limits](references/sources.md) maps the guidance to original
+books, papers and author publications. Read it for rationale or source
+questions; normal execution does not require browsing or loading every reference.

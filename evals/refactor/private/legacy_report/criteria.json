@@ -1,0 +1,15 @@
+{
+  "useful_opportunity": "Make event selection and accumulation consistent across direct and text APIs while respecting the mixed worktree.",
+  "quality_evidence": [
+    "One authoritative selection/accumulation policy avoids divergent fixes.",
+    "Rendering and CLI remain straightforward and output ownership remains clear.",
+    "Changes stay in the requested code/test scope and use Python 3.8-compatible APIs."
+  ],
+  "no_op_policy": "Unchanged duplication is incomplete.",
+  "major_harms": [
+    "Loss or modification of pre-existing tracked/untracked edits",
+    "Changed CLI or report format/order",
+    "Range/status mistakes",
+    "New import side effects or legacy incompatibility"
+  ]
+}

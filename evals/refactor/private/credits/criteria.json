@@ -1,0 +1,15 @@
+{
+  "useful_opportunity": "Exercise judgment about accidental textual similarity versus independently evolving policies.",
+  "quality_evidence": [
+    "Earning and refund rounding differences remain explicit.",
+    "No shared rounding switch or flags create unnecessary coupling between historical and current policy.",
+    "A justified no-op cites a concrete contractual divergence; a small useful clarity/test improvement also counts if it preserves locality."
+  ],
+  "no_op_policy": "A documented decision to retain separation with a correct concrete example is full completion. Silent no-op, generic refusal, or unexecuted plan is incomplete.",
+  "major_harms": [
+    "Reordered rounding changes points",
+    "Coupling current earning multiplier to historical refunds",
+    "Aggregation before row-level rounding",
+    "Input mutation"
+  ]
+}

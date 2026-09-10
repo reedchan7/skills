@@ -1,0 +1,4 @@
+{
+  "old": "points = cents * original_multiplier\n    points = points // 100",
+  "new": "points = (cents // 100) * original_multiplier"
+}

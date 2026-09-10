@@ -1,41 +1,39 @@
-# REFACTOR-ROADMAP template
+# Roadmap template
 
-Copy everything below the marker to `docs/refactor/REFACTOR-ROADMAP.md`.
+Use for a requested or necessary multi-session systemic plan. Detail only
+the next agreed phase; reassess after the pilot before expanding the plan.
 
 <!-- TEMPLATE START -->
 
-# Refactor Roadmap — <repo/subsystem>
+# Refactor roadmap — <scope>
 
-- Base assessment: REFACTOR-ASSESSMENT.md @ <revision/date>
-- Approved by: <owner> on <date>
-- Goal: <from Phase 0, verbatim>
-- Outcome measures: <post-refactor success metrics tied to the goal — e.g.
-  lead time, defect rate, build time, dependency-violation count>
+- Goal and selected approach: <why and what>
+- Decision basis: <assessment or self-contained evidence, baseline>
+- Actual authorization and boundaries: <scope>
+- Outcome evidence: <behavior, primary structural benefit, delivery costs>
 
-## Phases
+## Phase 1 — <usable pilot>
 
-### Phase 1 — <objective> (pilot)
+- Objective and tasks: <next-phase RT files if needed>
+- Dependency/consumer assumptions:
+- Behavior and quality exit criteria:
+- Required checks and observation:
+- Rollout/recovery: <mechanism only when relevant, precise safe checkpoint>
+- Reassessment: <what evidence supports continuing, adapting or stopping>
 
-- Tasks: RT-001 <slug>, RT-002 <slug> (generated)
-- Exit gate: <observable criteria>
-- Risk: low/med/high · Rollback point: <sha/flag/mechanism>
-- Releasable at end because: <flag off / adapter in place / ...>
-- MANDATORY: reassess this roadmap after the pilot, before generating
-  Phase 2 tasks.
+## Later phases — provisional
 
-### Phase 2 — <objective>
+<Coarse objectives, dependencies and risks. Generate execution tasks only
+after prior evidence and authorization support the next phase.>
 
-- Tasks: NOT YET GENERATED — just-in-time after the Phase 1 reassessment
-- Exit gate: · Risk: · Rollback point:
+## Coordination and completion
 
-## Dependency notes
-
-<ordering constraints between phases/tasks; parallel-safe groups (must be
-dependency-independent with non-overlapping scope)>
+<Real ownership conflicts, compatible work, integration boundaries and final
+acceptance. Non-overlapping files alone do not make tasks independent.>
 
 ## Reassessment log
 
-| Date | After phase | Changes made | Why |
-|---|---|---|---|
+| Date / checkpoint | Observed outcome | Decision and reason |
+|---|---|---|
 
 <!-- TEMPLATE END -->

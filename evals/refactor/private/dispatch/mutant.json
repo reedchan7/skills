@@ -1,0 +1,4 @@
+{
+  "old": "order['weight_grams'] > 5000",
+  "new": "order['weight_grams'] >= 5000"
+}
