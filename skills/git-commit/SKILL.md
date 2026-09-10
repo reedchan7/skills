@@ -1,6 +1,8 @@
 ---
 name: git-commit
 description: Use whenever the user or another skill/workflow asks to create, amend, save, submit, or prepare a Git commit or Conventional Commit message.
+metadata:
+  version: "1.0.0"
 ---
 
 # git-commit

@@ -2,6 +2,8 @@
 name: feature-implement
 description: Implement an approved docs/features SPEC, or resume its PLAN, in verified slices. Run only when the user names feature-implement, or an approved SPEC covers the ask. NEVER self-select for implementation requests, bug fixes, or refactors that have no approved SPEC.
 disable-model-invocation: true
+metadata:
+  version: "1.0.0"
 ---
 
 # feature-implement

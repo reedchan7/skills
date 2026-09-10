@@ -1,6 +1,8 @@
 ---
 name: handoff
 description: Use when a session is about to end, context is running low, or the user asks to hand off / save progress for a future session — e.g. "write a handoff", "session is ending", "save state before we stop", "交接", "写交接文档", "会话要结束了". Also use when resuming work in a repo that contains a HANDOFF.md.
+metadata:
+  version: "1.0.0"
 ---
 
 # handoff

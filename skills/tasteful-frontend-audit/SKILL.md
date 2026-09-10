@@ -1,6 +1,8 @@
 ---
 name: tasteful-frontend-audit
 description: Audit, score, and diagnose existing frontend UI — a whole product, a single page, or one component — against structural design invariants. Use when asked to review, evaluate, rate, or critique UI/UX visual quality, explain why a UI looks off, ugly, cheap, inconsistent, or AI-generated, check design-system conformance, or produce a prioritized improvement plan with concrete fixes. Read-only by default; reports findings and recommended fixes but does not edit code unless explicitly asked.
+metadata:
+  version: "1.0.0"
 ---
 
 # tasteful-frontend-audit

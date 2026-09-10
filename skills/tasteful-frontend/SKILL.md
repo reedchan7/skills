@@ -1,6 +1,8 @@
 ---
 name: tasteful-frontend
 description: Build and restyle frontend UI with modern, high-taste, Apple/Linear/Stripe-grade polish. Use when creating, implementing, redesigning, simplifying, or visually fixing a UI surface or component, including UI the user calls ugly, gaudy, heavy, bland, or AI-looking, or when choosing typography, color, spacing, depth, or motion values. Covers product and marketing UI. For read-only evaluation, scoring, or critique without edits, use tasteful-frontend-audit.
+metadata:
+  version: "1.0.0"
 ---
 
 # tasteful-frontend

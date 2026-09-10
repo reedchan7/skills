@@ -1,6 +1,8 @@
 ---
 name: deep-research
 description: Evidence-graded research that ends in a cited, verifiable report. Use when the user asks to research, investigate, or survey a topic, compare options or vendors, assess the state of the art, do due diligence on a company or person, check whether a claim is true, or asks a question whose answer must be current, contested, or source-backed (调研, 深度研究, 研究报告, 竞品分析, 技术选型, 文献综述). Any domain (software, science, markets, law, medicine, policy, history). A fact answerable from one authoritative page gets a direct answer with its source, without the full protocol. Not for debugging, code changes, or questions the repository itself answers.
+metadata:
+  version: "1.0.0"
 ---
 
 # deep-research

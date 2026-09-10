@@ -2,6 +2,8 @@
 name: viral-video-prompt
 description: Research-backed short-video prompt packs. One timestamped pack holds two A/B concepts rendered as paste-ready prompts for MiniMax Hailuo, Wan, Seedance, and a universal dialect. Run only when the user names viral-video-prompt, or explicitly asks for video-generation prompts for a product. NEVER self-select for a product mention, a marketing question, a copywriting request, or any video the user simply wants described.
 disable-model-invocation: true
+metadata:
+  version: "1.0.0"
 ---
 
 # viral-video-prompt

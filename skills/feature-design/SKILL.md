@@ -2,6 +2,8 @@
 name: feature-design
 description: Spec-first design workflow that ends in an approved SPEC under docs/features/. Run only when the user names feature-design, or explicitly asks to design or spec a change before building it. NEVER self-select for feature requests, bug fixes, refactors, or any change the user simply wants made.
 disable-model-invocation: true
+metadata:
+  version: "1.0.0"
 ---
 
 # feature-design
