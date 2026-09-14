@@ -1,0 +1,104 @@
+{
+  "skill_sha256": "ecabdba724f0aea344ff2bdfaad149fe3e6f0cb4aacf18f87db28d27b79dc391",
+  "case": {
+    "id": "focus-cache",
+    "request": "为什么改了名字，自己看是新的，同事看还是旧的？该修哪里？",
+    "source": "前一条回答：从读写路径的视角看，我们现在遇到的是跨层缓存 coherency 边界的表现，write-through 语义和 read-side invalidation 并不对齐，造成了可见性窗口。这一判断主要基于 refresh 之后的观察以及几个相关 handler 的行为，整体上可以理解为 state propagation 的不一致性，需要综合看前端 local state、服务端 cache 和 backing store 三个层次，不能简单以页面是否变化来做判断。\n具体调查：用户点击保存时，POST /profile 把新名字写进 PostgreSQL，返回成功后前端把自己的页面状态更新为新名字。GET /team 从 Redis 读取团队成员资料；缓存没有命中才去数据库取。团队列表的 Redis 缓存保存 10 分钟，POST /profile 并没有清除它。我们在测试环境看到：数据库里已是新名字，用户自己的页面也变了；同事刷新团队列表后仍看到 Redis 中的旧名字。手动删除对应团队缓存后，同事下一次刷新马上看到了新名字。浏览器禁用缓存没有改变现象。\n我先检查了 ProfileEditor 的状态更新逻辑，又看了 Network 里的响应，再查了 TeamList 是否复用之前的查询结果。两处前端代码有一些值得进一步整理的地方：状态变量名称不太一致，空值显示也有两种写法。但这些没有证据与此次旧名字有关。最初猜测是 React 组件没重新渲染，现在查询响应本身仍是旧名字，所以已有证据支持服务器 Redis 缓存没有被失效，而不是这条组件猜测。\n可选方向一是降低缓存 TTL；方向二是 refresh 时强制 bypass cache；方向三是把 update handler 和 cache invalidation 接起来。这三个方案在实现复杂度、性能、长期可维护性方面各有侧重，要结合场景进行权衡。这里还需要补充：用户要求同事下一次刷新就看到新名字，不需要页面自动实时更新；降低 TTL 只能缩短可能看到旧资料的时间，不能确保下一次刷新就看到新名字。团队成员读取流量目前约每分钟 2000 次，移除所有缓存会增加数据库读取，尚无负载测试数据来判断影响大小。\n我建议优先重新设计前端状态管理，再配合适当的 cache invalidation 形成端到端的方案。不过，现有证据只表明修改名字成功之后没有清掉对应团队缓存。尚未写代码或测过修复；删除缓存的排查动作只发生在测试环境。",
+    "required": [
+      "自己页面直接更新，同事读到尚未清除的Redis团队旧缓存",
+      "保存成功后清除对应团队缓存，让下次读取从数据库取新值",
+      "测试环境手动删缓存已确认原因；修复尚未实现"
+    ],
+    "reader_questions": [
+      {
+        "question": "为什么本人看到新名字，同事刷新还旧？",
+        "answer": "本人页面保存后直接更新；同事读到未清除的服务端团队缓存"
+      },
+      {
+        "question": "应优先改哪儿，前端需重写吗？",
+        "answer": "保存成功后清除对应团队Redis缓存；没有重写前端依据"
+      },
+      {
+        "question": "把缓存过期时间缩短就满足需求了吗？",
+        "answer": "不能保证下一次刷新即新"
+      },
+      {
+        "question": "这个方案已经修好并在生产验证了吗？",
+        "answer": "尚未写修复；测试环境排查"
+      }
+    ]
+  },
+  "results": [
+    {
+      "runtime": "claude",
+      "profile": "clean-text",
+      "prompt_sha256": "0d8de606769439928a5facada046ec31b88664dda8b78353b4525b93fa2227a1",
+      "argv": [
+        "claude",
+        "--print",
+        "--model",
+        "opus",
+        "--effort",
+        "medium",
+        "--permission-mode",
+        "plan",
+        "--tools",
+        "",
+        "--strict-mcp-config",
+        "--disable-slash-commands",
+        "--setting-sources",
+        "",
+        "--no-session-persistence",
+        "--output-format",
+        "json",
+        "--max-budget-usd",
+        "1.50",
+        "--safe-mode",
+        "--system-prompt",
+        "Answer the supplied writing request using its evidence. Return the answer directly. You have no tools."
+      ],
+      "exit_code": 0,
+      "seconds": 10.27,
+      "status": "completed",
+      "answer": "**保存名字时没有清掉团队列表的 Redis 缓存。** 你自己的页面是前端直接更新的，数据库里也确实是新名字；但同事的团队列表走 GET /team，命中 Redis 里那份缓存 10 分钟的旧数据，所以刷新还是旧名字——测试环境里手动删掉对应缓存后，同事下一次刷新立刻看到新名字。\n\n修的地方是 POST /profile 这条更新路径：写完数据库后顺带让对应的团队缓存失效。降低 TTL 只能缩短看到旧名字的时间，达不到你要的\"下一次刷新就正确\"；直接绕过缓存则要动到每分钟约 2000 次的读流量，目前没有负载测试数据支撑。\n\n目前只确认了原因，代码还没写、修复也还没测过。",
+      "model": "claude"
+    },
+    {
+      "runtime": "deepseek-api",
+      "profile": "clean-text",
+      "prompt_sha256": "0d8de606769439928a5facada046ec31b88664dda8b78353b4525b93fa2227a1",
+      "argv": [
+        "opencode",
+        "run",
+        "--pure",
+        "--agent",
+        "writing-eval",
+        "--model",
+        "deepseek/deepseek-v4-pro",
+        "--format",
+        "json",
+        "<prompt>"
+      ],
+      "exit_code": 0,
+      "seconds": 10.62,
+      "status": "completed",
+      "answer": "原因在 Redis 缓存没被清掉。你自己看到新名字，是因为保存成功后前端直接用返回结果更新了自己的页面；同事打开团队列表时，服务端优先读 Redis，而 Redis 里还缓存着 10 分钟前的旧名字，所以同事看到旧的。\n\n该修的是 **POST /profile 保存成功后的缓存失效逻辑**：在名字更新后，把对应的团队列表缓存清除（invalidate），让同事下一次刷新必须去 PostgreSQL 取新值。不要只缩短 TTL，那只能减少看到旧值的时间，不能保证下一次刷新就是新的。前端状态管理的问题目前没有证据和这个 bug 有关，不用为此先改。",
+      "model": "deepseek-api"
+    }
+  ],
+  "interpretation": "Focused regression only; previous v11/1.0.0 full-source outputs remain in concision-1.0.1.json. No claim of general superiority.",
+  "author_audit": {
+    "claude": {
+      "required_meanings": "All three retained",
+      "remaining_expansion": "Unrequested TTL and database-load alternatives remain",
+      "chars": 291,
+      "v11_same_question_chars": 944
+    },
+    "deepseek-api": {
+      "required_meanings": "Cause and remedy retained; explicit staging evidence and not-implemented status omitted",
+      "remaining_expansion": "Unrequested TTL and frontend comments remain",
+      "chars": 276
+    },
+    "conclusion": "The shorter guide reduces observed expansion on the same full-source task, but does not make every tested answer minimal or fully faithful. These samples are not proof of universal effectiveness."
+  }
+}

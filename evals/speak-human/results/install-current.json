@@ -1,0 +1,340 @@
+{
+  "checked_at": "2026-09-14T10:15:59.158887+00:00",
+  "version": "1.0.0",
+  "source": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+  "source_sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+  "agent_entry_count": 21,
+  "hub_entry_count": 1,
+  "entries": [
+    {
+      "entry": "/Users/reedchan/.agents/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.claude/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.codex/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.grok/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.zcode/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.kimi-code/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.kimi/agent/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.pi/agent/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.reasonix/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.gemini/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.gemini/config/skills/speak-human",
+      "layout": "directory-with-linked-files",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.gemini/antigravity/skills/speak-human",
+      "layout": "directory-with-linked-files",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.gemini/antigravity-cli/skills/speak-human",
+      "layout": "directory-with-linked-files",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.gemini/antigravity-ide/skills/speak-human",
+      "layout": "directory-with-linked-files",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.dsh/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.cursor/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.agy/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.openclaw/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.iflow/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.qwen/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.trae/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    },
+    {
+      "entry": "/Users/reedchan/.continue/skills/speak-human",
+      "layout": "symlink",
+      "skill_file": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+      "sha256": "b35cc4d1d52b63c578fe576c16fb72f6080cdff04e1e04f406feff770fd67055",
+      "version": "1.0.0",
+      "content_matches": true
+    }
+  ],
+  "note": "21 agent directory entry points plus the shared hub contain identical 1.0.0 content. Nine installed runtimes independently discovered this skill; Claude also invoked it and returned the exact release body. Other entries were checked for readable content and required directory layout, not interactive runtime invocation.",
+  "runtime_checks": [
+    {
+      "agent": "codex",
+      "method": "codex app-server: skills/list",
+      "matched_entries": [
+        {
+          "name": "speak-human",
+          "description": "Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task.",
+          "path": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+          "scope": "user",
+          "enabled": true,
+          "pluginId": null
+        }
+      ],
+      "raw_sha256": "c208cdb339475da44e667efde76ca76cd7150f38f2ba94c42468f8e2d6bbda59"
+    },
+    {
+      "agent": "kimi",
+      "method": "kimi acp: session/new available_commands_update",
+      "matched_entries": [
+        {
+          "name": "skill:speak-human",
+          "description": "Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task."
+        }
+      ],
+      "raw_sha256": "9f3661f5035a2c268a3e0e6913a332b85dd0ade19ee8a885026db20c0c12d79e"
+    },
+    {
+      "agent": "pi",
+      "method": "pi --mode rpc --no-session --no-extensions --no-tools --offline: get_commands",
+      "matched_entries": [
+        {
+          "name": "skill:speak-human",
+          "description": "Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task.",
+          "source": "skill",
+          "sourceInfo": {
+            "path": "/Users/reedchan/.pi/agent/skills/speak-human/SKILL.md",
+            "source": "auto",
+            "scope": "user",
+            "origin": "top-level",
+            "baseDir": "/Users/reedchan/.pi/agent"
+          }
+        }
+      ],
+      "raw_sha256": "6ade237c0fafc29accf60d3ef690174836d48d03142d57f73859c50455004270"
+    },
+    {
+      "agent": "reasonix",
+      "method": "reasonix acp: session/new available_commands_update",
+      "matched_entries": [
+        {
+          "name": "speak-human",
+          "description": "Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task.",
+          "input": {
+            "hint": "instructions"
+          }
+        }
+      ],
+      "raw_sha256": "82d5b8bd1c223da74fae3748dc593913b8ab52ac1edec84c3adce7722cd9bc97"
+    },
+    {
+      "agent": "grok",
+      "method": "grok inspect --json",
+      "matched_entries": [
+        {
+          "name": "speak-human",
+          "description": "Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task.",
+          "source": {
+            "type": "user",
+            "path": "/Users/reedchan/.grok/skills/speak-human/SKILL.md"
+          },
+          "userInvocable": true
+        }
+      ],
+      "raw_sha256": "da8f4857bf7c8c4c5af58dbbbde477d6f7a2085d6ff1f69431178ca7d71dc4ce"
+    },
+    {
+      "agent": "opencode",
+      "method": "opencode debug skill",
+      "matched_entries": [
+        {
+          "name": "speak-human",
+          "description": "Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task.",
+          "location": "/Users/reedchan/.agents/skills/speak-human/SKILL.md",
+          "body_matches_release": true
+        }
+      ],
+      "raw_sha256": "d24c500db7491671b4d4f6af7d7d6574c455820f99627dd7a3d1340084333792"
+    },
+    {
+      "agent": "openclaw",
+      "method": "openclaw skills info speak-human --json",
+      "matched_entries": [
+        {
+          "name": "speak-human",
+          "description": "Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task.",
+          "source": "agents-skills-personal",
+          "bundled": false,
+          "filePath": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human/SKILL.md",
+          "baseDir": "/Users/reedchan/Workspaces/github/reedchan7/skills/skills/speak-human",
+          "skillKey": "speak-human",
+          "always": false,
+          "disabled": false,
+          "blockedByAllowlist": false,
+          "blockedByAgentFilter": false,
+          "eligible": true,
+          "platformIncompatible": false,
+          "modelVisible": true,
+          "userInvocable": true,
+          "commandVisible": true,
+          "requirements": {
+            "bins": [],
+            "anyBins": [],
+            "env": [],
+            "config": [],
+            "os": []
+          },
+          "missing": {
+            "bins": [],
+            "anyBins": [],
+            "env": [],
+            "config": [],
+            "os": []
+          },
+          "configChecks": [],
+          "install": []
+        }
+      ],
+      "raw_sha256": "9accfe261aaaf0df1c11132a2ba5f104b3beca70d7642efca0b8a8f5722fdffa"
+    },
+    {
+      "agent": "gemini",
+      "method": "gemini skills list --all",
+      "matched_entry": "speak-human [Enabled]\n  Description: Explain answers, task results, and recommendations clearly and concisely without losing necessary facts, context, or conditions. Use when the user finds a response confusing, verbose, hard to follow, or full of jargon, or asks to get to the point, explain plainly, 说人话, 说明白, or 讲重点. Also use when explicitly asked to apply this style to an ongoing task.\n  Location:    /Users/reedchan/.agents/skills/speak-human/SKILL.md",
+      "raw_sha256": "8cd7f65116d7828fd0350d513cab12b2bd966c28725e85b8eb06e3f618ca41b6"
+    },
+    {
+      "agent": "claude",
+      "method": "Native Skill tool invocation; user settings enabled; only Skill(speak-human) allowed",
+      "tool_calls": [
+        {
+          "name": "Skill",
+          "input": {
+            "skill": "speak-human"
+          }
+        }
+      ],
+      "body_matches_release": true,
+      "result": "已加载",
+      "raw_sha256": "e59d9e15b2d375594709228547bdcecc8002865e67a3593b87a2ecddd32247ea"
+    }
+  ],
+  "runtime_check_count": 9
+}

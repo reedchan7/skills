@@ -1,0 +1,42 @@
+[
+  {
+    "path": "/Users/reedchan/.agents/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.claude/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.codex/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.grok/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.kimi-code/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.gemini/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.cursor/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.pi/agent/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.reasonix/skills/speak-human",
+    "status": "linked"
+  },
+  {
+    "path": "/Users/reedchan/.openclaw/skills/speak-human",
+    "status": "linked"
+  }
+]

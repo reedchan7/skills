@@ -1,0 +1,50 @@
+[
+  {
+    "id": "release-status",
+    "request": "我是项目负责人。看完下面汇报不知道现在能不能上线，请把情况讲清楚，给我建议。",
+    "source": "此次我们进行了针对性的修复和优化，整体进展非常积极。Bug 出现在上传重试：第一次请求超时后客户端重试，两次创建同一条 Asset；复现于本地。我们给 Asset 的业务键加了唯一约束，并让客户端复用同一个 key。重复上传的本地回归测试 12/12 通过。完整测试第一次 86/87，有一个 OAuth 回调超时；单独重跑该项通过，完整测试尚未重跑。数据库迁移尚未在 staging 执行，生产重试流量没验证。代码没有提交，也没有部署。只回滚应用无法删除数据库约束，需独立回滚迁移。之前的第三方配额告警仍然存在，与本次修复无关。",
+    "required": ["本地重复 Asset 的因果链与两部分修复", "12/12 本地通过", "全量 86/87 失败和单独重跑通过的区别", "staging 迁移和生产重试尚未验证", "未提交未部署", "应用回滚不撤销数据库约束", "第三方配额告警仍存在但与修复无关", "不上线或附明确前置条件的建议"]
+  },
+  {
+    "id": "choose-provider",
+    "request": "给我推荐一个方案，告诉我为什么、代价和什么情况下要换。我每月需要处理 1200 个任务，预算最多 ¥900，要求数据留在中国境内。",
+    "source": "内部报价，假设每月用量稳定且一个任务计一次，不考虑税：A 固定 ¥600/月，包含 1000 个，超额 ¥0.50/个，中国境内；B ¥0.40/个，不收月费，新加坡，已有接口迁移需 2 个工作日；C 固定 ¥850/月，限 1500 个，中国境内，不支持超额加购。A 迁移需 1 天，C 迁移需 3 天。本月还有 2 天迁移窗口。三家在你工作负载上的速度与可靠性均未知。",
+    "required": ["A 当月 ¥700 且满足所在地预算和时间", "B ¥480 但数据所在地不合要求", "C ¥850 但迁移 3 天超过 2 天窗口且 1500 硬上限", "无实际速度可靠性证据", "说明条件改变时的替代选择，不笼统推荐更便宜的 B"]
+  },
+  {
+    "id": "causal-uncertainty",
+    "request": "同事说改版让付费率提升 50%，建议立刻全量。我可以信吗？",
+    "source": "周报写旧版付费率 2%，新版 3%，于是标注增长 50%。但没有样本量和置信区间。新版只给新注册用户，旧版包含新老用户。后台导出文件标注同一周新版 2.7%，周报是 3%，尚未核对口径。同期还有一个仅对新用户的优惠券活动。没有随机分流记录。",
+    "required": ["不能认定改版导致增长或据此全量", "2% 到 3% 是 1 个百分点、相对 50%", "缺样本量不能确定统计可靠性", "人群不一致和同期券干扰因果", "2.7% 与 3% 冲突待核对", "下一步先核对口径并做可比或随机实验"]
+  },
+  {
+    "id": "technical-chinese",
+    "request": "下面这段解释我看得很累。请用自然的中文重说，保留必要的技术细节。",
+    "source": "这个 request 经由 middleware 做 schema validation，pass 后 enqueue 到 queue。worker 消费 job 并调用第三方 API。HTTP 202 only means accepted，不 guarantee execution success。由于 task status 只在 worker memory，restart 就丢 state，前端 refresh 只能读 DB 的旧 pending，导致一直 loading。这个 root cause 已通过停 worker、重启后刷新页面复现。拟把 job state 和 terminal result persist 到 DB，但还没实现。",
+    "required": ["校验入队再由 worker 调用 API 的次序", "HTTP 202 仅已接收并不表示执行成功", "内存状态随重启丢失、DB pending 导致刷新仍等待的完整链", "已通过重启刷新复现", "持久化方案尚未实现", "保留有用术语、中文完整句法，不机械逐词混排"]
+  },
+  {
+    "id": "faithful-dense",
+    "request": "把这份发布须知写得清楚好读，保留每条实质信息。读者是负责执行的同事。",
+    "source": "9 月 20 日 02:00–02:20（Asia/Shanghai）迁移，仅影响 EU workspace；US 不变。先备份并确认快照能恢复，再暂停写入，随后运行 migrate --region eu --batch-size 200；任何一步失败就停止。旧 SDK <2.4 的上传接口会返回 HTTP 426，但下载继续可用。移动端离线草稿不会自动迁移，用户须先同步。旧下载链接继续有效 24 小时。EU 的 webhook 最多延迟 15 分钟，不会重复计费。超过 20 分钟未完成则由值班李明回滚；回滚只能恢复迁移前的数据，暂停写入期间如违规写入则这些写入会丢失。完成后恢复写入并确认上传、下载、webhook 均正常。",
+    "required": ["日期时间时区与 EU/US 范围", "可恢复备份→停写→精确命令且失败即停", "SDK <2.4 上传 HTTP 426 下载可用", "移动草稿先同步", "旧下载链接 24 小时", "EU webhook 15 分钟且不重复计费", "20 分钟未完成李明回滚", "回滚只回到迁移前、违规写入会丢失", "恢复写入及三项终态确认"]
+  },
+  {
+    "id": "exact-format",
+    "request": "只返回 JSON 对象，字段恰好为 status、reason、next_action，值均为中文字符串。不要 Markdown 或额外说明。",
+    "source": "测试环境 smoke 通过；生产部署尚未开始。明早 10:00 负责人决定是否发布。",
+    "required": ["合法 JSON 只有三个指定键且均字符串", "status 不声称生产已完成", "reason 保留测试环境 smoke 通过", "next_action 保留明早 10:00 负责人决定"]
+  },
+  {
+    "id": "already-clear",
+    "request": "润色下面的通知，让它好懂。只返回通知正文。",
+    "source": "今晚 22:00–22:10 暂停上传，已上传的文件仍可下载。请在 22:00 前保存草稿。",
+    "required": ["三个时间及上传暂停/下载可用/保存草稿不变", "无需扩写、术语表、决策清单或审稿说明"]
+  },
+  {
+    "id": "english-explanation",
+    "request": "Explain this to an English-speaking product manager. Why does it matter and what can we do?",
+    "source": "Polling every second creates 60 status requests per minute per active client. At 500 active clients that is 30,000 requests per minute. Switching to five seconds would yield 6,000 per minute but add up to four seconds to status-detection delay relative to one-second polling. This is a calculated estimate, not a load-test result. The product currently promises status updates within two seconds. An SSE prototype exists; reconnect behavior and operating cost are untested.",
+    "required": ["natural English", "60/client/min and 30000/min at 500; five seconds 6000/min", "up to four additional seconds vs current interval", "five-second polling conflicts with two-second promise", "calculation not load test", "SSE only prototype reconnect/cost untested", "conditional actionable recommendation with tradeoff"]
+  }
+]

@@ -1,0 +1,108 @@
+{
+  "method": "Author source audit. Raw independent judgments remain unchanged. These dispositions are not added to the blind scores.",
+  "v1": [
+    {
+      "model": "gpt",
+      "case": "exact-format",
+      "disposition": "judge_false_positive",
+      "reason": "Smoke result exists in status; the user required keys/types but did not assign each fact to a field."
+    },
+    {
+      "model": "gpt",
+      "arm": "brief",
+      "case": "english-explanation",
+      "disposition": "disputed_materiality",
+      "reason": "60/client/min is inferable from 30000/min at 500 clients; omission need not change the PM decision."
+    },
+    {
+      "model": "claude",
+      "arm": "skill",
+      "case": "choose-provider",
+      "disposition": "confirmed_missed_by_judge",
+      "quote": "如果月用量稳定爬到 1500 以上，C 更划算也更可控",
+      "reason": "C cannot accept more than 1500 tasks. Repeating the cap later does not make that switching recommendation feasible."
+    },
+    {
+      "model": "kimi",
+      "arm": "skill",
+      "case": "choose-provider",
+      "disposition": "confirmed_missed_by_judge",
+      "quote": "超过 1500 个 C 完全无法承接，届时两家都不合适",
+      "reason": "A remains within the stated budget through 1600 tasks."
+    }
+  ],
+  "v2": [
+    {
+      "model": "claude",
+      "arm": "skill",
+      "case": "choose-provider",
+      "disposition": "confirmed_missed_by_judge",
+      "quote": "月用量稳定超过 1500 个：A 开始比 C 贵，超过 1600 个就破预算，此时应转 C",
+      "reason": "C has a 1500 hard cap. The later caveat directly invalidates the recommendation."
+    },
+    {
+      "model": "claude",
+      "arm": "skill",
+      "case": "english-explanation",
+      "disposition": "confirmed_missed_by_judge",
+      "quote": "Cheapest change to make.",
+      "reason": "No implementation costs are supplied for the alternatives."
+    }
+  ],
+  "final": [
+    {
+      "model": "claude",
+      "case": "technical-chinese",
+      "disposition": "confirmed",
+      "reason": "The answer introduces a migration-before state; this case has no migration. Another batch case does, so cross-case contamination is a plausible inference, not a proved mechanism."
+    },
+    {
+      "model": "claude",
+      "case": "english-explanation",
+      "disposition": "disputed_boundary_but_unverified_claim",
+      "reason": "Within two seconds may include equality. However, claiming the end-to-end promise is met is unsupported without processing/delivery latency evidence."
+    },
+    {
+      "model": "gpt",
+      "case": "faithful-dense",
+      "disposition": "minor_or_disputed_materiality",
+      "reason": "Added an instruction to notify users. This is sensible editing for an operator but not an explicit source instruction; it should not be used as proof of complete fidelity."
+    },
+    {
+      "model": "grok",
+      "case": "choose-provider",
+      "disposition": "confirmed_omission",
+      "reason": "Recommending B if residency changes omits its two-working-day migration requirement, relevant to the supplied time window."
+    },
+    {
+      "model": "grok",
+      "case": "english-explanation",
+      "disposition": "disputed_materiality",
+      "reason": "Can dominate describes a possible impact rather than asserting measured dominance. Better scoped wording is warranted, but the raw judge overstates the certainty of the claim."
+    },
+    {
+      "model": "gemini-api",
+      "case": "choose-provider",
+      "disposition": "partly_disputed_with_omission",
+      "reason": "A costs more than C at 1600, so that inequality is true and 1600 is the budget threshold. The explanation confuses the relevance of that comparison and omits C capacity; it does not explicitly recommend switching to C."
+    },
+    {
+      "model": "gemini-api",
+      "case": "technical-chinese",
+      "disposition": "confirmed_unsupported_attribution",
+      "reason": "The source does not identify the third-party API as the sender of HTTP 202; the rewrite assigns it that role."
+    },
+    {
+      "model": "kimi",
+      "case": "english-explanation",
+      "disposition": "confirmed",
+      "reason": "Claims most polls return nothing changed and that SSE keeps the two-second promise; neither is established by the source."
+    },
+    {
+      "model": "deepseek-api",
+      "case": "release-status",
+      "disposition": "confirmed_sequence_risk_with_ambiguity",
+      "reason": "Rollback preparation appears after deployment/migration. Deployment environment is unspecified, so the reviewer should not assert it was definitely production."
+    }
+  ]
+}

@@ -1,0 +1,3558 @@
+{
+  "note": "Raw model-judge metrics, before author adjudication. See separate adjudication records.",
+  "manifests": [
+    {
+      "skill_sha256": "95180a842bcbb48cd589ed0a33ca79cc3efa98ecf868a1b2141b614faea168da",
+      "cases_sha256": "e71bcc71e60cc92aa4ce78f00ca514bb2e0a8baf6f21c12d9fe0b6bf4605d003",
+      "protocol_sha256": "118c9de3edb361abc1697903c4fbfcd31e349af81f54550545c296116ecf3bc5",
+      "models": [
+        "claude",
+        "gpt",
+        "grok",
+        "gemini",
+        "kimi",
+        "deepseek",
+        "glm"
+      ],
+      "arms": [
+        "plain",
+        "brief",
+        "skill"
+      ],
+      "timeout_seconds": 240,
+      "collection_notes": [
+        "Grok parser recovery from existing text field.",
+        "Kimi native CLI retried all arms after removing incompatible --plan; initial calls made no inference.",
+        "GLM brief transport wrapper removed for case-level grading; violation retained."
+      ]
+    },
+    {
+      "skill_sha256": "95180a842bcbb48cd589ed0a33ca79cc3efa98ecf868a1b2141b614faea168da",
+      "cases_sha256": "e71bcc71e60cc92aa4ce78f00ca514bb2e0a8baf6f21c12d9fe0b6bf4605d003",
+      "protocol_sha256": "118c9de3edb361abc1697903c4fbfcd31e349af81f54550545c296116ecf3bc5",
+      "models": [
+        "gemini-api",
+        "deepseek-api"
+      ],
+      "arms": [
+        "plain",
+        "brief",
+        "skill"
+      ],
+      "timeout_seconds": 240
+    }
+  ],
+  "observations": [
+    {
+      "model_family": "claude",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 0,
+      "elapsed_seconds": 56.92,
+      "answers": {
+        "release-status": "结论：现在不能上线。\n\n已经完成的：\n- 根因清楚——上传超时后客户端重试，导致同一条 Asset 被创建两次，本地可复现。\n- 修复方向合理——Asset 业务键加唯一约束，客户端复用同一个 key。\n- 重复上传的本地回归 12/12 通过。\n\n还差的（这些是拦住上线的原因）：\n1. 完整测试没有重跑。第一次 86/87，失败项是 OAuth 回调超时，单独重跑通过，但整套没有再跑一次，不能确定是偶发还是真问题。\n2. 数据库迁移没有在 staging 执行过，生产重试流量也没验证。\n3. 代码没提交、没部署。\n4. 回滚路径有风险：只回滚应用删不掉数据库约束，需要单独准备并验证迁移回滚脚本。\n\n建议按顺序做：提交代码 → 在 staging 跑迁移并验证回滚脚本 → 重跑完整测试到全绿 → 用接近生产的重试流量验证 → 再安排上线，并准备好独立的迁移回滚步骤。\n\n另外：之前的第三方配额告警仍在，但与本次修复无关，可以单独排期，不必卡这次发布。",
+        "choose-provider": "推荐 A。\n\n为什么：\n- 数据必须留在中国境内，B 在新加坡，直接出局（哪怕它最便宜，1200 个约 ¥480）。\n- C 虽然合规，但迁移要 3 个工作日，本月只剩 2 天迁移窗口，来不及。\n- A 合规、迁移 1 天能赶上窗口，1200 个的月费用 = ¥600 + 200×¥0.50 = ¥700，在 ¥900 预算内。\n\n代价：\n- A 比 B 每月贵约 ¥220，超额部分按量计费，用量波动会直接反映在账单上。\n- 预算 ¥900 对应的 A 上限约是 1600 个/月（600 + 600×0.5 = 900），超过就超预算。\n\n什么情况下要换：\n- 稳定用量超过 1500 个/月：A 在 1500 个时正好 ¥850，和 C 打平，再往上 A 更贵；但 C 硬上限是 1500 且不支持超额加购，所以这时要重新谈 A 的阶梯价或找新方案。\n- 用量长期稳定在 1000–1500 且下次有 3 天以上迁移窗口：C 的固定 ¥850 更可预测，可以再评估。\n- 数据境内的要求被取消：B 最便宜，值得重算。\n\n说明：三家在我们这个工作负载上的速度和可靠性都还没数据，这个推荐只基于价格、合规和迁移时间。上线后建议先观察 A 的实际延迟和失败率再确认长期方案。",
+        "causal-uncertainty": "不能信，至少现在不能据此全量。\n\n主要问题：\n1. 数字本身没对上。后台导出同一周新版是 2.7%，周报写 3%，口径还没核对。若按 2.7%，相对提升是 35% 而不是 50%。\n2. 没有样本量和置信区间，2% 到 3% 有可能只是噪声。\n3. 人群不可比。新版只给新注册用户，旧版含新老用户，比较的是两拨不同的人，不是同一改版的效果。\n4. 有混淆因素。同期有一个只针对新用户的优惠券活动，涨幅可能来自优惠券而不是改版。\n5. 没有随机分流记录，这不是一个可以做因果结论的实验。\n\n建议：先让同事核对导出口径、补上样本量；然后做一次真正的随机分流实验（同一人群随机分到新旧版），并把优惠券活动错开或在两组中同等投放。拿到结果前，最多小流量灰度，不要全量。",
+        "technical-chinese": "请求进来后，先由中间件校验数据格式，通过就放进队列。后台 worker 从队列取出任务，去调用第三方 API。\n\n这里有个容易误会的点：接口返回 HTTP 202 只表示「任务已收下」，不代表任务真的执行成功。\n\n问题出在任务状态只存在 worker 的内存里。worker 一重启，状态就没了。前端刷新时只能从数据库读到旧的 pending 状态，于是页面一直转圈。\n\n这个根因已经复现过：把 worker 停掉，重启后刷新页面，就能看到一直 loading。\n\n打算把任务状态和最终结果都写进数据库，这样重启也不会丢，但目前还没开始实现。",
+        "faithful-dense": "# 迁移发布须知\n\n**时间**：9 月 20 日 02:00–02:20（Asia/Shanghai）\n**影响范围**：仅 EU workspace；US 不受影响。\n\n## 执行步骤（任何一步失败就停止，不要继续）\n1. 备份，并确认快照能够恢复。\n2. 暂停写入。\n3. 运行：`migrate --region eu --batch-size 200`\n4. 完成后恢复写入，并确认上传、下载、webhook 三项均正常。\n\n## 回滚\n- 超过 20 分钟仍未完成，由值班李明回滚。\n- 注意：回滚只能恢复到迁移前的数据。暂停写入期间如果有违规写入，这些写入会丢失。\n\n## 迁移期间和之后的已知影响\n- 旧 SDK（<2.4）的上传接口会返回 HTTP 426；下载功能不受影响，仍可使用。\n- 移动端离线草稿不会自动迁移，需提醒用户先同步。\n- 旧下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。",
+        "exact-format": "{\"status\": \"未发布\", \"reason\": \"测试环境 smoke 测试已通过，但生产部署尚未开始。\", \"next_action\": \"等待明早 10:00 负责人决定是否发布。\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，预计 10 分钟。期间无法上传新文件，但已上传的文件仍可正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "**What's happening**\n\nEvery active client polls our status endpoint once per second — 60 requests per minute each. With 500 active clients, that's about 30,000 requests per minute hitting us just to answer \"is it done yet?\"\n\n**Why it matters**\n\nThat volume is almost entirely wasted work. It scales linearly with active users, so it becomes a cost and capacity problem exactly when we're growing.\n\n**The obvious fix and its catch**\n\nPolling every 5 seconds instead of 1 cuts this to ~6,000 requests per minute — an 80% reduction. But it adds up to 4 seconds of delay before a user sees a status change. We currently promise status updates within 2 seconds, so this would break that commitment. Either we change the polling interval and renegotiate the promise, or we find another route.\n\n**Another option**\n\nWe have an SSE (server-sent events) prototype. Instead of clients asking repeatedly, the server pushes updates when something changes — that would cut the traffic and keep updates near-instant, preserving the 2-second promise. The catch: we haven't tested how it behaves when connections drop and reconnect, and we don't know what it costs to run at scale.\n\n**One caveat**\n\nAll the numbers above are calculated estimates, not results from an actual load test.\n\n**Suggested next steps**\n\n1. Run a real load test to confirm the request volume is actually a problem.\n2. Test the SSE prototype's reconnect behavior and measure its operating cost.\n3. Decide with that data: if SSE holds up, it's the better path since it keeps our 2-second promise. If not, we go to 5-second polling and update the commitment to customers first."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/0",
+      "character_count": 3802,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "claude",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 0,
+      "elapsed_seconds": 76.61,
+      "answers": {
+        "release-status": "结论：现在还不能上线。修复本身的证据是好的，但发布前必须做的验证还没做。\n\n已经做到的：\n- 定位到 Bug 出在上传重试——第一次请求超时后客户端重试，结果为同一次上传创建了两条 Asset。这是在本地复现的。\n- 修法是两处：给 Asset 的业务键加唯一约束，并让客户端重试时复用同一个 key。\n- 重复上传的本地回归测试 12/12 通过。\n\n还缺的（这些决定了能不能上线）：\n- 完整测试第一次是 86/87，失败项是一个 OAuth 回调超时。单独重跑该项通过，但完整测试还没重跑，所以“整套是绿的”目前没有证据。\n- 数据库迁移还没在 staging 执行过。\n- 生产的重试流量没有验证过，目前只有本地复现和本地测试。\n- 代码还没提交，也没有部署。\n\n还有一个回滚上的风险要先知道：只回滚应用删不掉数据库里的唯一约束，必须单独回滚迁移。也就是说出问题时是两步回滚，要提前把迁移回滚脚本准备好并验证。\n\n另外，之前那个第三方配额告警仍然存在，和这次修复无关，不要把它当成本次上线的验收信号，但它也不构成阻塞。\n\n建议按这个顺序推进：先提交代码；重跑一次完整测试，确认 87/87（如果 OAuth 回调仍然间歇超时，先查清是环境不稳还是真问题）；在 staging 执行迁移并验证迁移回滚脚本可用；在 staging 用重试/超时场景验证不再产生重复 Asset；然后再安排生产发布。这些做完再决定上线时间，我可以给出更准确的排期。",
+        "choose-provider": "推荐选 A。\n\n按你每月 1200 个任务算：A 是 ¥600 固定费含 1000 个，超出的 200 个按 ¥0.50 计 ¥100，合计 ¥700/月，在 ¥900 预算内，数据在中国境内，迁移 1 天，本月剩下的 2 天窗口来得及。\n\n另外两家为什么不选：\n- B 最便宜（1200 × ¥0.40 = ¥480/月，无月费），但服务在新加坡，不满足数据留在中国境内的硬要求，所以直接出局，不管多便宜。\n- C 是 ¥850/月含 1500 个，也在境内、也在预算内，但迁移要 3 个工作日，超过你只剩 2 天的窗口，这个月做不成。\n\nA 的代价和限制：\n- 它是按量超额计费，用量涨上去成本会跟着涨。到 1500 个时 A 正好是 ¥850，和 C 持平；超过 1600 个（600 + 0.5×600 = ¥900）就会突破你的预算上限。\n- 报价假设每月用量稳定、一个任务计一次、不含税。如果实际有重试或重复计数，单量会比 1200 高，成本要重算。\n\n什么情况下该换：\n- 如果月用量稳定爬到 1500 以上，C 更划算也更可控（固定 ¥850 封顶 1500）；但要注意 C 不支持超额加购，一旦超过 1500 就没有余量，得提前规划。换 C 需要预留 3 个工作日的迁移时间，不要等到窗口只剩两天。\n- 如果将来数据境内的要求放松，B 在这个量级上便宜得多（约 ¥480），值得重新评估，迁移成本是 2 个工作日。\n\n一点需要你知道的不确定性：三家在你这个工作负载上的速度和可靠性都是未知的，现在的比较只基于价格、数据所在地和迁移工期。建议 A 上线后先观察一段时间的实际时延和失败率，再决定是否长期绑定。",
+        "causal-uncertainty": "先别信，更不要据此全量。\n\n“提升 50%”这个说法本身没错——2% 到 3% 确实是相对提升 50%——但绝对差只有 1 个百分点，而现有数据支撑不了“这 1 个百分点是改版带来的”这个结论。问题有几层：\n\n数字本身还没对齐。后台导出文件里同一周新版是 2.7%，周报写的是 3%，口径还没核对。如果 2.7% 才对，相对提升是 35% 而不是 50%。\n\n没法判断这是不是噪声。周报没有样本量，也没有置信区间。如果新版只跑了几百个新注册用户，2% 和 3% 的差距完全可能是随机波动。\n\n两组人本来就不一样。新版只发给新注册用户，旧版包含新老用户，而且没有随机分流记录。新用户和老用户的付费行为天然不同，这个对比等于在比两拨不同的人，不是在比两个版本。\n\n还有一个同期的混淆因素。同一时期有一个只针对新用户的优惠券活动，它的覆盖人群和新版几乎重合。付费率的提升可能来自优惠券，也可能来自改版，现在的数据分不开。\n\n要把这件事说清楚，需要做这几件事：核对后台导出和周报的口径，确定到底是 2.7% 还是 3%；拿到两组的样本量和转化分子分母，算出置信区间；把对比限制在新注册用户对新注册用户；最关键的是做一次随机分流实验，并且让优惠券活动在两组中同等覆盖（或者错开时间），这样才能把改版的效果单独分出来。\n\n在这些之前，如果确实想推进，可以先做小比例灰度（比如 10%）加随机分流，而不是立刻全量。",
+        "technical-chinese": "请求先经过中间件做 schema 校验，通过后进入队列；worker 从队列取出任务，再去调用第三方 API。\n\n这里有个容易误解的点：HTTP 202 只表示请求已被接收，并不保证任务真的执行成功。\n\n出问题的地方在于任务状态只存在 worker 的内存里。worker 一重启，这些状态就没了。前端刷新页面时只能从数据库读到重启前的旧状态 pending，于是界面一直转圈加载。\n\n这个根因已经复现过：停掉 worker，重启后刷新页面，就能看到一直 loading 的现象。\n\n打算的修法是把任务状态和最终结果持久化到数据库，但目前还没有实现。",
+        "faithful-dense": "## 迁移窗口\n\n9 月 20 日 02:00–02:20（Asia/Shanghai）。只影响 EU workspace，US 不受影响。\n\n## 执行步骤（按顺序，任何一步失败就停止，不要继续往下走）\n\n1. 先做备份，并确认快照能够成功恢复。\n2. 暂停写入。\n3. 运行迁移命令：\n   ```\n   migrate --region eu --batch-size 200\n   ```\n4. 迁移完成后恢复写入，并确认上传、下载、webhook 三项都正常。\n\n## 回滚\n\n如果超过 20 分钟仍未完成，由值班的李明执行回滚。\n\n注意回滚的边界：回滚只能恢复到迁移前的数据。暂停写入期间如果有违规写入，这些写入在回滚后会丢失。所以第 2 步的写入暂停一定要落实。\n\n## 迁移期间用户会遇到什么\n\n- 使用旧 SDK（低于 2.4）的用户，调用上传接口会收到 HTTP 426；下载功能不受影响，仍然可用。\n- 移动端的离线草稿不会自动迁移，用户必须先同步，否则草稿不会带过去。\n- 旧的下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟。延迟不会造成重复计费。",
+        "exact-format": "{\"status\": \"尚未发布\", \"reason\": \"测试环境冒烟测试已通过，但生产部署还没有开始。\", \"next_action\": \"等待明早 10:00 负责人决定是否发布。\"}",
+        "already-clear": "今晚 22:00 到 22:10 将暂停上传功能，请在 22:00 前保存好草稿。此期间已上传的文件仍可正常下载。",
+        "english-explanation": "**The short version:** our one-second polling generates a lot of traffic — 60 status requests per minute per active client, which at 500 active clients is 30,000 requests per minute. Moving to five-second polling would cut that to 6,000 per minute, but it would also add up to four seconds of delay in detecting a status change compared to one-second polling.\n\n**Why that matters for us:** we currently promise status updates within two seconds. Five-second polling would break that promise, so this isn't purely an engineering call — it's a product commitment we'd need to change, or find another way to keep.\n\n**An important caveat on the numbers:** 30,000 and 6,000 requests per minute are calculated from the polling interval and client count, not measured in a load test. We don't yet know where the actual breaking point is, or whether 30,000/minute is genuinely causing problems today.\n\n**Options:**\n\n- **Slow the polling to five seconds.** An 80% traffic reduction, cheap to implement, but it violates the two-second promise as written.\n- **Switch to server-sent events (SSE).** A prototype already exists. SSE pushes updates as they happen, so it could reduce traffic *and* keep updates well under two seconds. The unknowns are reconnect behavior (what happens when a connection drops) and operating cost — neither has been tested.\n- **Do nothing yet** and first run a load test to find out whether 30,000 requests/minute is actually a problem at our current scale.\n\n**What I'd suggest:** start with the load test, because it's the cheapest way to find out whether this is urgent or theoretical, and it gives us a real baseline to compare SSE against. In parallel, someone should test the SSE prototype's reconnect behavior and measure its cost — if SSE holds up, it's the option that doesn't force us to renegotiate the two-second promise."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/1",
+      "character_count": 4721,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "claude",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 0,
+      "elapsed_seconds": 94.05,
+      "answers": {
+        "release-status": "结论：现在不能上线。修复方向是对的，但验证还没做完，而且这次改动有个不对称的风险——回滚比平时麻烦。\n\n现在确实站得住的：\n- 根因清楚：上传第一次请求超时后客户端重试，导致同一条 Asset 被创建两次。已在本地复现。\n- 修复方案对症：Asset 业务键加唯一约束 + 客户端复用同一个 key，双侧都堵上了。\n- 重复上传的本地回归 12/12 通过。\n\n还不能算过关的：\n- 完整测试第一次 86/87，失败项是 OAuth 回调超时。单独重跑通过，但完整测试没有重跑过——所以我们目前没有一次完整的绿色结果，也还不知道那次失败是偶发抖动还是被本次改动影响。\n- 数据库迁移没有在 staging 执行过。唯一约束落到已有数据上，如果存量里已经有重复记录，迁移会直接失败。这一点完全没验证。\n- 生产的重试流量没有验证，只验证了本地构造的场景。\n- 代码没提交，也没部署。也就是说离上线还差好几步，不只是\"点一下发布\"。\n\n需要特别提醒的一点：这次不是纯应用改动。只回滚应用是删不掉数据库约束的，必须单独回滚迁移。所以出问题时的恢复路径比平常长，上线前要先把回滚迁移脚本准备好并演练过。\n\n另外，之前的第三方配额告警仍然存在，但和这次修复无关，不应该算作本次的阻塞项，也不该指望这次上线把它带过去。\n\n建议的放行条件（按顺序）：\n1. 代码提交。\n2. 完整测试重跑一次，拿到干净的 87/87；如果 OAuth 回调再次超时，先查清原因再往下走。\n3. 在 staging 执行迁移，先确认存量数据里没有会撞唯一约束的重复记录（有的话要先定清洗方案）。\n4. 准备并验证回滚迁移脚本。\n5. 在 staging 上模拟一次超时重试，确认不再产生重复 Asset。\n\n这些做完再定上线时间。以现在的状态给我一个\"可以上线\"的判断，我不会签。",
+        "choose-provider": "推荐 A。\n\n**为什么**\n\n你的三个硬条件里，数据留在中国境内是最先起作用的一条——B 在新加坡，直接出局，哪怕它最便宜（1200 × ¥0.40 = ¥480）。剩下 A 和 C 都在境内。\n\n按每月 1200 个任务算：\n- A：¥600 月费（含 1000 个）+ 200 个超额 × ¥0.50 = **¥700/月**，在 ¥900 预算内。\n- C：固定 **¥850/月**，也在预算内，但上限 1500 个，且不支持超额加购。\n\n真正的分水岭是时间：本月只剩 2 天迁移窗口。A 迁移需要 1 天，来得及；C 需要 3 天，这个月做不完。所以按你给的条件，A 是唯一既满足数据境内、又在预算内、又能在窗口期内落地的方案。价格上 A 还比 C 便宜 ¥150/月。\n\n**代价**\n\n- A 是唯一一家按当前量就已经进入超额计费的方案，量涨了成本是线性上去的。触及你 ¥900 预算的临界点是每月 1600 个任务（600 + 600 × 0.5 = 900）。超过 1600 就爆预算。\n- C 虽然贵、这个月也来不及，但它在 1500 个以内成本完全固定，量波动时更好做预算。选 A 就是放弃了这份确定性。\n- 最需要说清楚的一点：三家在你这个工作负载上的速度和可靠性都是未知的。这个推荐纯粹建立在价格、数据驻留和迁移工期上，不包含任何性能判断。迁移完成后要尽快自己压一遍实际延迟和失败率。\n\n**什么情况下要换**\n\n1. 月用量稳定超过 1500 个 → A 的账单接近甚至突破预算，此时应重新评估；但注意 C 的上限也是 1500，超过这条线两家都不合适，得重新谈。\n2. 月用量稳定落在 1200–1500 且你更看重预算可预测性 → 下个月有完整迁移窗口时，可以考虑换 C（多花 ¥150 买固定成本）。\n3. A 的实测性能或可靠性达不到要求 → 境内只剩 C 一个备选，要提前留出 3 天迁移窗口。\n4. 数据驻留要求放宽 → B 会立刻变成最便宜的选项（¥480/月，且无月费、成本随量线性），值得重新比较；但它需要 2 个工作日做接口迁移，正好用满你现在的窗口。\n\n另外提醒一句：以上全部基于你给的假设——用量稳定、一个任务计一次、不含税。如果实际是按调用次数而非任务数计费，或者有重试放大，A 的超额部分会明显偏离这个估算。",
+        "causal-uncertainty": "不能。这个数字目前不足以支撑\"立刻全量\"的决定，问题不在于结论一定是错的，而在于我们现在根本没法判断它对不对。\n\n几个问题，按严重程度排：\n\n**1. 对比的不是同一群人（最致命）**\n新版只给新注册用户，旧版包含新老用户。所以 2% 和 3% 比较的是两个不同人群，不是两个版本。新用户和老用户的付费行为本来就不一样，这个差异完全可能由人群构成造成，跟改版无关。\n\n**2. 同期有干扰因素**\n同一时间还有一个**仅对新用户**的优惠券活动。它的覆盖人群和新版的覆盖人群完全重合。也就是说，新版用户看到的提升里，有多少来自改版、多少来自优惠券，现在无法拆开。这两个因素在数据上是纠缠在一起的。\n\n**3. 没有随机分流记录**\n没有随机分流，就不是一个实验，只是两组观察数据。哪怕人群和活动的问题都解决了，也仍然只能说\"相关\"，不能说\"改版带来了提升\"。\n\n**4. 数字本身对不上**\n后台导出文件同一周新版是 2.7%，周报写的是 3%，口径还没核对。如果真值是 2.7%，那所谓的\"50%\"实际是 35%。在口径没核对之前，这个数字不能直接用。\n\n**5. 没有样本量和置信区间**\n2% 到 3% 看着是翻了一半，但如果新版样本只有几百人，这个差距很可能在随机波动范围内。没有样本量，我们连\"这个差异是否真实存在\"都回答不了。\n\n顺带说一句口径问题：\"提升 50%\"是相对提升，绝对提升是 1 个百分点（或 0.7 个百分点，取决于用哪个数）。汇报时用相对值会把效果说得比实际感受大很多，容易误导决策。\n\n**建议怎么做**\n\n1. 先核对数据口径，确定到底是 2.7% 还是 3%，并把样本量补上。\n2. 在旧版里单独拆出\"新注册用户\"这一层，和新版的新用户做同层对比。这一步成本很低，做完就能排除掉相当一部分人群差异。\n3. 确认优惠券活动的覆盖范围和时间窗口，看能否找到没领券的新版用户作为对照。\n4. 真要下结论，就补一个带随机分流的小流量实验，跑到有足够样本量再看结果。\n\n在这之前，如果新版没有明显的稳定性或体验问题，可以考虑先扩到一个中等比例（比如 20%–50%）继续观察，但不要用这个数字作为\"立刻全量\"的依据。",
+        "technical-chinese": "整个流程是这样的：\n\n请求先经过中间件做参数校验，校验通过后进入队列排队。后台的 worker 从队列里取出任务，再去调用第三方 API。\n\n这里有个容易误解的地方：接口返回 HTTP 202，只表示\"请求已经收下了\"，不代表任务已经执行成功。两者之间还隔着排队和实际调用。\n\n出问题的根源在于任务状态只存在 worker 的内存里，没有落盘。worker 一重启，内存里的状态就全没了。这时前端刷新页面，只能从数据库读到那条还停留在 pending 的旧记录，于是页面就一直转圈加载，永远等不到结果。\n\n这个原因已经确认了：我们停掉 worker、重启后再刷新页面，稳定复现了同样的现象。\n\n打算的修复方案是把任务状态和最终结果都持久化到数据库，这样 worker 重启后状态不会丢，前端也能读到真实进度。不过这部分目前还没开始实现。",
+        "faithful-dense": "# 发布须知：EU workspace 数据迁移\n\n## 基本信息\n- **时间**：9 月 20 日 02:00–02:20（Asia/Shanghai）\n- **影响范围**：仅 EU workspace。US 不受影响，无需任何操作。\n- **值班回滚负责人**：李明\n\n## 执行步骤（严格按顺序，任何一步失败立即停止）\n\n1. **备份**，并确认快照可以正常恢复。不要跳过验证这一步。\n2. **暂停写入**。\n3. 执行迁移命令：\n   ```\n   migrate --region eu --batch-size 200\n   ```\n\n> ⚠️ 以上任一步骤失败，就地停止，不要继续往下执行。\n\n## 超时处理\n\n**超过 20 分钟未完成，由值班李明执行回滚。**\n\n关于回滚要提前知道两件事：\n- 回滚只能恢复到迁移前的数据状态。\n- 暂停写入期间如果有违规写入，这些写入在回滚时会丢失。\n\n## 迁移期间的用户影响\n\n| 项目 | 表现 |\n|---|---|\n| 旧 SDK（<2.4）上传接口 | 返回 HTTP 426；**下载功能仍然可用** |\n| 旧下载链接 | 继续有效 24 小时 |\n| EU 的 webhook | 最多延迟 15 分钟，**不会重复计费** |\n| 移动端离线草稿 | **不会自动迁移**，需用户提前自行同步 |\n\n移动端离线草稿这一条建议提前通知用户，迁移开始后再同步就来不及了。\n\n## 完成后收尾\n\n1. 恢复写入。\n2. 逐项确认以下三项功能正常：\n   - 上传\n   - 下载\n   - webhook",
+        "exact-format": "{\"status\": \"未发布\", \"reason\": \"测试环境 smoke 测试已通过，但生产部署尚未开始。\", \"next_action\": \"等待明早 10:00 负责人决定是否发布。\"}",
+        "already-clear": "【上传服务暂停通知】\n\n今晚 22:00 至 22:10，上传功能将暂停约 10 分钟。\n\n这期间已经上传的文件不受影响，仍然可以正常下载。\n\n请在 22:00 前保存好正在编辑的草稿，以免丢失。感谢配合。",
+        "english-explanation": "**The short version:** our status-polling design scales badly with active users, and the obvious fix would break a promise we've made in the product.\n\n**What's happening**\n\nEach active client polls for status once per second — 60 requests per minute, per client. At 500 active clients, that's 30,000 status requests per minute hitting our backend. These requests do nothing except ask \"are we done yet?\", and the volume grows linearly with every client we add.\n\n**Why it matters**\n\nThis is pure overhead that scales with growth. It's infrastructure cost and backend load that buys us no user value beyond the status update itself — and it gets worse precisely as we succeed at acquiring users.\n\n**The options, and the catch**\n\nThe simple fix is to poll every five seconds instead of every one. That cuts traffic to 6,000 requests per minute — an 80% reduction. The cost is latency: status detection would be up to four seconds slower than it is today.\n\nThat's the catch. **We currently promise status updates within two seconds.** Five-second polling would break that promise, so this isn't a purely technical decision — it needs a product call on whether that commitment can change, or whether we pick an interval that stays inside it (two-second polling, for instance, would halve traffic while still meeting the promise, though that specific number is my extrapolation, not something we've calculated).\n\nThere's also an SSE (server-sent events) prototype in existence. Conceptually it's the right answer — the server pushes updates instead of clients asking repeatedly, which would give us both lower traffic *and* faster updates.\n\n**What we don't know yet**\n\nTwo important caveats before anyone treats these numbers as decisions:\n\n1. The request figures above are a calculated estimate from the polling math, not results from a load test. We don't actually know at what point this load becomes a problem for our backend.\n2. On the SSE prototype, reconnect behavior and operating cost are both untested. Reconnect handling is usually where SSE gets difficult in practice, and the cost profile could be better or worse than polling — we genuinely don't know.\n\n**What I'd suggest**\n\n- Decide whether the two-second status promise is something we want to keep. That single answer determines which options are even on the table.\n- Run an actual load test so we know whether this is an urgent problem or a future one.\n- Fund a small amount of work to test the SSE prototype's reconnect behavior and measure its cost, so we can evaluate it as a real option rather than a hopeful one."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/2",
+      "character_count": 6517,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "gpt",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 0,
+      "elapsed_seconds": 56.32,
+      "answers": {
+        "release-status": "建议暂缓上线。本地已确认修复有效，但上线前的验证还没完成。\n\n问题发生在上传重试：第一次请求超时后，客户端重试会创建重复的 Asset。修复是在 Asset 业务键上增加唯一约束，并让客户端重试时复用同一个 key。重复上传的本地回归测试 12/12 通过。\n\n目前还有三个缺口：完整测试首次为 86/87，失败的是 OAuth 回调超时，虽然单独重跑通过，但完整测试尚未重跑；数据库迁移尚未在 staging 执行；生产重试流量尚未验证。代码也尚未提交、部署。\n\n建议先重跑完整测试，在 staging 执行迁移并验证上传重试，同时确认迁移回滚步骤，再安排生产重试流量验证。只回滚应用无法移除数据库唯一约束，必须单独回滚迁移，发布方案需要覆盖这一点。\n\n此前的第三方配额告警仍然存在，与本次修复无关，需要单独跟进，不能算作已解决。",
+        "choose-provider": "推荐 A。按每月 1200 个任务计算，费用为 ¥600 + 200 × ¥0.50 = ¥700，低于 ¥900 预算；数据留在中国境内，迁移需要 1 天，也能放进本月剩余的 2 天窗口。\n\n代价是每月固定支付 ¥600，超过 1000 个任务后按量加费。三家在你的工作负载上的速度和可靠性都未知，因此目前推荐依据是费用、数据所在地和迁移时间，性能仍需验证。\n\nB 每月只需 ¥480，但数据在新加坡，不满足境内要求。C 每月 ¥850，限 1500 个任务且不能加购，迁移还需要 3 天，超出本月窗口。\n\n如果用量稳定超过 1500 个，C 已无法承接；A 在 1600 个任务时恰好花满 ¥900，超过后需要重新选择能满足境内要求和预算的方案。如果 A 的实际速度或可靠性不达标，也应重新评估；用量不超过 1500 个且能留出 3 天迁移窗口时，可考虑 C，但需先验证其表现。\n\n以上按内部报价计算，假设用量稳定、每个任务计费一次，不含税。",
+        "causal-uncertainty": "目前不能据此认定改版让付费率提升了 50%，也不建议立刻全量。\n\n从 2% 到 3%，算术上确实是相对增长 50%，绝对增加 1 个百分点。但新版只覆盖新注册用户，旧版包含新老用户，两组不能直接比较；同期还有仅面向新用户的优惠券活动，无法区分改版和优惠券的影响。没有随机分流记录，也缺少样本量和置信区间，无法判断差异是否可靠。\n\n数据本身也未对齐：后台同周导出为 2.7%，周报为 3%。若按 2.7% 计算，相对增长是 35%，但这同样不能证明是改版带来的。\n\n建议先核对统计口径和原始数据，补齐样本量，再在可比的新用户中随机分流，并让两组优惠券条件一致。确认效果及不确定性后，再决定是否全量。",
+        "technical-chinese": "请求先经过中间件，检查数据结构是否符合要求，通过后进入任务队列。后台 worker 从队列中取出任务，再调用第三方 API。接口返回 HTTP 202，只表示请求已被接收，不代表任务已经执行成功。\n\n页面一直显示加载中，是因为任务状态只保存在 worker 的内存里，重启后就会丢失。用户刷新页面时，前端只能从数据库读到旧的 pending（等待处理）状态，因此会一直等待。这个原因已通过停止 worker、重启后刷新页面的操作复现确认。\n\n计划将任务状态和最终结果持久化到数据库，让 worker 重启后仍能查到，但这项修复尚未实现。",
+        "faithful-dense": "迁移时间：9 月 20 日 02:00–02:20（Asia/Shanghai）。仅影响 EU workspace，US 不变。\n\n迁移前须知：\n- 使用旧 SDK（版本低于 2.4）时，上传接口会返回 HTTP 426，下载仍可用。\n- 移动端离线草稿不会自动迁移，用户须在迁移前同步。\n- 旧下载链接继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n执行顺序：\n1. 备份，并确认快照可以恢复。\n2. 暂停写入。\n3. 运行 `migrate --region eu --batch-size 200`。\n4. 完成后恢复写入，确认上传、下载和 webhook 均正常。\n\n任何一步失败，立即停止。迁移超过 20 分钟仍未完成，由值班李明回滚。\n\n回滚只能恢复迁移前的数据。暂停写入期间如果发生违规写入，这些写入会丢失。",
+        "exact-format": "{\"status\":\"尚未发布\",\"reason\":\"测试环境冒烟测试已通过，生产部署尚未开始\",\"next_action\":\"等待负责人明早十点决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，已上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "Each active client checks status once a second, generating 60 requests per minute. With 500 active clients, that adds up to 30,000 requests per minute. This matters because status checks create substantial traffic even when nothing changes. These figures are calculated estimates, not load-test results.\n\nChecking every five seconds would reduce that traffic by 80%, to 6,000 requests per minute, but could add up to four seconds to detection time compared with the current interval. That would conflict with the product’s promise of updates within two seconds.\n\nKeep the current interval while testing alternatives. Load-test polling to measure its actual impact, and evaluate the existing server-sent events (SSE) prototype, which lets the server push updates to clients. Before adopting SSE, test reconnect behavior, confirm it meets the two-second promise, and measure operating cost. Five-second polling is an option only if we revise the product promise and accept slower updates."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/3",
+      "character_count": 2852,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "gpt",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 0,
+      "elapsed_seconds": 51.18,
+      "answers": {
+        "release-status": "建议暂不上线。本地修复已通过针对性测试，但上线验证尚未完成，代码也未提交或部署。\n\n问题是首次上传超时后，客户端重试导致同一条 Asset 被创建两次。修复给 Asset 业务键加了数据库唯一约束，并让客户端复用同一个 key；重复上传的本地回归测试 12/12 通过。\n\n上线前还需完成：\n- 重跑完整测试：首次结果为 86/87，失败的 OAuth 回调超时项单独重跑通过，但完整测试尚未重跑。\n- 在 staging 执行并验证数据库迁移，补齐生产重试流量验证。\n- 准备独立的迁移回滚方案：只回滚应用不会移除数据库约束。\n\n完成这些验证后再决定发布。此前的第三方配额告警仍存在，与本次修复无关，需单独跟进。",
+        "choose-provider": "推荐 A。按每月 1200 个任务计算，费用为 ¥600 + 200 × ¥0.50 = ¥700，低于 ¥900 预算；数据留在中国境内，迁移需 1 天，能赶上本月 2 天的窗口。\n\n代价是固定月费和超额费用；三家的实际速度与可靠性都未知，选 A 后仍需验证。\n\nB 每月仅 ¥480、迁移需 2 天，但数据在新加坡，不满足境内要求。C 每月 ¥850、境内容量上限为 1500 个且不能加购，迁移需 3 天，本月窗口不够。\n\n若用量降到 1500 个以内，C 在报价上也不比 A 便宜；若超过 1600 个，A 会超预算，C 又无法承接，届时需另找方案或调整预算。若 A 的实际性能不达标，可在迁移窗口至少 3 天、用量不超过 1500 个且验证 C 达标后考虑换 C。\n\n以上按用量稳定、每任务计一次、不含税计算。",
+        "causal-uncertainty": "不能据此认定改版让付费率提升了 50%，也不建议立刻全量。\n\n2% 到 3% 确实是相对增长 50%，绝对增加 1 个百分点，但目前数据不足以证明这是改版带来的：\n- 新版只有新用户，旧版包含新老用户，两组不可直接比较。\n- 同期新用户还有优惠券活动，无法分清两者影响。\n- 没有样本量、置信区间和随机分流记录，无法判断结果是否稳定。\n- 后台同周数据为 2.7%，周报为 3%，口径尚未核对。\n\n建议先核对数据口径、补齐样本量，再对可比用户随机分流，并让两组优惠券条件一致。确认付费率提升及其不确定范围后，再决定是否全量。",
+        "technical-chinese": "请求先经过中间件校验数据结构，通过后进入任务队列，再由后台 worker 取出任务并调用第三方 API。HTTP 202 只表示请求已被接受，不代表任务执行成功。\n\n目前任务状态只存在 worker 内存中，重启后就会丢失。前端刷新时只能读到数据库里旧的 pending（待处理）状态，因此一直显示加载中。这个根因已通过停止 worker、重启后刷新页面复现确认。\n\n计划将任务状态和最终结果持久化到数据库，但尚未实现。",
+        "faithful-dense": "迁移时间：9 月 20 日 02:00–02:20（Asia/Shanghai）。仅影响 EU workspace，US 不变。\n\n迁移前须知：\n- 移动端离线草稿不会自动迁移，用户须提前同步。\n- 旧 SDK（版本 <2.4）的上传接口会返回 HTTP 426，下载仍可用。\n- 旧下载链接继续有效 24 小时。\n- EU webhook 最多延迟 15 分钟，不会重复计费。\n\n执行顺序：\n1. 备份数据，并确认快照可以恢复。\n2. 暂停写入。\n3. 运行 `migrate --region eu --batch-size 200`。\n4. 完成后恢复写入，确认上传、下载和 webhook 均正常。\n\n任何一步失败都立即停止。超过 20 分钟仍未完成，由值班李明回滚。\n\n回滚只能恢复迁移前的数据。暂停写入期间如有违规写入，这些数据会丢失。",
+        "exact-format": "{\"status\":\"生产尚未部署\",\"reason\":\"测试环境冒烟测试已通过，生产部署尚未开始\",\"next_action\":\"明早十点由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，已上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "At 500 active clients, polling every second generates an estimated 30,000 status requests per minute. Polling every five seconds would reduce that to 6,000—an 80% reduction—but could detect updates up to four seconds later than today. That would conflict with the product’s promise of updates within two seconds. These are calculations, not load-test results.\n\nKeep one-second polling while testing alternatives. Load-test it to measure actual capacity and cost, and evaluate the existing SSE prototype, including reconnect behavior and operating cost. Five-second polling is an option only if the product can relax its two-second promise; SSE needs validation before a rollout decision."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/4",
+      "character_count": 2328,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "gpt",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 0,
+      "elapsed_seconds": 57.0,
+      "answers": {
+        "release-status": "建议暂缓上线。修复已通过本地专项测试，但还缺 staging 数据库迁移和生产重试流量的验证。\n\n已在本地复现的问题是：首次上传请求超时后，客户端重试，导致同一条 Asset 被创建两次。修复给 Asset 的业务键增加了唯一约束，并让客户端重试时复用同一个 key；重复上传的本地回归测试 12/12 通过。\n\n完整测试首次通过 86/87，失败项是 OAuth 回调超时。该项单独重跑通过，但完整测试尚未重跑，因此还不能说完整测试全部通过。代码也尚未提交或部署。\n\n建议先重跑完整测试，在 staging 执行数据库迁移并验证上传重试，再安排生产重试流量验证。上线前还需准备独立的迁移回滚步骤：只回滚应用不会删除数据库唯一约束。\n\n此前的第三方配额告警仍然存在，与本次修复无关，需要单独跟进。",
+        "choose-provider": "推荐 A。按每月稳定处理 1200 个任务、每个任务计费一次且不含税计算，月费为 ¥600 + 200 × ¥0.50 = ¥700，比预算上限少 ¥200。数据留在中国境内，迁移需要 1 天，也能赶上本月剩余的 2 天窗口。\n\n代价是固定月费 ¥600，超过 1000 个任务后按量加收。三家在你实际工作负载上的速度和可靠性都未知，价格合适还不能证明性能达标。\n\nB 每月只需 ¥480，迁移需 2 个工作日，但数据在新加坡，不符合境内存储要求。C 每月 ¥850，最多处理 1500 个任务，数据在境内，但迁移需 3 天，本月窗口不够。\n\n如果后续用量稳定在超过 1500、但不超过 1600 个任务，A 的费用会超过 C 的 ¥850，不过 C 无法承接超过 1500 个任务，所以也不能换成 C。A 在 1600 个任务时正好达到 ¥900；若预计超过 1600 个，应重新寻找满足预算和境内存储要求的方案。现有报价下，C 在可承接的用量范围内没有价格优势；只有后续实测证明它的速度或可靠性更适合、且能安排 3 天迁移窗口时，才值得考虑切换。",
+        "causal-uncertainty": "目前不能据此认定“改版让付费率提升 50%”，也不建议立刻全量。\n\n如果旧版确实是 2%、新版是 3%，相对增长 50% 的计算没错，绝对变化是增加 1 个百分点。但新版只覆盖新注册用户，旧版包含新老用户，两组不能直接比较；同期还有仅面向新用户的优惠券活动，无法区分改版和优惠券各自的影响，也没有随机分流记录。\n\n数据本身也没核对清楚：后台导出显示同一周新版为 2.7%，周报写的是 3%。此外，缺少样本量和置信区间，无法判断差异是否可能来自随机波动。\n\n建议先核对付费率口径和原始数据，补齐样本量，再对可比用户随机分流，并让两组的优惠券条件一致。确认提升幅度和不确定性后，再决定是否全量。",
+        "technical-chinese": "请求先经过中间件，按 schema 校验数据结构；校验通过后，任务进入队列，由 worker 取出并调用第三方 API。HTTP 202 只表示请求已被接受，不代表任务执行成功。\n\n页面一直显示加载中，是因为任务状态只保存在 worker 的内存里，重启后就会丢失。此时刷新页面，前端只能从数据库读到旧的 pending（待处理）状态，所以会一直等待。这个根因已通过停止 worker、重启后刷新页面的操作复现确认。\n\n计划将任务状态和最终结果持久化到数据库，让 worker 重启后仍能读取，但目前还没有实现。",
+        "faithful-dense": "迁移时间为 9 月 20 日 02:00–02:20（Asia/Shanghai），仅影响 EU workspace，US 保持不变。\n\n执行顺序如下，任何一步失败都必须停止：\n\n1. 备份，并确认快照能够恢复。\n2. 暂停写入。\n3. 运行 `migrate --region eu --batch-size 200`。\n4. 迁移完成后恢复写入，确认上传、下载和 webhook 均正常。\n\n请提前告知用户以下影响：\n\n- 使用旧 SDK（版本 <2.4）时，上传接口会返回 HTTP 426，下载仍可用。\n- 移动端离线草稿不会自动迁移，用户必须先同步。\n- 旧下载链接继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n如果迁移超过 20 分钟仍未完成，由值班李明回滚。回滚只能恢复迁移前的数据；暂停写入期间如果发生违规写入，这些写入会丢失。",
+        "exact-format": "{\"status\":\"测试环境冒烟测试已通过，生产部署尚未开始\",\"reason\":\"是否发布尚待负责人决定\",\"next_action\":\"明早十点由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，已上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "Polling once a second generates 60 status requests per minute for each active client. With 500 active clients, that adds up to 30,000 requests per minute. This is a calculated estimate, not a load-test result, so it does not establish how much load the system can handle.\n\nPolling every five seconds would reduce that to 6,000 requests per minute, an 80% reduction. But detecting a status change could take up to four seconds longer than with one-second polling, which conflicts with the current promise of updates within two seconds.\n\nI recommend keeping one-second polling while load-testing it and evaluating the existing SSE prototype. Before choosing SSE, test its reconnect behavior, whether it meets the two-second promise, and its operating cost. Five-second polling is an option only if the product can relax its update-time promise."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/5",
+      "character_count": 2745,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "grok",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 0,
+      "elapsed_seconds": 100.67,
+      "status": "completed",
+      "error": "Unrecognized runtime response keys: ['text', 'stopReason', 'sessionId', 'requestId', 'thought', 'usage', 'num_turns', 'total_cost_usd', 'total_cost_usd_ticks', 'modelUsage']",
+      "answers": {
+        "release-status": "现在不能上线。\n\n上传超时后客户端重试会创建两条同一 Asset。本地已复现。修复是给 Asset 业务键加唯一约束，并让客户端复用同一个 key。重复上传本地回归 12/12 通过。\n\n仍未完成：完整测试首次 86/87（OAuth 回调超时，该项单独重跑通过，全量未重跑）；数据库迁移未在 staging 执行；生产重试流量未验证；代码未提交、未部署。只回滚应用去不掉数据库约束，迁移必须单独回滚。第三方配额告警仍在，与本次修复无关。\n\n建议：提交代码 → staging 执行迁移并重跑完整测试 → 再验证接近生产的重试流量。这些完成前不要上线，回滚预案要同时覆盖应用和迁移。",
+        "choose-provider": "推荐 A。\n\n条件：每月约 1200 个任务（一任务计一次、用量稳定、不含税），预算最多 ¥900，数据须留在中国境内。本月迁移窗口还剩 2 天。三家在你这份负载上的速度和可靠性都未知。\n\n费用与约束：\n- A：¥600/月含 1000 个，超额 ¥0.50/个，境内，迁移 1 天。1200 个约 ¥700。\n- B：无月费，¥0.40/个，约 ¥480，新加坡，迁移 2 天。不满足境内要求。\n- C：¥850/月含 1500 个、不可超额，境内，迁移 3 天。窗口不够，本月迁不完。\n\n选 A：同时满足境内、预算和本月能迁完，月费约 ¥700。代价是超额按个计费，且表现未经实测。\n\n何时换：不再要求境内可改 B（约 ¥480）；月量到约 1500 时 A 也约 ¥850，可再比 C 的固定上限；月量超过 1800 时 A 会超过 ¥900；若 A 的速度或可靠性不达标，再换。",
+        "causal-uncertainty": "不能信，也不该立刻全量。\n\n周报用旧版付费率 2%、新版 3%，写成提升 50%。这是相对增幅，绝对只多 1 个百分点；且没有样本量和置信区间，无法判断波动还是实差。\n\n对比本身也不成立：新版只给新注册用户，旧版含新老用户；同期还有仅针对新用户的优惠券；没有随机分流记录。同一周后台导出新版是 2.7%，周报写 3%，口径还没核对。\n\n建议先对口径和样本量，再拿同期新用户、并处理优惠券干扰后比较。有随机分流再决定是否放量。现在全量会把人群差异和活动效果算进改版。",
+        "technical-chinese": "请求会先走中间件做 schema 校验，通过后进入队列。Worker 取出任务，再调用第三方 API。返回 HTTP 202 只表示已接收，执行成不成功要另看。\n\n任务状态目前只存在 worker 内存里，worker 一重启状态就丢。前端刷新只能读到数据库里仍是 pending 的旧记录，所以会一直转圈。这个根因已经复现：停掉 worker、重启后再刷新页面，就会一直 loading。\n\n计划把任务状态和最终结果写入数据库，但还没做。",
+        "faithful-dense": "9 月 20 日 02:00–02:20（Asia/Shanghai）做迁移，只影响 EU workspace，US 不变。\n\n顺序：先备份并确认快照能恢复 → 暂停写入 → 运行 migrate --region eu --batch-size 200。任何一步失败立刻停止。\n\n期间影响：\n- 旧 SDK <2.4：上传返回 HTTP 426，下载仍可用\n- 移动端离线草稿不会自动迁移，用户须先同步\n- 旧下载链接继续有效 24 小时\n- EU webhook 最多延迟 15 分钟，不会重复计费\n\n超过 20 分钟未完成，由值班李明回滚。回滚只能恢复迁移前的数据；暂停写入期间若有违规写入，这些写入会丢失。\n\n完成后恢复写入，并确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\":\"生产未部署\",\"reason\":\"测试环境 smoke 通过，生产部署尚未开始\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，已上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "Polling every second is 60 status requests per minute per active client. At 500 active clients that is about 30,000 requests per minute. That is a calculated estimate, not a load-test result. At that volume, status traffic can dominate cost and may hit rate limits or slow the API.\n\nThe product currently promises status updates within two seconds, so poll interval is an SLA decision, not only an infra tweak.\n\nOptions:\n- Poll every five seconds: about 6,000 requests per minute, with up to four extra seconds of detection delay versus one-second polling. That would miss the two-second promise.\n- Keep one-second polling if the two-second promise stays; budget for the load and confirm with a load test.\n- An SSE prototype could push updates instead of polling; reconnect behavior and operating cost are untested.\n\nIf the two-second promise is binding, do not move to five-second polling until a push path is tested. If the promise can change, five-second polling cuts estimated traffic by 80%, with slower detection. Load-test before committing."
+      },
+      "normalization_note": "Parsed existing Grok text field; no model call repeated.",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/6",
+      "character_count": 2656,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "gemini",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 55,
+      "elapsed_seconds": 5.51,
+      "status": "blocked",
+      "error": "Process failed; inspect stderr.txt",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/7"
+    },
+    {
+      "model_family": "gemini",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 55,
+      "elapsed_seconds": 4.52,
+      "status": "blocked",
+      "error": "Process failed; inspect stderr.txt",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/8"
+    },
+    {
+      "model_family": "gemini",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 55,
+      "elapsed_seconds": 4.69,
+      "status": "blocked",
+      "error": "Process failed; inspect stderr.txt",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/9"
+    },
+    {
+      "model_family": "grok",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 0,
+      "elapsed_seconds": 137.21,
+      "status": "completed",
+      "error": "Unrecognized runtime response keys: ['text', 'stopReason', 'sessionId', 'requestId', 'thought', 'usage', 'num_turns', 'total_cost_usd', 'total_cost_usd_ticks', 'modelUsage']",
+      "answers": {
+        "release-status": "现在不能上线。\n\n本地已复现的问题是：上传第一次超时后客户端再发一次，会建成两条同一条 Asset。处理方式是给 Asset 业务键加唯一约束，并让客户端复用同一个 key。重复上传的本地回归是 12/12 通过。完整测试只跑过一轮，86/87，失败的是 OAuth 回调超时；这项单独重跑通过，完整测试没有再跑。\n\n代码还没提交，也没有部署。数据库迁移没在 staging 执行，生产上的重试流量也没验证过。回滚时只回滚应用去不掉这条数据库约束，迁移要单独回滚。第三方配额告警还在，和这次修复无关，上线后仍会碰到。\n\n建议先提交，在 staging 执行迁移并重跑完整测试，再按生产形态验证重试，同时准备好迁移回滚。这些做完之前不要发生产。",
+        "choose-provider": "推荐 A。\n\n你的硬条件是数据留在中国境内、每月约 1200 个任务、预算不超过 ¥900。按用量稳定、一任务计一次、不含税来算：A 在境内，¥600/月含 1000 个、超额 ¥0.50/个，1200 个是 ¥700，迁移 1 天，赶得上剩下 2 天窗口。B 是 1200 × ¥0.40 = ¥480，最便宜，但在新加坡，不满足境内要求；迁到它现有接口要 2 个工作日。C 也在境内，¥850/月、上限 1500、不能超额，费用也在预算内，但迁移要 3 天，超过本月窗口。三家在你这套负载上的速度和可靠性都没有数据，这个推荐只覆盖价格、驻留地和迁移时间。\n\n代价：A 每月大约 ¥700；超出 1000 个按个加钱，量涨账单跟着涨。迁移占用 1 天。之后若要换供应商，还得再迁一次。\n\n什么情况下要换：若不再要求数据留在境内，B 更便宜，可以再看这 2 天接口迁移是否划算。A 在 1600 个时正好 ¥900，再多就超预算；C 最多 1500 且不能加购，量若稳定高于这个区间，两家都不合适，需要重新谈。若上线后 A 的速度或稳定性不够，要用实测再比，报价里看不出来。",
+        "causal-uncertainty": "不能据此立刻全量，也不能把这 50% 当成改版造成的。\n\n周报用旧版 2%、新版 3% 标了增长 50%，但没有样本量，也没有置信区间。新版只给新注册用户，旧版混了新老用户，两边不是同一群人。同一周后台导出的新版付费率是 2.7%，和周报 3% 还没对口径。同期还有一个只针对新用户的优惠券，和新版叠在一起。没有随机分流记录，所以没有「同等用户、只改版面」的对照。\n\n目前只能说新版用户那条付费率数字更高，原因可能是用户结构、优惠券、口径或波动。先核对 2.7% 和 3%，补样本量和对照（至少比较同期新用户），再决定是否放量。",
+        "technical-chinese": "请求会先经过中间件做 schema 校验，通过后才入队。worker 取出任务，再调用第三方 API。返回 HTTP 202 只表示请求被接收，不表示执行成功。\n\n任务状态目前只存在 worker 内存里。worker 重启后状态就没了；前端一刷新，读到的是数据库里原来的 pending，页面就会一直转圈。这个原因已经用停掉 worker、重启、再刷新页面复现过。\n\n计划把任务状态和最终结果写入数据库，这一步还没做。",
+        "faithful-dense": "9 月 20 日 02:00–02:20（Asia/Shanghai）做迁移，只影响 EU workspace，US 不变。\n\n顺序：先备份并确认快照能恢复；再暂停写入；然后运行 migrate --region eu --batch-size 200。任何一步失败就停止。\n\n旧 SDK 低于 2.4：上传接口返回 HTTP 426，下载仍可用。移动端离线草稿不会自动迁移，用户须先同步。旧下载链接继续有效 24 小时。EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n超过 20 分钟仍未完成，由值班李明回滚。回滚只能恢复迁移前的数据；暂停写入期间如果仍有写入，这些写入会丢失。\n\n完成后恢复写入，并确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\":\"待决策\",\"reason\":\"测试环境冒烟测试已通过，生产部署尚未开始\",\"next_action\":\"明早10:00由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，已上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "Each open client currently asks for status once a second, so one client sends 60 status requests per minute. At 500 active clients that is 30,000 requests per minute. Those figures are arithmetic, not a load-test result, so we do not yet know how the service behaves at that rate. The volume is still large enough to matter for capacity and cost.\n\nThe product promises a status update within two seconds. Polling every five seconds would cut traffic to 6,000 requests per minute and could add up to four seconds of delay versus one-second polling, which would miss that promise.\n\nKeep one-second polling until we change the two-second promise or replace polling with something cheaper. Run a load test before treating 30,000 requests per minute as a measured limit. An SSE prototype exists; reconnect behavior and operating cost are untested, so it is a lead to keep working, not a rollout plan."
+      },
+      "normalization_note": "Parsed existing Grok text field; no model call repeated.",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/10",
+      "character_count": 2635,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "grok",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 0,
+      "elapsed_seconds": 102.66,
+      "status": "completed",
+      "error": "Unrecognized runtime response keys: ['text', 'stopReason', 'sessionId', 'requestId', 'thought', 'usage', 'num_turns', 'total_cost_usd', 'total_cost_usd_ticks', 'modelUsage']",
+      "answers": {
+        "release-status": "现在不能上线。\n\n上传超时后客户端会再发一次请求，结果同一份资源被建成两条 Asset；这个问题已在本地复现。修复是给 Asset 的业务键加唯一约束，并让客户端复用同一个 key。重复上传的本地回归测试 12/12 通过。\n\n完整测试只跑过一轮，86/87：失败的是 OAuth 回调超时，单独重跑该项通过，整套测试还没再跑。数据库迁移还没在 staging 执行，生产上的重试流量也没验证。代码没提交，也没部署。这次加了数据库约束，只回滚应用删不掉约束，迁移必须单独回滚。第三方配额告警还在，和这次修复无关。\n\n建议先提交代码，在 staging 跑迁移并演练回滚，重跑完整测试，再用接近生产的重试流量验证；这些都过了再上线。",
+        "choose-provider": "推荐 A。\n\n按每月 1200 个任务、预算上限 ¥900、数据必须留在中国境内，并按「用量稳定、一个任务计一次、不含税」估算：A 是境内，月费 ¥600 含 1000 个、超额 ¥0.50/个，1200 个合计 ¥700；迁移约 1 天，赶得上本月仅剩的 2 天窗口。\n\nB 按 ¥0.40/个、无月费，1200 个约 ¥480，更便宜，但在新加坡，不满足境内要求。C 是境内，固定 ¥850、上限 1500 个、不能超额加购；迁移约 3 天，超出本月 2 天窗口。三家在你这套负载上的速度和可靠性都还没测过。\n\n数据可以出境时再看 B。需要 1500 以内一口价、且能排出 3 天迁移时再看 C。任务量超过 1500 时 C 加不了购；A 在 1600 个时正好 ¥900，再多就超预算。",
+        "causal-uncertainty": "不能信，也不该据此立刻全量。同事说的「付费率提升 50%」不能当成改版效果。\n\n周报把旧版 2%、新版 3% 写成增长 50%。这是相对增幅，绝对差是 1 个百分点。没有样本量，也没有置信区间，看不出这是稳定差异还是波动。\n\n对比也不公平：新版只给新注册用户，旧版混了新老用户。同一周后台导出新版是 2.7%，周报写的是 3%，口径还没核对。同期还有只针对新用户的优惠券。没有随机分流记录，没法把变化归因到改版。\n\n要下结论，需要统一口径、可比人群（最好随机分流）、样本量，并排除优惠券等同期因素。",
+        "technical-chinese": "请求先经过中间件做 schema 校验；通过后才会入队。worker 取出任务，再调用第三方 API。接口返回 HTTP 202 只表示已被接收，不保证执行成功。\n\n任务状态目前只存在 worker 的内存里。worker 一重启，状态就丢了。前端刷新只能读到数据库里仍是 pending 的旧记录，所以会一直转圈。这个原因已经用「停掉 worker、重启后再刷新页面」复现过。\n\n打算把任务状态和最终结果写入数据库，但还没做。",
+        "faithful-dense": "9 月 20 日 02:00–02:20（Asia/Shanghai）迁移，只影响 EU workspace，US 不变。\n\n执行顺序：先备份并确认快照能恢复；再暂停写入；然后运行 `migrate --region eu --batch-size 200`。任何一步失败就停止。\n\nSDK 低于 2.4 的上传会返回 HTTP 426，下载仍可用。移动端离线草稿不会自动迁移，用户必须先同步。旧下载链接继续有效 24 小时。EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n超过 20 分钟仍未完成，由值班李明回滚。回滚只能恢复迁移前的数据；暂停写入期间如果仍有写入，这些写入会丢失。完成后恢复写入，并确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\":\"生产未部署\",\"reason\":\"测试环境冒烟测试已通过，生产部署尚未开始。\",\"next_action\":\"明早 10:00 由负责人决定是否发布。\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传。已经上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "One-second status polling will generate a lot of traffic at your current scale, and slowing the poll would break the two-second update promise.\n\nEach active client asking once per second sends 60 status requests per minute. At 500 active clients that is 30,000 requests per minute. Polling every five seconds would cut that to 6,000 per minute, but status could be up to four seconds later than with one-second polling. These numbers are calculated estimates, not load-test results.\n\nThe product currently promises status updates within two seconds, so five-second polling would miss that promise. An SSE prototype exists; reconnect behavior and operating cost have not been tested.\n\nKeep one-second polling only if you accept about 30,000 requests per minute at 500 clients and confirm that with a load test. To keep the two-second promise at lower request volume, test SSE reconnects and cost before relying on it. If you want cheaper polling instead, the two-second promise has to change. Do not switch to five-second polling while that promise still stands."
+      },
+      "normalization_note": "Parsed existing Grok text field; no model call repeated.",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/11",
+      "character_count": 2650,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "deepseek",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 1,
+      "elapsed_seconds": 179.3,
+      "status": "blocked",
+      "error": "Process failed; inspect stderr.txt",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/12"
+    },
+    {
+      "model_family": "deepseek",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 1,
+      "elapsed_seconds": 185.36,
+      "status": "blocked",
+      "error": "Process failed; inspect stderr.txt",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/13"
+    },
+    {
+      "model_family": "deepseek",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 1,
+      "elapsed_seconds": 190.97,
+      "status": "blocked",
+      "error": "Process failed; inspect stderr.txt",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/14"
+    },
+    {
+      "model_family": "glm",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 0,
+      "elapsed_seconds": 44.84,
+      "status": "completed",
+      "answers": {
+        "release-status": "结论：现在不能上线。\n\n已完成的部分：\n- Bug 根因已定位：上传重试（第一次请求超时后客户端重试）导致两次创建同一条 Asset，本地已复现。\n- 修复已做：给 Asset 业务键加唯一约束，客户端复用同一个 key。\n- 本地回归测试 12/12 通过；完整测试第一次 86/87，唯一失败项（OAuth 回调超时）单独重跑通过。\n\n上线前的阻塞项：\n1. 完整测试尚未重跑（86/87 那次不算通过）。\n2. 数据库迁移尚未在 staging 执行。\n3. 生产环境的重试流量未验证。\n4. 代码未提交、未部署。\n\n建议：按顺序补齐——提交代码 → staging 执行迁移并验证 → 重跑完整测试 → 用生产重试流量场景验证 → 再上线。另外注意回滚方案：只回滚应用无法删除数据库唯一约束，需独立回滚迁移，上线前要确认这条回滚路径可行。第三方配额告警与本次无关，可另行处理，不阻塞本次发布。",
+        "choose-provider": "推荐方案 A。\n\n为什么：\n- 满足硬性条件：数据留在中国境内，且 1 天迁移在本月剩余的 2 天窗口内可完成。\n- 费用：固定 ¥600 含 1000 个，超额 200 个 × ¥0.50 = ¥100，合计 ¥700/月，低于 ¥900 预算。\n\n为什么不选其他：\n- B（¥0.40/个，约 ¥480/月）：数据在新加坡，直接不满足境内要求。\n- C（¥850/月，限 1500 个）：价格和境内都满足，但迁移需 3 天，超出仅剩的 2 天窗口，来不及。\n\n代价与风险：\n- A 按超额计费：任务量增长时费用上升，超过 1400 个/月（600 + 0.5×超400）会突破 ¥900 预算。\n- 三家在你的工作负载上的速度和可靠性都未知，签约前建议先小规模实测。\n- 有超额费的方案需留意用量监控，避免月底超支。\n\n什么时候换：\n- 如果“数据留境内”的要求取消：换 B，月用量 1200 时约 ¥480，最省钱（预留 2 天迁移）。\n- 如果用量持续接近或超过 1500/月且想要固定成本：考虑 C（但要确认其容量上限，C 不支持超额加购，超过 1500 会直接受限）。",
+        "causal-uncertainty": "不能信，不建议立刻全量。\n\n这个“提升 50%”只是 2% 对 3% 的相对比较，存在多个致命问题：\n1. 没有样本量和置信区间，无法判断差异是真实效果还是随机波动。\n2. 两组人群不可比：新版只给新注册用户，旧版包含新老用户，用户构成本身就会影响付费率。\n3. 有混淆因素：同期有一个仅面向新用户的优惠券活动，新版用户恰好都是新用户，无法区分提升来自改版还是优惠券。\n4. 数据口径未核对：周报写 3%，后台导出同周是 2.7%，两处不一致。\n5. 没有随机分流记录，这不是一个合格的 A/B 实验。\n\n建议：先核对 2.7% 与 3% 的口径差异，再设计规范的随机分流实验（控制优惠券等混淆因素、预埋样本量和置信度计算），拿到可信结论后再决定是否全量。在此之前全量，风险是把优惠券或人群差异的效果当成改版效果。",
+        "technical-chinese": "问题出在任务状态只存在 worker 的内存里，一旦重启就会丢失。\n\n整个流程是这样的：请求先经过中间件做 schema 校验，通过后进入消息队列；worker 从队列取任务并调用第三方 API。这里有个关键点：第三方返回 HTTP 202 只表示“请求已接收”，并不保证执行成功。而任务状态一直放在 worker 内存里，worker 重启后状态就没了；前端刷新时只能从数据库读到旧的 pending 状态，于是页面一直转圈加载。\n\n这个根因已经确认可复现：停掉 worker、重启后刷新页面就会出现。\n\n修复计划是把任务状态和最终结果都持久化到数据库，但目前还没实现。",
+        "faithful-dense": "【EU 区域迁移发布须知】\n\n时间：9 月 20 日 02:00–02:20（Asia/Shanghai）。仅影响 EU workspace，US 不受影响。\n\n执行步骤（按顺序，任何一步失败立即停止）：\n1. 备份数据，并确认快照可以恢复。\n2. 暂停写入。\n3. 运行 migrate --region eu --batch-size 200。\n\n对各端的影响：\n- 旧 SDK（<2.4）的上传接口会返回 HTTP 426，但下载不受影响，继续可用。\n- 移动端离线草稿不会自动迁移，需要用户提前手动同步。\n- 旧下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟；不会重复计费。\n\n超时与回滚：\n- 若迁移超过 20 分钟未完成，由值班李明执行回滚。\n- 回滚只能恢复到迁移前的数据；暂停写入期间如有违规写入，这部分数据会丢失。\n\n完成后：恢复写入，并逐项确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\": \"测试环境 smoke 已通过，生产部署尚未开始\", \"reason\": \"目前仅在测试环境完成冒烟验证，生产还未部署，发布与否尚无定论\", \"next_action\": \"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 将暂停上传服务，暂停期间已上传的文件仍可正常下载。请务必在 22:00 前保存好草稿，以免丢失。",
+        "english-explanation": "Here's the situation in plain terms.\n\n**What's happening:** Every active client polls for status once per second — that's 60 requests per minute per client. With 500 active clients, we're generating about 30,000 status requests per minute. That's a lot of load for what is essentially clients asking \"are you done yet?\"\n\n**Why it matters:** This load scales linearly with users. If active clients double, those 30,000 requests become 60,000 — and we'd be paying infrastructure costs mostly to answer the same question over and over. Note this is a calculated estimate, not a load-test result, so real numbers may differ.\n**The trade-off:** Polling every 5 seconds instead of every second would cut traffic to about 6,000 requests per minute (an 80% reduction), but status updates could lag by up to 4 extra seconds compared to today. That matters because our product currently promises status updates within 2 seconds — so simply slowing the polling breaks a product promise.\n\n**Options:**\n1. **Slow the polling (quick fix):** Big load reduction, but it breaks the 2-second update promise. Only viable if we're willing to change that promise.\n2. **Server-Sent Events (SSE):** The server pushes updates to clients instead of clients asking — this could keep updates fast while cutting request volume. A prototype already exists, but two things are untested: how it behaves when connections drop and reconnect, and what it actually costs to operate. Until those are validated, it's not ready to commit to.\n\n**My recommendation:** Treat the polling change as a cost/performance decision you own — the 2-second promise is a product commitment, so relaxing it is your call, not just an engineering one. In parallel, let engineering validate the SSE prototype (reconnect behavior and cost), since it's the only option that reduces load without breaking the promise."
+      },
+      "transport_issue": "Model added planning preface before JSON batch. Parsed the single fenced object; raw answer unchanged.",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/15",
+      "character_count": 3996,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "glm",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 0,
+      "elapsed_seconds": 112.58,
+      "answers": {
+        "release-status": "结论：现在还不能上线。\n\n已确认的部分：\n- Bug 根因已定位——上传第一次请求超时后客户端重试，导致创建了同一条 Asset（本地已复现）。\n- 修复方案：给 Asset 的业务键加唯一约束，并让客户端重试时复用同一个 key。针对重复上传的本地回归测试 12/12 通过。\n\n尚存的风险项：\n- 完整测试第一次 86/87，唯一失败是 OAuth 回调超时；单独重跑通过，但完整测试尚未重跑，不能排除偶发问题。\n- 数据库迁移尚未在 staging 执行，生产重试流量也未验证。\n- 代码未提交、未部署。\n- 回滚有坑：只回滚应用删不掉数据库里的唯一约束，需要单独回滚迁移，即回滚是两步操作，必须提前准备好。\n\n另外：第三方配额告警仍然存在，与本次修复无关，但建议单独安排人跟进。\n\n建议的上线前置清单：\n1. 重跑完整测试，确认 87/87；\n2. 在 staging 执行迁移，并验证生产行为（含重试流量）；\n3. 提交代码，走正常部署流程；\n4. 准备好「应用 + 迁移」两步回滚方案并确认步骤；\n5. 配额告警另行处理，不阻塞本次发布，但要有负责人。\n\n以上全部完成后再上线。",
+        "choose-provider": "推荐：方案 A。\n\n理由（对照你的三个条件）：\n- 数据留在中国境内：A、C 满足；B 在新加坡，直接排除。\n- 费用（按每月 1200 个、一个任务计一次、不含税估算）：A = ¥600 固定费 + 超额 200 个 × ¥0.50 = ¥700/月，在 ¥900 预算内；C = 固定 ¥850/月（上限 1500 个）。\n- 迁移窗口：本月只剩 2 天，A 迁移需 1 天，来得及；C 需 3 天，赶不上窗口，这是 C 的硬伤。\n- C 还有另一个问题：超过 1500 个不支持超额加购，用量一涨就断；且在 1500 个以内 A 始终比 C 便宜（两者到 1500 个才打平，均为 ¥850）。\n\n代价与风险：\n- A 的月费之外还有超额部分，账单会随用量波动（1200 个时约 ¥700/月）。\n- 三家在你这个工作负载上的速度和可靠性均未知；报价假设用量稳定、不含税。建议迁移前先小规模试跑验证性能。\n\n什么情况下要换：\n- 如果「数据必须留在境内」的要求取消，B 最便宜（1200 个约 ¥480/月），值得换，但要预留 2 天迁移时间。\n- 如果实际用量持续明显超过 1500 个/月，A 的超额单价会使成本上升，届时需重新比价（C 用不了，需要谈量价或另找供应商）。\n- 如果 A 实测速度或可靠性不达标，再考虑换 C 或其他方案。",
+        "causal-uncertainty": "结论：现在不能信，不建议立刻全量。\n\n理由：\n1. 没有样本量和置信区间。2% → 3% 可能是真实提升，也可能是小样本噪声，无法判断。\n2. 对比双方不同质：新版只给新注册用户，旧版是新老用户混合，而新用户的付费行为本身就和老用户不同，这个差异会污染结论。\n3. 同期还有一个仅针对新用户的优惠券活动，人群与新版完全重叠。即使付费率真的涨了，也无法区分是改版还是优惠券带来的。\n4. 没有随机分流记录，这不是受控实验，连「同期可比」都无法保证。\n5. 数据本身还没对齐：后台导出显示同一周新版付费率为 2.7%，周报写 3%，口径尚未核对。\n\n建议：\n- 先核对 2.7% 与 3% 的统计口径，确认哪个准确；\n- 拿到样本量，评估差异是否显著；\n- 尽量做同类对比（如「新版新用户」 vs 「同期未看到新版的新用户」，并拆开优惠券的影响）；更稳妥的做法是补做一次随机分流实验；\n- 在此之前，推迟全量决策。",
+        "technical-chinese": "重说如下：\n\n请求进来后，先由中间件做数据格式校验（schema validation），通过后放进任务队列。后台的 worker 从队列里取任务，去调用第三方 API。这里有个容易误解的地方：第三方返回 HTTP 202 只表示「请求已接收」，并不代表任务执行成功。\n\n真正的问题在于：任务的状态只存在 worker 的内存里，没有落库。所以 worker 一重启，状态就丢了；前端刷新时只能从数据库读到旧的 pending 状态，页面就会一直转圈。这个根因已经复现过：停掉 worker、重启、再刷新页面，就能看到卡在 loading。\n\n拟定的修复方向是把任务状态和最终结果都持久化到数据库，但还没有实现。",
+        "faithful-dense": "EU 迁移发布须知\n\n【时间与范围】\n- 9 月 20 日 02:00–02:20（Asia/Shanghai）执行迁移。\n- 仅影响 EU workspace；US 不受影响。\n\n【执行步骤（按顺序）】\n1. 先做备份，并确认快照能够恢复；\n2. 暂停写入；\n3. 运行 migrate --region eu --batch-size 200。\n注意：任何一步失败，立即停止，不要继续。\n\n【对用户的影响】\n- 旧版 SDK（<2.4）的上传接口会返回 HTTP 426；下载不受影响，继续可用。\n- 移动端离线草稿不会自动迁移，用户需先手动同步。\n- 旧下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟；不会重复计费。\n\n【超时与回滚】\n- 若超过 20 分钟未完成，由值班李明执行回滚。\n- 回滚只能恢复迁移前的数据；暂停写入期间如有违规写入，这部分数据会丢失。\n\n【完成后】\n- 恢复写入，并逐项确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\":\"测试环境 smoke 测试已通过，生产部署尚未开始\",\"reason\":\"目前只完成了测试环境的 smoke 验证，生产环境还没有执行任何部署\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传（约 10 分钟）。已上传的文件不受影响，仍可正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "Here's what's going on and why it matters:\n\nOur clients currently poll for status updates once per second — that's 60 status requests per minute from every active client. At 500 active clients, the backend handles 30,000 requests per minute, a constant load that grows linearly with user count.\n\nThe obvious fix — polling every 5 seconds instead — would cut that to 6,000 requests per minute (an 80% reduction). But there's a product trade-off: status changes could take up to 4 seconds longer to appear than they do today. The catch is that the product currently promises status updates within 2 seconds, so slower polling would break that promise.\n\nTwo important caveats:\n1. These numbers are calculated estimates, not load-test results — they haven't been empirically validated.\n2. An SSE (server-sent events) prototype already exists. Pushing updates over SSE would cut request volume sharply without the delay penalty, but its reconnect behavior and operating cost are untested.\n\nWhat we can do:\n- Short term: decide whether the 2-second promise is a hard requirement. If it can be relaxed to about 5 seconds, switching to 5-second polling is a quick, low-risk win.\n- If the 2-second promise must stay: invest in hardening the SSE prototype — test reconnection handling and estimate operating costs before committing.\n- Either way: run an actual load test first, since today's decision would rest on math rather than measurements."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/16",
+      "character_count": 3842,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "glm",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 0,
+      "elapsed_seconds": 142.58,
+      "answers": {
+        "release-status": "结论：现在还不能上线。修复本身方向是对的，但发布前的关键步骤还没走完。\n\n已经确认的部分：问题根因清楚了——上传第一次请求超时后客户端重试，导致两次创建同一条 Asset，已在本地复现。修复方案是给 Asset 的业务键加唯一约束，并让客户端重试时复用同一个 key；重复上传的本地回归测试 12/12 全部通过。\n\n还没完成、上线前必须补的：\n- 完整测试只跑过一次，86/87，唯一失败项（OAuth 回调超时）单独重跑通过了，但完整测试本身没有重跑；\n- 数据库迁移还没在 staging 执行；\n- 生产环境的重试流量没有验证过；\n- 代码还没提交，也没有部署。\n\n另外两点要留意：\n- 回滚有坑：只回滚应用删不掉数据库里的唯一约束，需要单独回滚迁移。一旦上线后出问题，恢复比平时多一步，演练回滚时要包含这一步；\n- 之前的第三方配额告警仍然存在，和这次修复无关，不阻塞本次发布，另行处理即可。\n\n建议：先提交代码，在 staging 执行迁移，重跑完整测试，再在生产验证重试场景，全部通过后再上线。",
+        "choose-provider": "推荐 A，预计每月 ¥700，满足预算和数据留在中国境内的要求，迁移时间也赶得上窗口。\n\n算账（按每月 1200 个任务）：A 固定 ¥600 含 1000 个，超出 200 个 × ¥0.50 = ¥100，合计 ¥700/月；B 是 1200 × ¥0.40 = ¥480/月最便宜，但数据在新加坡，直接不满足境内要求，排除；C 固定 ¥850、上限 1500 个虽然够用，但迁移要 3 天，而本月只剩 2 天窗口，赶不上，且不支持超额加购。\n\nA 还有一点余量：预算上限 ¥900，在 ¥600 底费之外还能承受 600 个超额任务，也就是月用量涨到约 1600 个以内都不会超预算；C 一旦超过 1500 个就没有任何余地。\n\n代价与不确定性：A 迁移要 1 天，用掉一半窗口；这份报价假设每月用量稳定、一个任务计一次、不含税，如果实际计费口径不同，成本会变；另外三家在你这种工作负载上的速度和可靠性都没有数据，建议迁移后先小流量验证再全量切。\n\n什么情况下换：如果数据必须留境的要求将来取消，B 每月能省两百多块，值得重新评估（需 2 个工作日做接口迁移）；如果更看重成本的固定可预测，且能另找到 3 天迁移窗口，可以再比 C。",
+        "causal-uncertainty": "结论：现在不能信，不建议立刻全量。\n\n这个「提升 50%」有硬伤：\n- 2% 到 3% 是相对提升 50%，绝对值只涨了 1 个百分点，而且没有样本量和置信区间，无法判断差异是不是噪音；\n- 两组用户根本不可比：新版只给新注册用户，旧版包含新老用户。就算付费率有差异，也分不清是改版的效果还是用户群体本身不同；\n- 同期还有一个仅面向新用户的优惠券活动，恰好和新版命中同一批人，进一步混淆归因；\n- 没有随机分流记录，等于没做过真正的 A/B 实验，「改版导致提升」这个因果结论站不住；\n- 数据本身还对不上：后台导出显示同一周新版付费率是 2.7%，周报写的是 3%，两边口径还没核对。\n\n建议：先别全量。第一步核对 2.7% 和 3% 的口径差异；然后做一次规范的 A/B 实验——随机分流、记录样本量、给出置信区间，并把优惠券因素分层排除。实验确认提升显著后再全量，不迟。",
+        "technical-chinese": "流程是这样的：请求先经过中间件做 schema 校验，通过后进入队列；worker 从队列里取任务，去调用第三方 API。\n\n问题出在状态放在哪。HTTP 202 只表示第三方「已接收」，不代表执行成功，所以前端要靠查任务状态来判断结果——但任务状态只存在 worker 的内存里，worker 一重启状态就丢了。这时前端刷新页面，只能从数据库读到旧的 pending 记录，于是页面一直转圈。\n\n这个根因已经复现过：停掉 worker、重启、刷新页面，就能看到一直 loading 的现象。\n\n修复思路是把任务状态和最终结果都持久化到数据库，这样 worker 重启也不会丢状态；但目前还没实现。",
+        "faithful-dense": "EU 迁移发布须知（执行版）\n\n时间与范围：9 月 20 日 02:00–02:20（Asia/Shanghai）执行迁移，只影响 EU workspace，US 不变。\n\n执行顺序（任何一步失败就立即停止，不要继续后面的步骤）：\n1. 先做备份，并确认快照能够恢复；\n2. 暂停写入；\n3. 运行 `migrate --region eu --batch-size 200`。\n\n用户侧影响：\n- 旧 SDK（低于 2.4）的上传接口会返回 HTTP 426，但下载不受影响，继续可用；\n- 移动端离线草稿不会自动迁移，需要用户先手动同步；\n- 旧下载链接继续有效 24 小时；\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n超时与回滚：如果超过 20 分钟迁移仍未完成，由值班李明执行回滚。两点务必注意：回滚只能恢复到迁移前的数据；暂停写入期间如果发生违规写入，这部分写入会丢失。\n\n完成后：恢复写入，并逐一确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\": \"未发布\", \"reason\": \"测试环境 smoke 测试已通过，但生产部署尚未开始。\", \"next_action\": \"等待明早 10:00 负责人决定是否发布。\"}",
+        "already-clear": "今晚 22:00–22:10 将暂停上传，共 10 分钟；期间已上传的文件不受影响，仍可正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "Here's the issue in plain terms: our clients ask the server for status once per second. That's 60 requests per minute from every active client — with 500 active clients, about 30,000 requests per minute. That's real load and cost, and it grows in step with user numbers.\n\nThe obvious fix — polling every 5 seconds instead — cuts traffic to 6,000 requests per minute, an 80% reduction. But there's a product tradeoff: a status change could take up to 4 extra seconds to appear. That breaks our current promise of status updates within 2 seconds, so we can't just make that change silently.\n\nTwo caveats worth knowing: these numbers are calculated, not load-tested, so we don't know how the system actually behaves at that scale. And an SSE prototype already exists — SSE pushes updates to clients instead of making them ask repeatedly, which could give real-time updates with a fraction of the traffic — but its reconnect behavior and operating cost are untested.\n\nWhat we can do:\n1. First decide whether the 2-second promise is a hard commitment or negotiable — that determines which options are on the table.\n2. Load-test the current 1-second polling to confirm whether 30,000 requests per minute is actually causing problems today.\n3. Invest in validating the SSE prototype, since it's the only option that cuts traffic without giving up update speed.\n\nIf we need a quick win, a middle ground — poll fast right after a user action, then slow down — reduces load without changing the promise."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/17",
+      "character_count": 3755,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "kimi",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 0,
+      "elapsed_seconds": 85.8,
+      "answers": {
+        "release-status": "结论：现在还不能上线。修复方向正确、本地验证通过，但几个上线前的关键环节还没有走完，且存在独立的回滚风险。\n\n已确认的部分：\n- 根因清楚：上传超时后客户端重试，两次请求创建了同一条 Asset，本地可复现。\n- 修复已落地：Asset 业务键加了数据库唯一约束，客户端重试复用同一个 key。\n- 针对重复上传的本地回归测试 12/12 全部通过。\n\n未完成或有风险的部分：\n- 完整测试第一次 86/87，失败的 OAuth 回调超时单独重跑通过，疑似偶发，但完整套件尚未重跑，无法确认整体是绿的。\n- 数据库迁移还没在 staging 执行过，生产环境的重试流量也没有验证——也就是说修复在接近真实的环境中从未跑过。\n- 代码未提交、未部署，上线动作本身还没开始。\n- 回滚复杂：只回滚应用代码无法删除数据库约束，迁移需要单独回滚，一旦出问题恢复路径更长。\n- 第三方配额告警仍在，虽与本次修复无关，但上线后要分开跟踪。\n\n建议：先提交代码，在 staging 执行迁移并用接近生产的重试流量验证；重跑完整测试套件确认 87/87；明确迁移与应用分离的回滚预案并演练一遍。这些都通过后再安排上线。若时间紧张，至少 staging 迁移验证和完整测试重跑这两项不能省。",
+        "choose-provider": "推荐方案 A。\n\n为什么选 A：\n- 满足硬性约束：数据在中国境内（B 在新加坡，直接排除）；按你每月 1200 个任务计算，费用为固定 ¥600 + 超额 200 个 × ¥0.50 = ¥700/月，在 ¥900 预算内，且超额可弹性加购，用量波动不会被卡死。\n- 迁移只需 1 个工作日，能赶上本月还剩的 2 天迁移窗口（C 需要 3 天，赶不上）。\n\n为什么不是另外两家：\n- B 虽然最便宜（1200 × ¥0.40 = ¥480/月），但数据在新加坡，不满足境内要求，不能用。\n- C 费用 ¥850 在预算内且数据境内，但上限 1500 个且不支持超额加购——你当前用量已达上限的 80%，一旦某月超过 1500 个就会直接中断；加上 3 天迁移赶不上本月窗口。\n\n代价：A 不是最便宜的，比 B 每月贵约 ¥220；且迁移需要占用 1 个工作日。\n\n什么情况下要换：\n- 用量持续超过约 1500 个/月时，A 的超额费用会涨到 ¥850 以上，届时重新对比 C（若用量稳定在 1500 以内且迁移窗口充裕）或重新询价。\n- 若数据境内要求未来放松，B 的价格优势明显，可重新评估。\n\n需要注意的未知项：三家在你的实际工作负载上的速度和可靠性都没有数据，建议迁移后先用小流量观察一段时间再全量切换。",
+        "causal-uncertainty": "不能全信。数字本身没有编造，但\"提升 50%\"这个结论目前站不住，直接全量有风险。\n\n问题在哪：\n- 口径混了：新版 3% 只统计新注册用户，旧版 2% 包含新老用户，两组人群不同，不能直接对比。\n- 数据对不上：后台导出显示同周新版是 2.7%，周报写 3%，两个口径还没核对清楚哪个准。\n- 有混淆因素：同期有一个仅面向新用户的优惠券活动，付费率提升可能来自优惠券，不一定是改版。\n- 缺少基本统计信息：没有样本量和置信区间，2% 到 3% 看着是涨 50%，绝对值只差 1 个百分点，样本小的话很可能只是随机波动。\n- 没有随机分流记录，无法排除选择偏差。\n\n建议：先核对周报与后台数据的口径差异，确认 3% 还是 2.7%；然后用随机分流的 A/B 实验重测，新版和旧版对准同一类人群（比如都只看新用户），并把优惠券活动作为变量隔离或暂停；拿到样本量和置信区间后，确认提升统计显著再全量。在这些完成前，维持现状或只做小范围灰度。",
+        "technical-chinese": "整个流程是这样的：请求进来后，先由中间件做 schema 校验，校验通过就把任务塞进队列；worker 从队列里取出任务，再去调用第三方 API。\n\n问题在于对\"成功\"的理解。第三方返回 HTTP 202，只表示\"请求收到了、接受了\"，并不代表任务真的执行成功。真正的执行结果要看任务状态，而这个状态目前只存在 worker 的内存里，没有写进数据库。所以 worker 一重启，状态就全丢了。这时前端刷新页面，只能从数据库里读到重启前留下的\"处理中\"状态，于是一直停在加载界面，永远等不到结果。\n\n这个根因已经复现确认过：停掉 worker、重启、刷新页面，就能稳定看到卡住的现象。\n\n修复方案是把任务状态和最终结果都持久化到数据库，这样 worker 重启也不影响前端读到真实状态。不过这还只是方案，代码还没开始写。",
+        "faithful-dense": "发布须知\n\n时间与范围\n- 迁移窗口：9 月 20 日 02:00–02:20（Asia/Shanghai）。\n- 仅影响 EU workspace，US 不受影响。\n\n执行步骤（按顺序，任何一步失败立即停止）\n1. 备份，并确认快照可以恢复。\n2. 暂停写入。\n3. 运行 migrate --region eu --batch-size 200。\n\n用户侧影响\n- 旧版 SDK（低于 2.4）的上传接口会返回 HTTP 426，下载功能不受影响。\n- 移动端离线草稿不会自动迁移，用户需要先手动同步。\n- 旧下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n超时与回滚\n- 超过 20 分钟未完成，由值班李明执行回滚。\n- 回滚只能恢复到迁移前的数据；暂停写入期间如有违规写入，这部分数据会丢失。\n\n收尾\n- 迁移完成后恢复写入，并确认上传、下载、webhook 三项均正常。",
+        "exact-format": "{\"status\":\"测试环境就绪，生产未部署\",\"reason\":\"smoke 测试已通过，但生产部署尚未开始\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00 至 22:10 将暂停上传，期间已上传的文件仍可正常下载。请大家在 22:00 前保存好草稿。",
+        "english-explanation": "The problem: every active client currently polls our server once per second to check status. That means each client generates 60 requests per minute, so at 500 active clients we're handling about 30,000 status requests per minute. This matters because that's a large, constant load on our infrastructure that grows linearly with our user base — every new active client adds another 60 requests per minute, forever.\n\nWhat we could do:\n\n1. Quick fix — slow the polling to every 5 seconds. That cuts the load from 30,000 to about 6,000 requests per minute. The trade-off: status changes could take up to 4 extra seconds to be detected, and we currently promise users status updates within 2 seconds. So this option breaks that promise and would need either a product decision to relax it, or acceptance of slower updates.\n\n2. Better long-term fix — switch to SSE (Server-Sent Events), where the server pushes status updates to clients instead of clients constantly asking. This eliminates the polling load and can actually deliver updates faster. A prototype already exists, but reconnect behavior (what happens when a connection drops) and operating cost haven't been tested yet.\n\nOne important caveat: these numbers are calculated estimates, not load-test results. Before committing, we should validate actual traffic patterns. A reasonable path is to run a load test, finish hardening the SSE prototype (especially reconnection), and only fall back to slower polling if SSE proves too costly — since slow polling conflicts with our current 2-second update promise."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/18",
+      "character_count": 4006,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "kimi",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 0,
+      "elapsed_seconds": 94.14,
+      "answers": {
+        "release-status": "结论：现在不能上线。\n\n现状：\n- 已修复的问题：上传重试导致重复创建 Asset（第一次请求超时后客户端重试产生两条记录），本地可复现。修复方式是给 Asset 业务键加唯一约束，并让客户端重试时复用同一个 key。\n- 已完成验证：重复上传的本地回归测试 12/12 通过。\n- 未完成的验证：完整测试第一次 86/87，失败项是 OAuth 回调超时；该项单独重跑通过，但完整测试套件尚未重跑。数据库迁移还没在 staging 执行，生产环境的重试流量没有验证过。\n- 未完成的流程：代码尚未提交，也未部署。\n- 风险点：只回滚应用无法删掉数据库唯一约束，回滚迁移需要单独操作，回滚方案要先准备好。另外之前的第三方配额告警仍在，虽与本次修复无关，上线后要留意。\n\n建议：1) 提交代码；2) 在 staging 执行迁移并验证；3) 重跑完整测试套件确认 87/87；4) 用模拟生产重试流量验证修复效果；5) 准备好迁移的独立回滚方案后再上线。",
+        "choose-provider": "推荐 A。\n\n算一下账（按每月 1200 个任务、一任务计一次、不含税）：\n- A：固定 ¥600 含 1000 个，超出 200 个 × ¥0.50 = ¥100，月成本 ¥700。数据在中国境内，迁移 1 天。\n- B：¥0.40 × 1200 = ¥480，最便宜，但数据在新加坡，不满足境内要求，直接排除。\n- C：固定 ¥850 含 1500 个，境内且容量够用，但不能超额加购，且迁移要 3 天——本月只剩 2 天迁移窗口，赶不上。\n\nA 满足所有硬性要求（¥700 ≤ ¥900 预算、境内、1 天迁移赶得上窗口），所以选 A。\n\n代价：比 B 贵约 ¥220/月；超额单价 ¥0.50 偏高；三家的速度和可靠性在你的工作负载上都未经验证，上线前建议先小流量试跑。\n\n什么情况下要换：\n- 月用量持续超过约 1500 个：A 的超额费会超过 C 的固定价（600 + 0.5×(x−1000) > 850，即 x > 1500），这时迁到 C 更划算，但要预留 3 天迁移时间。\n- 用量波动大、经常超 1500：C 不能加购是硬伤，需重新评估。\n- 数据境内要求放宽：B 单价最低，量大时优势明显，迁移 2 天。",
+        "causal-uncertainty": "不能全信，不建议立刻全量。「提升 50%」这个数字本身没错（2% → 3%），但不足以支撑全量决策，原因如下：\n\n1. 没有样本量和置信区间，无法判断差异是真实效果还是随机波动。\n2. 人群不可比：新版只给新注册用户，旧版包含新老用户，两组用户构成不同，付费率差异可能来自人群而非改版。\n3. 数据口径存疑：后台导出同一周新版是 2.7%，周报写 3%，差异未核对。\n4. 有混淆因素：同期有一个仅面向新用户的优惠券活动，新版组的提升可能来自优惠券。\n5. 没有随机分流记录，算不上严格的 A/B 实验。\n\n建议下一步：先核对周报与后台的口径差异；补做随机分流的 A/B 实验（新老用户分层），控制或剔除优惠券的影响；拿到样本量和置信区间后，确认提升显著再全量。",
+        "technical-chinese": "问题的原因和现状是这样的：\n\n一个请求进来后，先经过中间件做 schema 校验，校验通过就把任务放进队列；worker 从队列取出任务，调用第三方 API 执行。\n\n关键在于：第三方返回 HTTP 202 只表示「已受理」，不代表任务执行成功。而任务的实时状态只保存在 worker 的内存里——worker 一重启，这些状态就全丢了。这时前端刷新页面，只能从数据库读到重启前写下的旧的「处理中（pending）」状态，所以页面一直停在加载中。\n\n这个根因已经通过「停掉 worker → 重启 → 刷新页面」的操作复现确认。修复方案是把任务状态和最终结果持久化到数据库，让前端重启后也能读到真实状态，但这个方案目前还没有实现。",
+        "faithful-dense": "发布须知：EU workspace 数据库迁移\n\n时间：9 月 20 日 02:00–02:20（Asia/Shanghai）\n影响范围：仅 EU workspace；US 不受影响。\n\n执行步骤（按顺序，任何一步失败立即停止）：\n1. 备份，并确认快照可以恢复。\n2. 暂停写入。\n3. 运行 migrate --region eu --batch-size 200。\n4. 完成后恢复写入，并确认上传、下载、webhook 均正常。\n\n执行期间与之后的影响：\n- 旧版 SDK（<2.4）的上传接口会返回 HTTP 426；下载不受影响，继续可用。\n- 移动端离线草稿不会自动迁移，用户需先手动同步。\n- 旧下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n超时与回滚：\n- 超过 20 分钟未完成，由值班李明执行回滚。\n- 回滚只能恢复迁移前的数据；暂停写入期间如有违规写入，这些写入会丢失。",
+        "exact-format": "{\"status\":\"待发布\",\"reason\":\"测试环境 smoke 已通过，但生产部署尚未开始\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 将暂停上传，已上传的文件可正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "The issue: our clients poll for status every second, which means each active client generates 60 requests per minute. With 500 active clients, that's 30,000 requests per minute hitting our servers.\n\nWhy it matters: this is a scalability and cost problem. As the active client base grows, request volume grows linearly and will drive up infrastructure load and cost even though most of those polls return no new information.\n\nWhat we can do:\n- Easy win: slow polling to every five seconds. That cuts volume to 6,000 requests per minute (an 80% reduction), but adds up to four seconds of extra delay in detecting a status change compared to one-second polling. Note the catch: our product currently promises status updates within two seconds, so five-second polling would break that promise.\n- Better long-term fix: switch to server-sent events (SSE), where the server pushes updates instead of clients polling. A prototype already exists, but reconnect behavior and operating cost are untested.\n\nOne caveat: all these numbers are calculated estimates, not load-test results, so we should validate them under real load before committing. A reasonable path is to validate the SSE prototype (reconnects, cost) since it preserves the two-second promise, and use slower polling only as a fallback if SSE doesn't pan out."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/19",
+      "character_count": 3466,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "kimi",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 0,
+      "elapsed_seconds": 142.62,
+      "answers": {
+        "release-status": "结论：现在不能上线。修复方向正确、本地验证通过，但上线的关键前提都还没完成。\n\n已经做到的：\n- 根因已确认并在本地复现：上传第一次请求超时后客户端重试，导致同一条 Asset 被创建两次。\n- 修复是双重的：数据库给 Asset 业务键加了唯一约束兜底，客户端重试时复用同一个 key。\n- 针对重复上传的本地回归测试 12/12 全部通过。\n\n还没做到的：\n- 代码没有提交，也没有部署。\n- 数据库迁移还没在 staging 执行过，生产环境的重试流量也没验证过。\n- 完整测试第一次跑是 86/87，失败项是一个 OAuth 回调超时；该项单独重跑通过了，但完整套件没有整体重跑，不能确认没有其他隐藏问题。\n\n另外两个必须知道的点：\n- 回滚要分两步：只回滚应用代码删不掉数据库约束，迁移必须单独回滚，上线前要先把这套回滚步骤准备好。\n- 之前的第三方配额告警仍然存在，与本次修复无关，但上线后依然需要处理。\n\n建议：先提交代码，在 staging 执行迁移并完整重跑测试，再用接近生产的重试流量验证一次，同时确认迁移的独立回滚可行。这几步都完成后就可以上线。",
+        "choose-provider": "推荐 A。按每月 1200 个任务算，A 的费用是月费 ¥600 加 200 个超额（每个 ¥0.50），合计 ¥700/月，在 ¥900 预算内；数据在中国境内；迁移只需 1 天，赶得上本月还剩的 2 天迁移窗口。\n\n为什么不选另外两个：\n- B 最便宜（1200 × ¥0.40 = ¥480/月，无月费），但数据在新加坡，不满足境内要求，直接排除。\n- C 也在境内，但固定 ¥850/月，比 A 贵 ¥150；迁移要 3 天，超过本月的 2 天窗口；而且超过 1500 个不能加购，是硬性上限。\n\nA 的代价：超额单价 ¥0.50/个高于 B，用量越大费用线性增长；用量到 1500 个时 A 的费用是 ¥850，与 C 持平。以上费用均按每月用量稳定、一个任务计一次、不含税的口径计算。\n\n什么情况下换：\n- 月用量稳定接近 1500 个、希望费用可预期时，可以换 C（锁定 ¥850），但要提前留出 3 天迁移窗口；超过 1500 个 C 完全无法承接，届时两家都不合适，需要重新谈。\n- 如果数据境内要求将来放开，单价最低的 B 可以重新评估。\n\n需要注意：三家在你的实际工作负载上的速度和可靠性都还没有数据，建议正式迁移前先用一小部分任务实测失败率和耗时，再最终确认。",
+        "causal-uncertainty": "不能直接信，现在不建议立刻全量。“付费率提升 50%”在算术上没错（2% → 3%），但这个数字背后有几个实质问题：\n\n- 绝对提升只有 1 个百分点（2% 到 3%），“50%”是相对值，听起来比实际效果大。\n- 没有样本量和置信区间，无法判断这个差异是真实效果还是随机波动。\n- 两组用户不可比：新版只给新注册用户看，旧版数据包含新老用户。新用户本身的付费率就可能和整体不同，差异可能来自人群，不来自改版。\n- 数据本身对不上：后台导出显示同一周新版是 2.7%，周报写的是 3%，口径还没核对。若实际是 2.7%，相对提升就缩水到 35%。\n- 同期有一个只针对新用户的优惠券活动，而新用户恰好就是看新版的人群——即使新版付费率真的更高，也无法区分是改版还是优惠券带来的。\n- 没有随机分流记录，无法排除其他选择偏差。\n\n建议：先核对 2.7% 和 3% 的口径差异，再做一次真正的随机 A/B 实验——新老用户分层、排除优惠券干扰、给出样本量和置信区间。拿到这样的结果之前，立刻全量的依据不够。",
+        "technical-chinese": "整个流程是这样的：请求先到中间件做 schema 校验，通过后进入队列；worker 从队列取出任务，去调用第三方 API。\n\n问题出在任务状态的保存方式上。第三方 API 返回 HTTP 202 只表示“已受理”，不代表执行成功，真正的结果是异步产生的。而任务状态目前只存在 worker 的内存里，数据库中一直是最初的 pending。worker 一旦重启，内存中的状态就丢了，前端刷新页面时只能从数据库读到那条旧的 pending，于是页面一直停在加载中。\n\n这个根因已经实际复现确认过：停掉 worker、重启、再刷新页面，问题就会出现。\n\n修复方案是把任务状态和最终结果持久化到数据库，这样 worker 重启后状态不丢，前端也能读到真实进度。该方案目前尚未实现。",
+        "faithful-dense": "EU workspace 数据库迁移须知\n\n时间与范围：9 月 20 日 02:00–02:20（Asia/Shanghai）。仅影响 EU workspace，US 不受影响。\n\n执行步骤（按顺序进行，任何一步失败就停止，不要继续）：\n1. 先备份，并确认快照确实可以恢复。\n2. 暂停写入。\n3. 运行 migrate --region eu --batch-size 200。\n\n超时与回滚：\n- 超过 20 分钟未完成，由值班李明执行回滚。\n- 回滚只能恢复到迁移前的数据；暂停写入期间如有违规写入，这些写入在回滚后会丢失。\n\n对用户的影响：\n- 旧版 SDK（低于 2.4）的上传接口会返回 HTTP 426，但下载继续可用。\n- 移动端离线草稿不会自动迁移，用户必须先同步。\n- 旧下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n收尾：迁移完成后恢复写入，并确认上传、下载、webhook 三项均正常。",
+        "exact-format": "{\"status\":\"测试通过，待发布\",\"reason\":\"测试环境 smoke 测试已通过，但生产部署尚未开始\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00 至 22:10 暂停上传，已上传的文件可以正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "What's happening: every active client polls for status once per second — 60 requests per minute per client. With 500 active clients, that's about 30,000 status requests per minute. These are calculated estimates, not load-test results, so read them as orders of magnitude.\n\nWhy it matters: we've promised users status updates within two seconds. Slowing the poll to once every five seconds would cut request volume by 80% — from 30,000 to 6,000 per minute — but adds up to four seconds to status-detection delay compared with one-second polling. That breaks the two-second promise. So this is a direct trade-off between server load and a commitment we've made to users.\n\nWhat we can do:\n- Keep one-second polling: keeps the promise, but the load stays high and grows with every additional client.\n- Switch to five-second polling: cuts load by 80%, but only works if the two-second promise is relaxed — that's a product decision, not just an engineering one.\n- Invest in SSE (server-sent events): the server pushes each update the moment it happens, cutting request volume without adding delay. A prototype exists, but its reconnection behavior (when a client's connection drops) and its operating cost are untested.\n\nRecommendation: don't just slow polling, since it silently breaks the two-second commitment. Evaluate the SSE prototype properly — reconnect behavior and cost first — and in parallel decide whether the two-second promise is a hard requirement. If the promise can move, five-second polling is the cheapest fix; if it can't, SSE is the path worth validating."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-v1-collected/manifest.json#results/20",
+      "character_count": 3972,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "gemini-api",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 0,
+      "elapsed_seconds": 79.28,
+      "answers": {
+        "release-status": "建议**现在不能上线**。\n\n**当前真实情况：**\n1. **尚未准备就绪：** 代码根本还没提交和部署，数据库迁移也未在测试环境（Staging）执行验证，生产环境的重试流量同样没有验证。\n2. **测试未完全通过：** 完整测试跑出过一次失败（OAuth 回调超时），虽然单独重跑该项通过，但未进行完整的重新验证。\n3. **回滚存在风险：** 本次修复包含数据库变更（增加唯一约束），如果上线后出问题，只回滚应用代码不行，必须单独回滚数据库，操作更复杂。\n4. **外部隐患：** 存在与本次修复无关的第三方配额告警，带着告警上线增加了整体系统风险。\n\n**我的建议：**\n1. **暂缓发布：** 必须等所有前置流程走完再做决定。\n2. **要求执行以下步骤：**\n   - 完整重跑一遍自动化测试，确保 100% 通过。\n   - 在测试环境严格执行一次数据库迁移，并验证重试逻辑。\n   - 明确并演练数据库的回滚方案。\n   - 提交代码并走正常部署流程。",
+        "choose-provider": "**推荐方案：选择方案 A**\n\n**推荐原因：**\n1. **满足硬性要求与预算：** 数据留在中国境内。在每月 1200 个任务的需求下，方案 A 的总费用为 ¥700（¥600基础包含1000个 + 超额200个*¥0.5），低于 ¥900 的最高预算。而方案 C 固定费用 ¥850，相比之下方案 A 更省钱。\n2. **符合时间窗限制：** 方案 A 迁移只需 1 天，可以完美在剩下的 2 天迁移窗口内完成；方案 C 需要 3 天，时间不够。（方案 B 因数据在新加坡直接淘汰）。\n\n**方案代价：**\n1. 每月需支付约 ¥700 的服务费。\n2. 目前这三家在你实际工作负载上的速度和可靠性均未知，存在一定的性能盲盒风险。\n\n**什么情况下需要换：**\n1. **任务量暴增：** 如果未来每月任务量持续稳定超过 1500 个（此时方案 A 费用超过 ¥850），可能需要重新评估包月上限更高的方案。\n2. **质量不达标：** 上线后如果发现方案 A 的处理速度或可靠性无法满足业务实际要求。",
+        "causal-uncertainty": "**不能信，建议暂缓全量。**\n\n同事得出的结论存在严重的逻辑和数据漏洞，主要原因如下：\n\n1. **对比对象不一致（控制变量失败）：** 新版只针对“新注册用户”，而旧版包含“新老用户”。新用户通常有更高的新鲜感或转化动力，这本身就不公平。\n2. **存在严重干扰因素：** 同期正好有“仅对新用户”的优惠券活动。付费率提升极有可能是优惠券带来的，而不是改版。\n3. **数据准确性存疑：** 周报写的是 3%，但后台实际导出数据是 2.7%，口径尚未对齐就匆忙得出结论，不够严谨。\n4. **缺乏科学的统计验证：** 没有随机分流记录（说明不是真正的 A/B 测试），且没有提供样本量和置信区间。如果样本量很小，这种波动可能是纯偶然的。\n\n**建议：** 查清数据口径差异，并在严格控制变量（同样的新老用户比例、排除优惠券干扰、科学的随机分流）的前提下，重新进行 A/B 测试后再做决定。",
+        "technical-chinese": "这个请求会先通过中间件进行数据格式校验，校验通过后放入队列。接着，后台任务进程（worker）会从队列中取出任务并调用第三方 API。需要注意的是，第三方返回 HTTP 202 状态码只代表请求已受理，并不保证最终执行成功。\n\n现在的问题是，任务的执行状态只保存在 worker 的内存中，一旦 worker 重启，状态就会丢失。此时前端刷新页面，只能从数据库读取到旧的“等待中（pending）”状态，导致界面一直卡在 loading。这个根本原因我们已经通过“停止 worker、重启并刷新页面”的方式成功复现了。\n\n目前的修复计划是将任务状态和最终结果持久化保存到数据库中，不过这个方案还没开始开发。",
+        "faithful-dense": "**EU Workspace 迁移发布须知**\n\n**一、 基本信息**\n- **时间：** 9 月 20 日 02:00 – 02:20（北京时间）\n- **影响范围：** 仅影响 EU workspace，US 保持不变。\n\n**二、 执行步骤（若任意一步失败，请立即停止操作）**\n1. **备份：** 执行数据备份，并务必确认快照能够成功恢复。\n2. **阻断：** 暂停系统写入。\n3. **迁移：** 运行命令 `migrate --region eu --batch-size 200`\n4. **恢复与验证：** 迁移完成后，恢复写入，并验证上传、下载以及 Webhook 功能均恢复正常。\n\n**三、 异常与回滚机制**\n- **触发条件：** 如果迁移操作超过 20 分钟未完成，由值班人（李明）执行回滚。\n- **回滚风险：** 回滚只能恢复到迁移前的数据状态；如果在暂停写入期间发生了违规写入，这部分数据将会丢失。\n\n**四、 用户与业务影响（需留意）**\n- **旧版 SDK（<2.4）：** 上传接口将返回 HTTP 426 错误，但下载功能继续可用。\n- **下载链接：** 旧的下载链接在迁移后 24 小时内依然有效。\n- **移动端：** 离线草稿不会自动迁移，用户必须手动先进行同步。\n- **Webhook：** EU 区域的 Webhook 会有最多 15 分钟的延迟，但不会产生重复计费。",
+        "exact-format": "{\n  \"status\": \"生产部署尚未开始\",\n  \"reason\": \"测试环境smoke已通过，需等待负责人决策\",\n  \"next_action\": \"明早10:00由负责人决定是否发布\"\n}",
+        "already-clear": "今晚 22:00 至 22:10 期间系统将暂停文件上传服务，但之前已上传的文件仍可正常下载。为了避免您的数据丢失，请务必在 22:00 前保存好草稿。",
+        "english-explanation": "**Why it matters:**\nCurrently, our app checks for status updates every second. With 500 active users, this translates to 30,000 requests per minute, creating a heavy load on our servers. If we slow this polling interval down to every 5 seconds, we can reduce the server load by 80% (down to 6,000 requests per minute). However, doing this would delay status updates by up to 4 seconds, which violates our current product promise of delivering updates within 2 seconds. Please note that these numbers are calculated estimates, not actual load test results.\n\n**What we can do:**\n1. **Short-term decision:** We need to decide whether to accept the higher server load or change the polling interval and update user expectations regarding the 2-second promise.\n2. **Long-term solution:** We have a prototype using Server-Sent Events (SSE), a technology that pushes updates efficiently without constant polling. Before we can use it in production, we need to thoroughly test its reconnection reliability and evaluate its operating costs."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-api-adapters/manifest.json#results/0",
+      "character_count": 3414,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "gemini-api",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 0,
+      "elapsed_seconds": 87.72,
+      "answers": {
+        "release-status": "**目前无法上线。**\n\n**当前状况：**\n1. **缺乏生产环境与数据库验证**：本地虽通过12/12重试测试，但生产重试流量未验证；数据库增加唯一约束的迁移尚未在staging执行。\n2. **代码未就绪**：代码既未提交，也未部署。\n3. **测试未通过**：完整测试因OAuth回调超时失败，单跑通过但尚未重跑完整测试。\n4. **回滚存在风险**：如果上线，应用回滚无法撤销数据库约束，需要独立回滚迁移。\n（注：之前的第三方配额告警与本次无关。）\n\n**建议：**\n1. 提交代码并在staging执行数据库迁移，充分回归测试。\n2. 重跑完整测试并确保100%通过。\n3. 准备好数据库的独立回滚预案，再评估上线。",
+        "choose-provider": "**推荐方案：A方案**\n\n**为什么推荐：**\n只有A方案能同时满足您的所有硬性要求：\n1. **数据合规**：数据留在中国境内（B方案在新加坡，不符合）。\n2. **时间窗口**：迁移仅需1天，符合本月仅剩2天的窗口期（C方案需3天，来不及）。\n3. **预算控制**：每月1200个任务，费用为 ¥700（600元基础费包含1000个，超出的200个按0.5元计费即100元），低于您的¥900预算。\n\n**代价：**\n超出1000个任务的部分，每个需额外支付¥0.50。\n\n**什么情况下要换：**\n1. 当月任务量激增超过1600个时（费用将超过¥900预算）。\n2. 实际上线后，发现A方案的处理速度或可靠性无法满足业务需求（目前三家性能均未知）。",
+        "causal-uncertainty": "**不可以信，不建议立刻全量。**\n\n该结论存在严重的数据验证漏洞：\n1. **存在干扰因素**：同期有“仅限新用户的优惠券活动”，付费率提升可能是优惠券导致的，而不是改版。\n2. **对比人群不一致**：新版只针对新用户，旧版包含了新老用户。由于没有进行随机分流，两者的基础转化率本身就不同，无法直接对比。\n3. **数据不一致且缺乏统计严谨性**：周报数据（3%）与后台导出数据（2.7%）口径未对齐；同时缺少样本量和置信区间，无法证明该提升在统计学上是显著的。\n\n**建议**：严格控制变量，在排除优惠券影响的前提下，针对新用户开展规范的随机 A/B 测试，获取显著性结果后再做决策。",
+        "technical-chinese": "请求会先经过中间件进行数据格式校验，通过后排队。接着，后台工作程序（Worker）会接手任务并调用第三方 API。\n\n这里返回 HTTP 202 只代表“请求已受理”，不保证执行成功。因为任务的执行状态目前只保存在 Worker 的内存里，程序一重启状态就会丢失。这就导致前端刷新页面时，只能读到数据库里旧的“处理中”状态，界面一直卡在加载中。\n\n我们已经通过“停掉 Worker、重启再刷新页面”复现了这个根本原因。目前的解决方案是准备把任务状态和最终结果永久存到数据库里，但代码还没写完。",
+        "faithful-dense": "**EU 区域迁移执行指南**\n\n**时间与范围**\n*   **时间**：9月20日 02:00–02:20（Asia/Shanghai）\n*   **范围**：仅影响 EU workspace（US 区域不受影响）\n\n**执行步骤**\n1. **备份与验证**：先备份数据，并确认快照能够成功恢复。\n2. **暂停写入**：暂停系统的写入操作。\n3. **执行迁移**：运行命令 `migrate --region eu --batch-size 200`。（**注意：任何一步失败必须立即停止。**）\n4. **恢复与检查**：完成后恢复写入，并确认上传、下载、webhook 均工作正常。\n\n**异常与回滚**\n*   **触发条件**：超过 20 分钟未完成，由值班人（李明）执行回滚。\n*   **数据风险**：回滚只能恢复到迁移前状态；如果在“暂停写入”期间发生违规写入，这部分数据将永久丢失。\n\n**迁移后影响**\n*   **SDK 上传**：旧 SDK（<2.4）的上传接口将报错 HTTP 426。\n*   **文件下载**：下载功能继续可用，旧下载链接继续有效 24 小时。\n*   **移动端**：离线草稿不会自动迁移，需提醒用户先手动同步。\n*   **Webhook**：EU 区域可能会有最多 15 分钟延迟，但不会引发重复计费。",
+        "exact-format": "{\n  \"status\": \"待决定\",\n  \"reason\": \"测试环境smoke测试已通过，但生产部署尚未开始\",\n  \"next_action\": \"等待明早10:00负责人决定是否发布\"\n}",
+        "already-clear": "今晚 22:00 至 22:10 将暂停文件上传服务。在此期间，已上传的文件仍可正常下载。请您务必在 22:00 前保存好草稿。",
+        "english-explanation": "**Why it matters:**\nCurrently, clients ask the server for status updates every second. With 500 active clients, this generates a massive 30,000 requests per minute, which creates heavy server load. If we change this to every five seconds, requests drop significantly to 6,000 per minute. However, doing so means users might have to wait up to four extra seconds to see a status change, violating our product promise of updates within two seconds. (Note: These are calculated estimates, not actual load test data.)\n\n**What we can do:**\n1. **Short-term:** Decide whether preserving the two-second update promise is worth the high server load, or if we can accept slower updates (5 seconds) to reduce stress.\n2. **Long-term:** We have a prototype using Server-Sent Events (SSE), a much more efficient way to push real-time updates. We need to test how well it handles disconnections and calculate its running costs to see if it can replace the current system."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-api-adapters/manifest.json#results/1",
+      "character_count": 2886,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "gemini-api",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 0,
+      "elapsed_seconds": 108.68,
+      "answers": {
+        "release-status": "建议：**目前不能上线**。\n\n需要先完成以下工作：\n1. **完成部署与环境验证**：代码尚未提交。数据库迁移尚未在 staging 环境执行，也没有验证生产环境的重试流量。\n2. **重跑完整测试**：之前 87 项测试中有 1 项（OAuth 回调）超时，单独重跑该项虽过，但必须重跑完整测试。\n3. **确认回滚预案**：本次修复新增了数据库唯一约束，若需回滚，仅回滚应用代码无效，必须独立回滚数据库迁移。\n\n注：\n- 本次针对“上传重试导致重复创建 Asset”的 Bug 进行了修复（加了业务键唯一约束并复用 key），本地回归测试已全数通过。\n- 之前的第三方配额告警依然存在，但与本次修复无关。",
+        "choose-provider": "建议：**选择方案 A**。\n\n**为什么选 A**：\n- **唯一满足所有硬性条件的方案**：数据留在中国境内，且迁移仅需 1 天（符合本月仅剩 2 天的窗口期）。相比之下，方案 B 数据在新加坡，方案 C 迁移需 3 天，均不满足条件。\n- **符合预算**：按每月 1200 个任务计算，总成本为 ¥700（基础费 ¥600 包含 1000 个，超额 200 个 × ¥0.5），低于 ¥900 的预算上限。\n\n**代价与风险**：\n- 三家供应商在当前工作负载下的速度与可靠性均未知，存在不确定性。\n\n**什么情况下需要更换**：\n- 方案 A 的速度或可靠性无法满足业务需求。\n- 每月任务量超过 1600 个（此时方案 A 的成本将突破 ¥900 的预算）。",
+        "causal-uncertainty": "建议：**不能轻信“付费率提升 50%”的结论，也不建议立刻全量**。\n\n该结论的数据依据存在严重的偏差和不确定性：\n1. **对比条件不一致（未控制变量）**：新版仅对新注册用户开放，而旧版包含新老用户。且同期还有针对新用户的优惠券活动。付费率上升很可能是因为优惠券或新用户的自带转化特征，不能直接归因于改版。测试也没有进行随机分流。\n2. **数据口径存疑**：后台导出数据显示新版付费率为 2.7%，与周报标注的 3% 不符，两者差异尚未核对。\n3. **缺乏统计有效性**：结论没有提供样本量和置信区间，无法确认该差异是否具有统计学意义。\n\n建议先核对数据口径，并在排除优惠券等变量干扰的前提下，进行严格的随机 A/B 测试后再做决定。",
+        "technical-chinese": "请求会先经过中间件进行 schema validation，校验通过后进入队列，由 worker 消费并调用第三方 API。\n\n目前前端一直显示 loading 的原因如下：\n1. 第三方 API 返回 HTTP 202 仅代表请求已受理，并不保证最终执行成功。\n2. 任务状态目前只存在 worker 的内存中，一旦 worker 重启，状态就会丢失。\n3. 前端刷新时，只能读到数据库里旧的 pending 状态。\n\n这个根本原因已通过“停止 worker、重启后刷新页面”的步骤成功复现。目前的解决计划是将任务状态和最终执行结果持久化到数据库中，但这部分尚未实现。",
+        "faithful-dense": "**发布及迁移须知**\n\n**时间**：9 月 20 日 02:00–02:20 (Asia/Shanghai)\n**范围**：仅影响 EU workspace，US 保持不变。\n\n**操作步骤**：\n1. 先进行备份，并确认快照可以正常恢复。\n2. 暂停写入。\n3. 运行迁移命令：`migrate --region eu --batch-size 200`\n（注意：以上任何一步如果失败，请立即停止操作）\n4. 如果超过 20 分钟未完成，由值班人（李明）执行回滚。\n5. 迁移完成后，恢复写入，并确认上传、下载、webhook 均正常。\n\n**异常与回滚风险**：\n- 回滚只能恢复迁移前的数据。暂停写入期间如果发生违规写入，这部分数据在回滚后会丢失。\n\n**其他影响与注意事项**：\n- **旧版 SDK**：低于 2.4 版本的 SDK 上传接口会返回 HTTP 426 错误，但下载功能继续可用。旧下载链接在迁移后继续有效 24 小时。\n- **离线草稿**：移动端离线草稿不会自动迁移，用户必须先进行同步。\n- **Webhook**：EU 的 webhook 最多会有 15 分钟延迟，但不会产生重复计费。",
+        "exact-format": "{\n  \"status\": \"待决定\",\n  \"reason\": \"测试环境 smoke 已通过，但生产部署尚未开始\",\n  \"next_action\": \"明早 10:00 负责人决定是否发布\"\n}",
+        "already-clear": "今晚 22:00–22:10 系统将暂停文件上传，已上传的文件仍可正常下载。请务必在 22:00 前保存好草稿。",
+        "english-explanation": "**Why it matters**\nOur current method of checking status (polling every second) scales poorly. With 500 active clients, it generates 30,000 requests per minute. We need a more sustainable approach, but changing it will affect our product promise of delivering status updates within two seconds. Note that these are calculated estimates, not load-test results.\n\n**What we can do**\nWe have two options, both with tradeoffs:\n1. **Increase the polling interval to 5 seconds:** This drastically reduces server load (down to 6,000 requests per minute), but it breaks our 2-second SLA, adding up to 4 seconds of delay to status updates.\n2. **Switch to Server-Sent Events (SSE):** We have a prototype that could solve this, but its operating cost and how it handles reconnects are currently untested."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-api-adapters/manifest.json#results/2",
+      "character_count": 2706,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "deepseek-api",
+      "arm": "brief",
+      "prompt_sha256": "52e36859dcb881a1a61b9417e098127a556712e97e99a797927b68d60300dfe9",
+      "exit_code": 0,
+      "elapsed_seconds": 77.9,
+      "answers": {
+        "release-status": "目前还不能上线，还有几项硬性前置条件没完成：① 代码尚未提交，也没有部署；② 完整测试首轮 86/87（有 1 项 OAuth 回调超时），虽单跑通过，但完整测试未重跑确认；③ 数据库迁移还没在 staging 执行，生产环境的重试流量也没验证过。修复本身是扎实的——给 Asset 业务键加了唯一约束、客户端复用同一 key，本地重复上传回归 12/12 通过。但要注意两点：回滚不能只回滚应用，数据库唯一约束需要独立的迁移回滚；另外第三方配额告警仍在，虽与本次无关，建议同时跟进。建议：先把代码提交、在 staging 跑通迁移并验证生产流量、重跑一次完整测试全绿，再考虑上线。",
+        "choose-provider": "推荐 A。理由：满足数据必须留在中国境内的要求（B 在新加坡，直接排除）；1200 个任务成本 = 600 + (1200−1000)×0.5 = ¥700，在 ¥900 预算内；迁移仅需 1 天，落在本月 2 天窗口内（C 需 3 天，超出窗口）。代价/风险：A 超额单价 ¥0.50，随用量增长较快；且三家在你负载上的速度与可靠性均未知，需实测。换方案的情形：若数据境内要求解除、追求最低成本，可改 B（¥480），但需 2 天迁移、当前窗口不足；若未来月用量接近或超过 1500 且你能接受更高单价与容量上限（C 不支持超额加购），才考虑 C。就当前约束，A 最优。",
+        "causal-uncertainty": "不能直接信，也不能因此立刻全量。问题在于：① 没有样本量和置信区间，2%→3% 的差异可能只是随机波动；② 分组不干净——新版只给新注册用户，旧版混着新老用户，无法公平对比；③ 同期还有一个只针对新用户的优惠券活动，很可能才是付费率上升的真正原因，改版和优惠券的效应被混在一起；④ 数据口径对不上：后台导出显示新版 2.7%，周报写 3%，尚未核对；⑤ 没有随机分流记录，无法排除选择偏差。建议：先核对数据口径、确认是否有随机分组、能否单独剥离优惠券效应，再决定是否全量，别在没验证因果的情况下放大。",
+        "technical-chinese": "这个请求会先经过中间件做 schema 校验，校验通过后被放进队列。worker 从队列取出任务，再去调用第三方 API。HTTP 202 只代表“已接收”，不保证执行一定成功。由于任务状态只存在 worker 的内存里，worker 一重启状态就丢了，前端刷新后只能从数据库读到旧的 pending，所以页面一直转圈。这个根因我们已经通过“停掉 worker、重启后刷新页面”复现确认了。计划是把任务状态和最终结果持久化到数据库，但还没实现。",
+        "faithful-dense": "【影响范围】9 月 20 日 02:00–02:20（Asia/Shanghai）迁移，仅影响 EU workspace，US 不受影响。【迁移步骤】① 先备份并确认快照能恢复；② 暂停写入；③ 运行 migrate --region eu --batch-size 200；任何一步失败立即停止。【用户影响】旧 SDK（<2.4）的上传接口会返回 HTTP 426，但下载继续可用；移动端离线草稿不会自动迁移，用户须先同步；旧下载链接继续有效 24 小时；EU 的 webhook 最多延迟 15 分钟，不会重复计费。【回滚】超过 20 分钟未完成，由值班李明回滚；回滚只能恢复迁移前的数据，暂停写入期间若有违规写入，这些写入会丢失。【收尾】完成后恢复写入，并确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\":\"测试环境 smoke 通过\",\"reason\":\"生产部署尚未开始\",\"next_action\":\"明早 10:00 负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传；期间已上传的文件仍可正常下载。请务必在 22:00 前保存草稿。",
+        "english-explanation": "Every client polling every second fires 60 status requests per minute; with 500 concurrent clients that's 30,000 requests/minute. Moving to 5-second polling cuts that to 6,000/minute but adds up to ~4 seconds of delay in detecting a status change. Why it matters: the product currently promises status updates within 2 seconds, so 5-second polling would break that promise. Note these are back-of-the-envelope estimates, not load-test results. What we can do: (1) run a real load test before committing to any change; (2) consider SSE (a prototype exists) to push updates without polling, though its reconnect behavior and operating cost are untested; (3) if we must ship quickly, either keep 1-second polling to honor the 2-second SLA, or explicitly reset that SLA if we move to 5 seconds."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-api-adapters/manifest.json#results/3",
+      "character_count": 2323,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "deepseek-api",
+      "arm": "plain",
+      "prompt_sha256": "4bb883b9917a8e57100e60fd0c77aca979fad3f6a8cca67770ce4be96126e255",
+      "exit_code": 0,
+      "elapsed_seconds": 154.1,
+      "answers": {
+        "release-status": "结论：现在还不能上线，离可发布还差关键几步。\n\n问题本身（上传重试导致重复创建 Asset）已定位并修复：根因是第一次请求超时后客户端重试、两次创建同一条 Asset；已通过给 Asset 业务键加唯一约束、并让客户端复用同一个 key 来根治。重复上传的本地回归 12/12 通过。\n\n但上线前还有这些必须完成、目前未完成的事项：\n1. 完整测试只跑过一次（86/87，失败项是 OAuth 回调超时）；失败项单独重跑通过了，但完整测试尚未重跑，需要重跑一次并确认全绿。\n2. 数据库迁移（新增唯一约束）尚未在 staging 执行，需先在 staging 跑通。\n3. 生产上的重试流量没有验证过，需要确认唯一约束和 key 复用在生产真实并发/重试下不会引入新问题。\n4. 代码还没提交、也没部署。\n5. 回滚方案要单独准备：只回滚应用删不掉数据库的唯一约束，迁移需要独立回滚脚本。\n6. 第三方配额告警仍然存在，但与本次修复无关，需要另行处理（不阻塞本次发布，但要清楚它不是本次改动引起的）。\n\n我的建议：先完成上述 1–4，并确认 staging 验证通过、生产重试流量验证 OK，同时把迁移的独立回滚脚本准备好，再上线；在此之前不要上线。",
+        "choose-provider": "推荐 A。\n\n理由：数据必须留在中国境内，B 的机房在新加坡，直接不满足合规要求，先排除。剩下 A、C 都符合境内要求：\n- A：固定 ¥600/月含 1000 个，超出 ¥0.50/个。你每月 1200 个，费用 = 600 + 200 × 0.5 = ¥700/月。\n- C：固定 ¥850/月、上限 1500 个，1200 个在限内，费用 ¥850/月。\n\n对比：\n- 费用：A 的 ¥700 比 C 的 ¥850 每月便宜 ¥150，两者都在 ¥900 预算内。\n- 迁移：A 需 1 天，C 需 3 天；本月只有 2 天迁移窗口，A 赶得上、C 装不下。\n- 弹性：A 支持超额加购，未来量上去也能买；C 上限 1500 且不支持超额加购，一旦超过就没得买，风险更大。\n\n代价与注意：A 迁移要占 1 天，需在这 2 天窗口内安排；另外 A、B、C 在你真实工作负载上的速度与可靠性都未知，建议上线后做小规模实测。\n\n什么情况要换：\n- 若月用量显著增长、接近或超过 1500 个，C 已覆盖不了，A 的超额加购反而是优势，不建议换到 C。\n- 若未来用量长期低于 1000 个，A 的固定月费才显得不划算；但 C 也要 ¥850，并不便宜。\n- 若将来数据境内要求放宽、允许新加坡，B（¥0.40/个、无月费）在 1200 个时只要 ¥480，会更便宜，但那要等合规放开之后。\n\n一句话：现在选 A——境内合规、¥700 在预算内、1 天迁移赶得上窗口，且支持超额加购。",
+        "causal-uncertainty": "不能信，也不建议立刻全量。这个 50% 目前站不住，原因有几点：\n\n1. 没有样本量和置信区间：2% → 3% 只是两个点估计，没有置信区间，无法判断 3% 是真实提升还是随机波动。\n2. 两组人群不对等：新版只给了新注册用户，旧版里既有新用户也有老用户。新用户本身的转化习惯就不同，拿「只有新用户」的新版去比「新老混合」的旧版，差异可能来自人群构成，而不是改版。\n3. 数据口径不一致：后台导出显示同一周新版是 2.7%，周报写的是 3%，两个数字还没对过口径，得先核实到底哪个是真的。\n4. 同期有干扰：这段时间还有一个仅针对新用户的优惠券活动，付费率提升很可能来自优惠券，而不是改版。\n5. 没有随机分流记录：无法确认用户是被随机分成两组的，所以没法归因。\n\n结论：目前只能说「数值上看起来高了」，但没法归因到改版。建议先做一次干净的随机 A/B（随机分流、两组人群可比、排除优惠券等干扰、给出样本量和置信区间），再决定是否全量。在此之前不要全量。",
+        "technical-chinese": "整个流程是这样的：请求进来后，先经过中间件做 schema 校验，校验通过就被放进消息队列排队；然后由 worker 从队列里取出任务、去调用第三方 API。但要注意，返回的 HTTP 202 只代表「我已经收到、受理了」，并不保证任务最终会成功。\n\n问题的根子在于：任务的状态只存在 worker 的内存里，worker 一重启，这些状态就全丢了。所以前端刷新时，只能从数据库里读到那条早就过期的 pending 状态，页面就一直转圈加载不出来。这个根因我们已经验证过：先把 worker 停掉、再重启，然后刷新页面就能复现。\n\n目前的修复方向是：把任务的状态和最终结果都持久化存进数据库。但这个方案还没实现，代码还没落地。",
+        "faithful-dense": "【发布须知：EU 迁移】\n\n时间与范围：\n- 迁移时间：9 月 20 日 02:00–02:20（Asia/Shanghai）。\n- 只影响 EU workspace，US 不受影响、保持不变。\n\n执行步骤（严格按顺序）：\n1. 先备份数据，并确认快照可以正常恢复。\n2. 确认无误后，暂停写入。\n3. 运行命令：migrate --region eu --batch-size 200。\n4. 上述任何一步失败，立即停止，不要继续。\n\n对用户 / 接口的影响：\n- 旧 SDK（版本 <2.4）的上传接口会返回 HTTP 426，但下载功能继续可用。\n- 移动端的离线草稿不会自动迁移，用户必须先同步，再迁移。\n- 旧的下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n回滚约定：\n- 若迁移超过 20 分钟仍未完成，由值班李明执行回滚。\n- 注意：回滚只能恢复迁移前的数据；暂停写入期间如有违规写入，这些写入会丢失。\n\n完成后：\n- 恢复写入，并逐项确认上传、下载、webhook 均恢复正常。",
+        "exact-format": "{\"status\":\"待发布\",\"reason\":\"测试环境 smoke 已通过，生产部署尚未开始\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 系统将暂停上传，期间已上传的文件仍可正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "Here's the situation: right now every active client polls our server once per second for status, which is 60 requests per minute per client. With 500 concurrent clients, that's about 30,000 status requests every minute.\n\nThe load is real, and the obvious fix — polling every 5 seconds instead of every 1 — would cut it to 6,000 requests per minute, an 80% reduction. But it has a cost: a client only notices a status change at its next poll, so updates would be detected up to 4 seconds later than they are today.\n\nWhy it matters: our product currently promises status updates within 2 seconds. Moving to 5-second polling would directly break that promise. Also, these numbers are calculated estimates, not load-test results, so we don't actually know how the system behaves under real load.\n\nThere's a better path already started: an SSE (server-sent events) prototype would push updates instantly instead of polling, keeping the 2-second promise while eliminating the polling load. But two things are still untested — how it reconnects after a dropped connection, and what it costs to operate.\n\nWhat I'd suggest:\n1. Don't simply switch to 5-second polling; it would violate the 2-second promise we've made.\n2. Invest in finishing the SSE approach, since it satisfies both the latency promise and the load concern.\n3. Before committing, test SSE's reconnect behavior and operating cost, and run a real load test so decisions rest on measurements rather than estimates."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-api-adapters/manifest.json#results/4",
+      "character_count": 3995,
+      "mechanical_issues": []
+    },
+    {
+      "model_family": "deepseek-api",
+      "arm": "skill",
+      "prompt_sha256": "d41dd1a459160fba847650301c0a6829920de02fbc807803fc29ee73599c7db4",
+      "exit_code": 0,
+      "elapsed_seconds": 126.06,
+      "answers": {
+        "release-status": "还不能上线。核心修复（上传重试产生重复 Asset）已通过给 Asset 业务键加唯一约束、并让客户端复用同一个 key 来解决，本地回归 12/12 通过。但还有几件事没做完：完整测试首次是 86/87，一项 OAuth 回调超时，单独重跑已通过，可完整测试还没重跑；代码没有提交、也没有部署；数据库迁移没在 staging 执行，生产上的重试流量也没验证。另外要注意：单独回滚应用删不掉数据库里的唯一约束，需要配套的迁移回滚方案。第三方配额告警是另一个独立问题，与本次修复无关。建议先提交代码，在 staging 跑迁移并重跑完整测试，再用小流量验证生产重试场景，同时准备好迁移回滚方案，这些都通过后再发布。",
+        "choose-provider": "推荐 A。理由：它满足数据境内要求，1200 个任务的月成本是 600 + (1200−1000)×0.5 = ¥700，在 ¥900 预算内，迁移只需 1 天，赶得上本月 2 天窗口。B 虽然最便宜（1200×0.4=¥480），但数据在新加坡，不满足境内要求，直接排除。C 固定 ¥850 也在预算内且境内，但迁移要 3 天，超出 2 天窗口，而且不支持超额加购。代价与何时要换：A 超额部分按 ¥0.5/个计，若月用量超过 1500 个，A 的成本会超过 ¥850，那时 C 更便宜（但 C 限 1500 且不能加购，需先确认容量足够）；若用量大幅下降，A 的固定 600 元也省不掉。另外三家在你工作负载上的速度与可靠性都未知，建议上线后实测。以上按一个任务计一次、不含税估算。",
+        "causal-uncertainty": "不能直接信。那个 50% 只是 2% 到 3% 的相对涨幅，但周报没有样本量，也没有置信区间，判断不了是否显著。而且新版只推给新注册用户，旧版同时包含新老用户，两组人群不可比；同一周后台导出文件显示新版是 2.7%，和周报里的 3% 对不上，还没核对口径。同期还有一个只面向新用户的优惠券活动，会和改版效果混在一起。也没有随机分流记录。建议先别全量：改用随机分流、同一口径对比，并把优惠券的影响拆出来，核对完数字再决定。",
+        "technical-chinese": "请求先经过中间件做 schema 校验，通过后进入队列；worker 取出任务再调用第三方 API。HTTP 202 只表示“已接收”，不保证执行一定成功。因为任务状态只存在 worker 的内存里，一重启就丢，前端刷新只能读到数据库里旧的 pending 状态，所以一直显示加载中。这个根因已经通过停掉 worker、重启后刷新页面复现了。计划把任务状态和最终结果写入数据库持久化，但目前还没实现。",
+        "faithful-dense": "9 月 20 日 02:00–02:20（Asia/Shanghai）执行迁移，只影响 EU workspace，US 不受影响。\n\n执行顺序：先备份并确认快照能恢复；再暂停写入；然后运行 `migrate --region eu --batch-size 200`。任何一步失败就立即停止。\n\n影响说明：旧 SDK（<2.4）的上传接口会返回 HTTP 426，但下载继续可用；移动端离线草稿不会自动迁移，用户须先同步；旧下载链接仍有效 24 小时；EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n回滚与时限：若超过 20 分钟未完成，由值班李明回滚。回滚只能恢复迁移前的数据；暂停写入期间若有违规写入，这些写入会丢失。\n\n完成后：恢复写入，并确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\":\"待发布\",\"reason\":\"测试环境 smoke 测试通过，生产部署尚未开始。\",\"next_action\":\"明早 10:00 由负责人决定是否发布。\"}",
+        "already-clear": "今晚 22:00–22:10 将暂停上传，已上传的文件仍可正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "Every active client currently polls once per second, which is 60 status requests per minute per client, or 30,000 per minute at 500 clients. That load scales directly with the number of active clients, and it matters because we promise status updates within two seconds. Slowing polling to once every five seconds would cut load to 6,000 requests per minute, but it would add up to four seconds of detection delay, breaking that two-second promise. These figures are estimates, not load-test results. We have an SSE prototype that could avoid polling entirely, but its reconnect behavior and operating cost are untested. Recommendation: keep one-second polling for now, run a real load test to confirm the server handles 500+ clients, and test SSE's reconnect and cost before deciding whether to adopt it."
+      },
+      "status": "completed",
+      "source_record": "evals/speak-human/runs/2026-09-14-api-adapters/manifest.json#results/5",
+      "character_count": 2356,
+      "mechanical_issues": []
+    }
+  ],
+  "judgments": [
+    {
+      "model": "claude",
+      "case": "release-status",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 3,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "skill/brief": "tie",
+        "skill/plain": "skill",
+        "brief/plain": "brief"
+      },
+      "reason": "All three cover the full chain (重试→重复 Asset、唯一约束+复用 key、12/12、86/87 与单独重跑、staging/生产未验证、未提交未部署、应用回滚不删约束、配额告警无关) and all conclude 不上线。C adds an unsourced speculation ('唯一约束落到已有数据上，如果存量里已经有重复记录，迁移会直接失败') and ends with a persona slip ('我不会签')，把自己写成了项目负责人，读起来别扭且多出一段推测；A 与 B 同样完整但更紧凑，B 的编号阻塞项清单和 A 的顺序化放行条件读起来同样省力。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "brief",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "claude",
+      "case": "choose-provider",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "tie",
+        "skill/brief": "brief",
+        "plain/brief": "brief"
+      },
+      "reason": "三者算术一致且都正确（A ¥700、B ¥480 但新加坡出局、C ¥850 但 3 天迁移超过 2 天窗口、1500 硬上限、¥900 对应约 1600 个），也都声明速度/可靠性未知。C 用同样的篇幅一次讲清淘汰顺序、临界点和三种换方案条件；A 与 B 重复了'用量稳定/不含税'等前提和临界点计算（B 还额外引入'按调用次数计费'的假设推演），读者要多读一段才拿到同样的结论。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "claude",
+      "case": "causal-uncertainty",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/skill": "skill",
+        "plain/brief": "brief",
+        "skill/brief": "tie"
+      },
+      "reason": "三者都指出人群不可比、优惠券混淆、无随机分流、缺样本量、2.7% 与 3% 冲突（35% 而非 50%）。差别在下一步：B 和 C 明确要求'随机分流 + 券在两组同等投放或错开'，A 则建议'先扩到 20%–50% 继续观察'——在没有随机分流的前提下，扩量并不能产生可归因的证据，指导性更弱；A 也最长。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "skill",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "claude",
+      "case": "technical-chinese",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "tie",
+        "skill/brief": "tie",
+        "plain/brief": "tie"
+      },
+      "reason": "三者都还原了完整次序（中间件校验→入队→worker 调第三方 API）、202 只表示已接收、状态只在内存导致重启丢失而前端从 DB 读到旧 pending 一直 loading、停 worker 重启刷新已复现、持久化方案未实现，且都改成了完整中文句式而非术语逐词混排。B 多一句修复后效果的说明（'重启后状态不会丢'），属于合理推论而非新事实，三者可读性差异不足以分高下。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "claude",
+      "case": "faithful-dense",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "tie",
+        "brief/plain": "brief",
+        "skill/plain": "skill"
+      },
+      "reason": "九条实质信息（时间时区、仅 EU、可恢复备份→停写→migrate --region eu --batch-size 200、失败即停、SDK<2.4 上传 426 下载可用、草稿需先同步、旧链接 24 小时、webhook 15 分钟不重复计费、超 20 分钟李明回滚、回滚只到迁移前且违规写入丢失、恢复写入并三项确认）三者都保留。C 把用户影响拆成表格并加了标题、警告块和额外提醒，信息量相同但执行同事要在表格与正文间来回跳；A、B 的线性步骤更贴合'照着做'的场景，B 还解释了为何第 2 步必须落实。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "claude",
+      "case": "exact-format",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "tie",
+        "plain/skill": "tie",
+        "brief/skill": "tie"
+      },
+      "reason": "三者均为合法 JSON、恰好 status/reason/next_action 三个中文字符串键、无 Markdown 或额外说明；status 都未声称生产已完成，reason 保留测试环境 smoke 通过与生产未开始，next_action 保留明早 10:00 负责人决定。C 仅用词不同（'尚未发布'/'冒烟测试'），等效。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "claude",
+      "case": "already-clear",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 2
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "skill",
+        "brief/plain": null,
+        "skill/plain": "skill"
+      },
+      "reason": "原文只有三条信息，B 用一句半原样传达且语序更顺（先说停上传和保存草稿，再说下载不受影响）；A 多加'预计 10 分钟'和'期间无法上传新文件'，是对 22:00–22:10 的重复表述；C 把三句扩成带标题、分段和'感谢配合'的通知，读者要读四倍篇幅才拿到同样的三条信息。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "claude",
+      "case": "english-explanation",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [
+            {
+              "excerpt": "two-second polling, for instance, would halve traffic while still meeting the promise",
+              "source_fact": "Source only states that five-second polling adds up to four seconds of detection delay relative to one-second polling and that the product promises updates within two seconds; it gives no basis for claiming a two-second interval would stay inside that promise (a 2s interval implies up to ~2s detection delay on top of the event, i.e. at or past the boundary)."
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 2
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "tie",
+        "brief/plain": "brief",
+        "skill/plain": "skill"
+      },
+      "reason": "A 和 B 都给出 60/client/min、500 客户端 30,000/min、五秒 6,000/min、最多多四秒延迟、与两秒承诺冲突、数字是计算而非压测、SSE 仅原型且重连与成本未测，并给出条件化的下一步。C 额外发明了一个未经支持的中间方案（two-second polling 'still meeting the promise'），可能把 PM 直接引向一个并不满足承诺的区间，且篇幅最长、caveat 重复。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/c857d09d/recovered-result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "release-status",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/plain": "tie",
+        "brief/skill": "skill",
+        "plain/skill": "skill"
+      },
+      "reason": "All three keep every required fact (12/12, 86/87 vs single rerun, staging/prod unverified, uncommitted, migration-only rollback, unrelated quota alert). C alone states the bug was reproduced locally (\"已在本地复现的问题是\"), completing the causal chain, while staying compact; B adds filler such as \"不能算作已解决\" and a separate gap paragraph that repeats the later action list.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "plain",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "choose-provider",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 3,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "plain",
+        "skill/brief": "brief",
+        "plain/brief": "tie"
+      },
+      "reason": "All recommend A with correct math (¥600+200×¥0.50=¥700) and correctly disqualify B on Singapore residency and C on the 3-day migration vs 2-day window plus the hard 1500 cap. A's switch conditions are tangled — \"如果后续用量稳定在超过 1500、但不超过 1600 个任务，A 的费用会超过 C 的 ¥850，不过 C 无法承接超过 1500 个任务\" states a comparison it then cancels; B and C give the same thresholds (1500 cap, ¥900 at 1600) in one pass.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "causal-uncertainty",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "brief",
+        "plain/skill": "tie",
+        "brief/skill": "brief"
+      },
+      "reason": "All three refuse the 50% causal claim, give the 1-percentage-point/relative-50% framing, flag the mismatched populations, the new-user coupon, missing sample size/CI/randomization, and the 2.7% vs 3% discrepancy. B's bulleted confounder list makes the four independent objections separable at a glance, whereas A and C bury them in prose; A's added \"若按 2.7% 计算，相对增长是 35%\" is arithmetically right but immediately disclaimed as non-probative.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "technical-chinese",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "skill",
+        "skill/brief": "tie",
+        "plain/brief": "brief"
+      },
+      "reason": "All three give natural Chinese sentences with the validate→enqueue→worker→third-party order, the 202-means-accepted-only caveat, the memory-loss/DB-pending loading chain, the restart-and-refresh reproduction, and the unimplemented persistence. A keeps the useful term \"schema 校验\" as the request asks (\"保留必要的技术细节\") while B paraphrases it away as \"检查数据结构是否符合要求\" and adds a clause about worker 重启后仍能查到; C is equally faithful and tightest.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "faithful-dense",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "tie",
+        "brief/plain": "plain",
+        "skill/plain": "tie"
+      },
+      "reason": "All retain every item: the 02:00–02:20 Asia/Shanghai window, EU-only scope, restorable-snapshot backup before pausing writes, the exact `migrate --region eu --batch-size 200`, stop-on-any-failure, HTTP 426 for SDK <2.4 with downloads working, manual draft sync, 24h links, 15-minute webhook lag without double billing, 李明's 20-minute rollback, and the lost-writes caveat. C states the mobile-draft timing precisely (\"用户须在迁移前同步\") and keeps the notice list shortest; B's \"请提前告知用户以下影响\" adds an instruction the source does not state, though it is a reasonable next step.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "exact-format",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [
+            "\"reason\":\"是否发布尚待负责人决定\" — the reason field drops the source fact that 测试环境 smoke 通过 (and that 生产部署尚未开始 is the reason), instead duplicating next_action; the status field carries the reason text"
+          ],
+          "scores": {
+            "clarity": 2,
+            "causality": null,
+            "decision": null,
+            "naturalness": 3,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "tie",
+        "plain/skill": "plain",
+        "brief/skill": "brief"
+      },
+      "reason": "A and B are valid JSON with exactly the three keys, a status that does not claim production is done (\"尚未发布\"/\"生产尚未部署\"), smoke-pass in reason, and the 10:00 decision in next_action. C misuses the fields: status holds the explanation and reason merely repeats next_action, so the smoke-test result no longer appears as the reason.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "already-clear",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "tie",
+        "skill/brief": "tie",
+        "plain/brief": "tie"
+      },
+      "reason": "The three answers are textually identical: the original notice returned as body only, with the 22:00–22:10 window, downloads still available, and the save-drafts-before-22:00 instruction, and no added glossary or commentary.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "gpt",
+      "case": "english-explanation",
+      "answers": {
+        "brief": {
+          "material_errors": [
+            "\"At 500 active clients, polling every second generates an estimated 30,000 status requests per minute.\" — omits the source's per-client figure of 60 status requests per minute per active client"
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/plain": "plain",
+        "brief/skill": "skill",
+        "plain/skill": "tie"
+      },
+      "reason": "B and C both give the full arithmetic chain (60 per client per minute → 30,000 at 500 clients → 6,000 at five seconds), the up-to-four-second added detection delay against the two-second promise, the estimate-not-load-test caveat, and the untested SSE reconnect/cost; A jumps straight to 30,000 and never states the 60-per-client rate the PM needs to scale the estimate. B spends an extra sentence defining SSE for the PM audience, which C conveys more briefly.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-1/053ea480/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "plain",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "release-status",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "skill/brief": "brief",
+        "skill/plain": "tie",
+        "brief/plain": "brief"
+      },
+      "reason": "All three are fact-complete (cause chain, two-part fix, 12/12, 86/87 vs single rerun, staging/prod unverified, uncommitted, migration rollback, unrelated quota alert). B groups the blockers under an explicit 「仍未完成」 list and gives an ordered gate sequence plus 「回滚预案要同时覆盖应用和迁移」, so the owner can act without re-reading; A and C bury the same items in prose, and C adds the small unsourced aside 「上线后仍会碰到」.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "brief",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "choose-provider",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [
+            {
+              "excerpt": "月量超过 1800 时 A 会超过 ¥900",
+              "source_fact": "A 固定 ¥600/月，包含 1000 个，超额 ¥0.50/个；预算最多 ¥900。600+0.5×(1600−1000)=¥900，即超过 1600 个即已超预算，而非 1800。"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 2,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "plain",
+        "skill/brief": "skill",
+        "plain/brief": "plain"
+      },
+      "reason": "C states A stays inside the ¥900 budget until 1800 tasks, but A already hits exactly ¥900 at 1600 and ¥1000 at 1800 — a wrong switching threshold that could delay a needed renegotiation. A and B are arithmetically correct (¥700/¥480/¥850) and both rule B out on residency and C out on the 3-day migration vs 2-day window; B is preferred for explicitly separating 代价 (per-unit billing growth, 1 day migration, re-migration later) from the switch conditions the user asked for.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "causal-uncertainty",
+      "answers": {
+        "plain": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "周报写旧版付费率 2%，新版 3%，于是标注增长 50%——即绝对差仅 1 个百分点，50% 是相对增幅；A 未做此区分。"
+            }
+          ],
+          "scores": {
+            "clarity": 3,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/skill": "skill",
+        "plain/brief": "brief",
+        "skill/brief": "brief"
+      },
+      "reason": "A repeats the 「增长 50%」 framing without ever noting it is a 1-percentage-point absolute difference stated as a relative gain, which is the single fact that most deflates the colleague's claim. B and C both make that distinction; C edges ahead by closing with a concrete ordered next step (核对口径和样本量 → 同期新用户比较并处理券干扰 → 随机分流后再放量) and naming the consequence of acting now (把人群差异和活动效果算进改版).",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "skill",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "technical-chinese",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 3,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "tie",
+        "skill/brief": "skill",
+        "plain/brief": "plain"
+      },
+      "reason": "All three keep the 校验→入队→worker 调 API 次序、202 的含义、内存状态随重启丢失与 DB 旧 pending 的完整链、复现方式、以及持久化尚未实现。A and B are indistinguishable in fidelity and flow. C is slightly weaker on the stated goal of readable Chinese: 「执行成不成功要另看」 softens 「不保证执行成功」, and it leaves 「一直 loading」 untranslated alongside 「一直转圈」.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "faithful-dense",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 3,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "brief",
+        "brief/plain": "tie",
+        "skill/plain": "plain"
+      },
+      "reason": "All three retain every item: 时间/时区/EU-US 范围、可恢复备份→停写→migrate --region eu --batch-size 200、失败即停、SDK<2.4 上传 426 下载可用、移动草稿先同步、链接 24 小时、webhook 15 分钟不重复计费、20 分钟由李明回滚、回滚仅到迁移前且停写期违规写入会丢、恢复写入并确认三项。A separates the four during-migration side effects into checkable bullets and C isolates the rollback condition in its own paragraph; B packs the SDK/草稿/链接/webhook facts and the rollback rule into two dense blocks, which an on-shift executor has to parse line by line.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "exact-format",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "tie",
+        "plain/skill": "tie",
+        "brief/skill": "tie"
+      },
+      "reason": "All three return bare valid JSON with exactly status/reason/next_action as Chinese strings, no Markdown or commentary; none claims production is deployed, all keep 测试环境 smoke 通过 and 明早 10:00 负责人决定. 「待决策」 vs 「生产未部署」 and the trailing periods are style, not substance.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "already-clear",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "tie",
+        "brief/plain": "tie",
+        "skill/plain": "tie"
+      },
+      "reason": "All three return only the notice body with the three facts intact (22:00–22:10 暂停上传、已上传文件仍可下载、22:00 前保存草稿) and none pads with glossaries, checklists, or editorial notes. B's sentence split is an equivalent stylistic choice.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "grok",
+      "case": "english-explanation",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "skill",
+        "brief/plain": "plain",
+        "skill/plain": "skill"
+      },
+      "reason": "All three carry 60/client/min, 30,000/min at 500 clients, 6,000/min at five seconds, up to four extra seconds versus one-second polling, the clash with the two-second promise, the calculated-not-load-tested caveat, and SSE's untested reconnect and cost. A additionally speculates that traffic 'may hit rate limits or slow the API', which the source does not support, and spreads its guidance over an options list plus a closing paragraph. B is tightest on the decision: it states the exact condition for each branch (keep one-second polling only if you accept ~30,000/min and confirm by load test; five-second polling requires changing the promise first) rather than C's single default of holding.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/add92b9c/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "release-status",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/plain": "plain",
+        "brief/skill": "skill",
+        "plain/skill": "tie"
+      },
+      "reason": "All three keep every source fact (12/12, 86/87 vs single rerun, staging/prod unverified, uncommitted, rollback of app does not drop the constraint, unrelated quota alert) and all say do not ship. B and C make the rollback split and the 'never run in a near-production environment' gap explicit and label the fix as two-part; B additionally prioritizes which two steps cannot be skipped if time is short. A lists the same facts but leaves the rollback risk as a bullet without stressing the two-step recovery path, so the reader has to assemble the priority themselves. B costs a little more reading than C for the same content.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "plain",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "choose-provider",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "tie",
+        "skill/brief": "brief",
+        "plain/brief": "brief"
+      },
+      "reason": "All three recommend A with the correct ¥700 (600 + 200×0.50), exclude B on the Singapore data-residency requirement rather than on price, and cite C's 3-day migration against the 2-day window plus the hard 1500 cap and the unknown speed/reliability. C is the easiest to act on because it lays the three options out as a single comparable cost line and derives the switch threshold explicitly (600 + 0.5×(x−1000) > 850 ⇒ x > 1500), while A and B state the ¥850 crossover without showing where it comes from. A repeats the cost assumptions in a separate paragraph, adding reading effort for no new information.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "causal-uncertainty",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "周报写旧版付费率 2%，新版 3%，于是标注增长 50%（绝对差为 1 个百分点，50% 为相对值）"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "plain",
+        "plain/skill": "skill",
+        "brief/skill": "skill"
+      },
+      "reason": "B validates the headline with '「提升 50%」这个数字本身没错（2% → 3%）' but never tells the reader the absolute gain is only 1 percentage point, so the manager keeps the inflated impression the report created. A and C both make that distinction; C goes further by tying the population mismatch to the coupon ('新用户恰好就是看新版的人群'), which is precisely why the two confounders cannot be separated, and by noting that 2.7% would drop the relative lift to 35%. All three correctly refuse full rollout and propose reconciling the metric definition before a randomized test.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "technical-chinese",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "skill",
+        "skill/brief": "tie",
+        "plain/brief": "brief"
+      },
+      "reason": "All three rebuild the order (middleware schema 校验 → 入队 → worker 调第三方 API), state that 202 only means accepted, and complete the chain from in-memory state to the stale DB pending to the endless loading spinner, and all note the persistence plan is unimplemented. B pads the explanation ('问题在于对\"成功\"的理解', '永远等不到结果') and says the repro '稳定' reproduces, which the source does not claim; A and C say the same thing with less text, C compressing the repro into the '停掉 worker → 重启 → 刷新页面' sequence.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "faithful-dense",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "tie",
+        "brief/plain": "tie",
+        "skill/plain": "tie"
+      },
+      "reason": "All three retain every substantive item for the executing colleague: the 02:00–02:20 Asia/Shanghai window limited to EU with US unaffected, the restore-verified backup → pause writes → exact 'migrate --region eu --batch-size 200' order with stop-on-any-failure, HTTP 426 on SDK <2.4 uploads with downloads still working, manual sync for mobile offline drafts, 24-hour validity of old download links, EU webhook delay up to 15 minutes with no double billing, 李明's rollback past 20 minutes, rollback only restoring pre-migration data with writes made during the pause lost, and the closing resume-writes plus upload/download/webhook check. The only difference is whether the closing check sits inside the numbered steps (A) or in a separate 收尾 section (B, C), which is formatting, not substance.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "exact-format",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "tie",
+        "plain/skill": "tie",
+        "brief/skill": "tie"
+      },
+      "reason": "All three return a bare, valid JSON object with exactly status, reason, next_action as Chinese strings, no Markdown or commentary. None claims production is deployed, each reason keeps 'smoke 已通过' alongside '生产部署尚未开始', and each next_action keeps '明早 10:00 由负责人决定是否发布'. The status wording differs ('测试环境就绪，生产未部署' vs '待发布' vs '测试通过，待发布') but in every case the reason field carries the production-not-started fact, so no reader is misled.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "already-clear",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "tie",
+        "skill/brief": "tie",
+        "plain/brief": "tie"
+      },
+      "reason": "Each returns only the notice body and keeps all three facts unchanged: uploads paused 22:00–22:10 tonight, already-uploaded files still downloadable, drafts saved before 22:00. None adds a glossary, checklist, or editorial note. B's '期间' and '请大家' and C's dash-style time range are wording choices of equal cost to the reader.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "kimi",
+      "case": "english-explanation",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/plain": "brief",
+        "brief/skill": "skill",
+        "plain/skill": "skill"
+      },
+      "reason": "All three give the right arithmetic (60/client/min, 30,000/min at 500 clients, 6,000/min at five seconds), the up-to-four-seconds added detection delay, the clash with the two-second promise, the estimate-not-load-test caveat, and the SSE prototype's untested reconnect behavior and cost. C is the most decisive: it frames the choice as three named options and states the branch condition plainly — if the two-second promise can move, five-second polling is the cheapest fix; if not, SSE is the path to validate. A buries the promise conflict as a 'catch' inside the polling bullet and ends with a softer suggestion. B spends a paragraph on load growth before reaching the options and asserts SSE 'can actually deliver updates faster', which goes slightly beyond the source's untested prototype.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/e4f9c522/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "plain",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "release-status",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 4,
+            "naturalness": 3,
+            "economy": 2
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/plain": "brief",
+        "brief/skill": "tie",
+        "plain/skill": "skill"
+      },
+      "reason": "All three keep every fact (12/12, 86/87 vs single rerun, staging/prod unverified, uncommitted, two-step rollback, unrelated quota alert). B states the same blockers twice — once in 「尚存的风险项」 and again in the 5-item 上线前置清单 — forcing re-reading; A and C give one blocker list plus one ordered next-step line.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "plain",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "choose-provider",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [
+            {
+              "excerpt": "超过 1400 个/月（600 + 0.5×超400）会突破 ¥900 预算",
+              "source_fact": "A 固定 ¥600 含 1000 个，超额 ¥0.50/个；1400 个时为 600 + 400×0.5 = ¥800，仍在 ¥900 内，实际临界点约 1600 个"
+            }
+          ],
+          "scores": {
+            "clarity": 3,
+            "causality": 3,
+            "decision": 2,
+            "naturalness": 3,
+            "economy": 3
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/brief": "skill",
+        "skill/plain": "tie",
+        "brief/plain": "plain"
+      },
+      "reason": "B miscomputes A 的预算临界点为 1400 个（实为约 1600 个），可能让负责人过早认为要换供应商；A 算出 1600 个上限、C 算出 A 与 C 在 1500 个处 ¥850 打平，两者数字均正确且都给出境内要求取消时才考虑 B 的条件。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "brief",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "causal-uncertainty",
+      "answers": {
+        "plain": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "2%→3% 只是 1 个百分点的绝对差，所谓「提升 50%」是相对口径；A 全文未点明这一区分"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "brief",
+        "plain/skill": "skill",
+        "brief/skill": "skill"
+      },
+      "reason": "C 明确写出「相对提升 50%，绝对值只涨了 1 个百分点」，B 至少点出这是相对比较，A 完全没有拆解 50% 的口径，而该口径正是同事结论被夸大的核心；三者对人群不可比、优惠券混淆、2.7% vs 3% 的处理相当。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "technical-chinese",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "skill",
+        "brief/plain": "tie",
+        "skill/plain": "skill"
+      },
+      "reason": "B 把 HTTP 202 与故障链接上（「不代表执行成功，所以前端要靠查任务状态来判断结果——但状态只在 worker 内存里」），A 与 C 把 202 作为独立提醒放着，读者需自己补上这一环；三者都保留了校验→入队→worker 调用的次序、重启复现和「尚未实现」。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "faithful-dense",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/skill": "tie",
+        "plain/brief": "tie",
+        "skill/brief": "tie"
+      },
+      "reason": "三份都完整保留时间时区、EU/US 范围、备份可恢复→停写→migrate --region eu --batch-size 200、失败即停、426 与下载可用、草稿先同步、链接 24 小时、webhook 15 分钟不重复计费、20 分钟由李明回滚、回滚只到迁移前且违规写入丢失、恢复写入后三项确认；差异仅在标题符号与段落切分。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "skill",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "exact-format",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 3,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 3,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "skill",
+        "brief/plain": "tie",
+        "skill/plain": "skill"
+      },
+      "reason": "三者都是合法 JSON、恰好三个字符串键、均未宣称生产已完成并保留明早 10:00 决策。B 的 status 为「未发布」、reason 承载 smoke 通过与生产未部署，各字段职责分明；A 与 C 把同一句「测试环境 smoke 通过、生产未部署」在 status 与 reason 里重复了一遍。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "already-clear",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "plain",
+        "plain/skill": "tie",
+        "brief/skill": "skill"
+      },
+      "reason": "三者都只保留三条事实、没有扩写成清单或说明。B 加了「务必」「以免丢失」这类劝诫字眼却未补充信息；A、C 只补了由 22:00–22:10 直接算出的「10 分钟」，属正当推算且对读者有用。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "glm",
+      "case": "english-explanation",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 3,
+            "economy": 2
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "plain",
+        "plain/skill": "tie",
+        "brief/skill": "skill"
+      },
+      "reason": "All three give 60/client/min, 30,000/min at 500 clients, 6,000 at five seconds, up to four extra seconds, the clash with the two-second promise, the estimate-not-load-test caveat, and the untested SSE reconnect/cost. B wraps this in bolded section labels plus an extra doubling scenario and a paragraph on who owns the decision, adding reading effort without new facts; A and C reach the same conditional recommendation in half the space.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-2/2bf548d8/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "release-status",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "修复由两部分组成：给 Asset 业务键加唯一约束，并让客户端复用同一个 key；Bug 的成因是第一次请求超时后客户端重试导致创建两条 Asset（B 只提到数据库唯一约束，未说明客户端复用 key 与超时重试的因果链）"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 2,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "重复上传的本地回归测试 12/12 通过；修复还包括让客户端复用同一个 key（C 完全未提本地回归结果与该修复部分）"
+            },
+            {
+              "excerpt": "带着告警上线增加了整体系统风险",
+              "source_fact": "之前的第三方配额告警仍然存在，与本次修复无关（源未说明它会提高本次上线的风险）"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 2,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "skill/brief": "skill",
+        "skill/plain": "skill",
+        "brief/plain": "brief"
+      },
+      "reason": "只有 A 同时讲清了成因（超时重试造成两条 Asset）和两部分修复（唯一约束 + 客户端复用 key），并给出已通过的本地回归作为正面证据；B 漏掉成因与客户端侧修复但保留 12/12；C 既漏掉本地回归证据与半个修复，又把无关的配额告警说成会增加本次上线风险。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "brief",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "choose-provider",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "skill",
+        "skill/brief": "skill",
+        "plain/brief": "brief"
+      },
+      "reason": "三者都正确算出 A 当月 ¥700 并以境内与 2 天窗口淘汰 B、C，也都未提 B 的 ¥480 与 C 的 1500 硬上限。A 的更换条件最贴合用户约束（>1600 个时 A 费用突破 ¥900），并把“三家速度可靠性未知”单列为代价；C 同样给出 1600 的正确阈值但代价一节较单薄；B 的阈值改用“超过1500、费用超过¥850”并暗示去找“包月上限更高的方案”，而源中并不存在这样的选项，读者要多绕一圈才知道该怎么办。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "causal-uncertainty",
+      "answers": {
+        "plain": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "旧版 2%、新版 3%，即绝对差 1 个百分点、相对提升 50%，三个答案都未点明这一换算"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "旧版 2%、新版 3%，即绝对差 1 个百分点、相对提升 50%"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [
+            {
+              "excerpt": "<omitted>",
+              "source_fact": "旧版 2%、新版 3%，即绝对差 1 个百分点、相对提升 50%"
+            }
+          ],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/skill": "skill",
+        "plain/brief": "tie",
+        "skill/brief": "skill"
+      },
+      "reason": "同为漏掉“1 个百分点 vs 相对 50%”的换算，影响相当。B 的归因分析最干净：把人群不一致、优惠券、无随机分流合并为一条控制变量问题，并明确把“先核对口径、再做随机 A/B”写进下一步。A 多出“新用户通常有更高的新鲜感或转化动力”这一源中没有的一般性推测；C 断言“两者的基础转化率本身就不同”（源只说人群不同，未说基础率已知不同），且建议里未包含核对 2.7% 与 3% 的口径。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "skill",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "technical-chinese",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 3,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "plain",
+        "skill/brief": "brief",
+        "plain/brief": "plain"
+      },
+      "reason": "B 用连贯中文长句还原了“校验→入队→worker 调用第三方 API”的次序，并把 202 只表示受理与“内存状态随重启丢失 → DB 仍是 pending → 前端一直 loading”分成两段因果，术语（worker、pending）保留得当。A 把“202 不保证成功”排进 loading 的原因列表，实际它并非一直 loading 的成因，且保留 schema validation 等未翻译词较多；C 用“因为”把 202 与内存存状态直接连成一句，因果略错位，并把“还没实现”说成“代码还没写完”（暗示已动工）。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "faithful-dense",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "brief",
+        "brief/plain": "tie",
+        "skill/plain": "plain"
+      },
+      "reason": "三份都完整保留了时间时区、EU/US 范围、备份可恢复→停写→精确命令→失败即停、426 与下载可用、草稿先同步、链接 24 小时、webhook 15 分钟不重复计费、20 分钟由李明回滚、回滚只到迁移前且违规写入丢失、恢复写入与三项确认。差别在编排：A、C 把回滚单列为异常分支，执行同事顺着 1→4 做即可；B 把“超过 20 分钟由李明回滚”排成正常步骤 4、验收成了步骤 5，容易被当成常规动作误读。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "exact-format",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "tie",
+        "plain/skill": "tie",
+        "brief/skill": "tie"
+      },
+      "reason": "三份都是合法 JSON、恰好 status/reason/next_action 三个中文字符串键、无 Markdown 与多余说明；均未宣称生产已完成，reason 保留测试环境 smoke 通过，next_action 保留明早 10:00 由负责人决定。A 把“生产部署尚未开始”放在 status、B/C 放在 reason，属等价处理，无实质差别。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "already-clear",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "tie",
+        "brief/plain": "brief",
+        "skill/plain": "skill"
+      },
+      "reason": "三者都只给通知正文并保住 22:00–22:10 暂停上传、已上传文件仍可下载、22:00 前保存草稿三条。A 与 B 未加一字；C 多出“为了避免您的数据丢失”这一源中没有的理由说明，属于本不必要的扩写。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "gemini-api",
+      "case": "english-explanation",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "brief",
+        "brief/plain": "plain",
+        "skill/plain": "plain"
+      },
+      "reason": "三份都给出 30,000/min at 500 clients、5 秒轮询降到 6,000/min、最多多等 4 秒、与 2 秒承诺冲突、数字是估算而非压测、SSE 仅原型且重连与成本未测（都没写出 60 requests/client/min 这一中间量）。C 把“降 80%”的换算和取舍并排摆出，并把短期取舍与长期 SSE 验证拆成可执行的两步；A 内容相当但表述略松；B 只列两个选项不给倾向，且把 product promise 升格成 “SLA”，是源中没有的措辞强度。",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-3/59cff1cc/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "release-status",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 3,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 3,
+            "causality": 2,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "skill/brief": "skill",
+        "skill/plain": "plain",
+        "brief/plain": "plain"
+      },
+      "reason": "C alone spells out the mechanism (首次请求超时→客户端重试→两次创建同一条 Asset) and ties each unfinished item to a concrete precondition; A states the two-part fix and all gating items but compresses the cause to '上传重试产生重复 Asset'; B never explains how duplicates arose at all, only that a unique constraint was added.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "brief",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "choose-provider",
+      "answers": {
+        "skill": {
+          "material_errors": [
+            {
+              "excerpt": "若月用量超过 1500 个，A 的成本会超过 ¥850，那时 C 更便宜",
+              "source_fact": "C 限 1500 个且不支持超额加购，超过 1500 时 C 根本无法承载，谈不上更便宜"
+            }
+          ],
+          "scores": {
+            "clarity": 3,
+            "causality": 3,
+            "decision": 2,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [
+            {
+              "excerpt": "可改 B（¥480），但需 2 天迁移、当前窗口不足",
+              "source_fact": "B 迁移需 2 个工作日，本月还有 2 天迁移窗口——窗口恰好够，并非不足"
+            }
+          ],
+          "scores": {
+            "clarity": 3,
+            "causality": 2,
+            "decision": 2,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "plain",
+        "skill/brief": "skill",
+        "plain/brief": "plain"
+      },
+      "reason": "B is the only answer whose switch conditions hold up: it notes that above 1500 C 的硬上限使其无法覆盖，因此不应换到 C。A inverts this (claims C 更便宜 at >1500) and C misstates B 的迁移窗口 (2 工作日 vs 2 天窗口 = 刚好够)。A's error carries an explicit容量 caveat, C's is a flat contradiction of the source.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "causal-uncertainty",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 3,
+            "causality": 3,
+            "decision": 3,
+            "naturalness": 3,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/skill": "plain",
+        "plain/brief": "brief",
+        "skill/brief": "brief"
+      },
+      "reason": "All three refuse the全量 and list the confounders. B uniquely flags that 50% 只是相对涨幅 (a point A and C leave implicit), but packs everything into one paragraph; C delivers the same five confounders plus the 口径核对/随机分流 next steps in scannable form with the least rereading, and A does so at greater length.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "skill",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "technical-chinese",
+      "answers": {
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 3
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "skill/plain": "skill",
+        "skill/brief": "tie",
+        "plain/brief": "brief"
+      },
+      "reason": "All three keep the full chain (校验→入队→worker 调用、202 仅表示已接收、内存状态随重启丢失→DB 旧 pending→一直 loading、停 worker 重启复现、持久化未实现). B restates the same content with added scaffolding ('问题的根子在于'、'代码还没落地') without adding information, so A and C cost less reading for identical fidelity.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "skill",
+        "B": "plain",
+        "C": "brief"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "faithful-dense",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 3,
+            "causality": 3,
+            "decision": null,
+            "naturalness": 3,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "skill",
+        "brief/plain": "plain",
+        "skill/plain": "plain"
+      },
+      "reason": "All retain every fact including 快照可恢复、失败即停、HTTP 426、24 小时链接、15 分钟 webhook 不重复计费、20 分钟李明回滚、违规写入丢失. C numbers the four execution steps so an operator can follow them under time pressure; B is equally accurate but runs the steps inline in a sentence; A crams every section into bracket-labeled running text, which is the hardest to execute from at 02:00.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "exact-format",
+      "answers": {
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 2,
+            "causality": null,
+            "decision": null,
+            "naturalness": 3,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "plain/brief": "plain",
+        "plain/skill": "tie",
+        "brief/skill": "skill"
+      },
+      "reason": "All three are valid JSON with exactly the three keys and no Markdown. B puts 'smoke 通过' in status and '生产部署尚未开始' in reason, so status reads as a pass verdict rather than a release state and reason no longer explains anything; A and C both give status='待发布' with the smoke result and 生产未开始 in reason. C differs from A only by trailing periods.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "plain",
+        "B": "brief",
+        "C": "skill"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "already-clear",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": null,
+            "decision": null,
+            "naturalness": 4,
+            "economy": 4
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "tie",
+        "brief/plain": "tie",
+        "skill/plain": "tie"
+      },
+      "reason": "All three keep 22:00–22:10 暂停上传、已上传文件可下载、22:00 前保存草稿, return only the notice body, and add nothing (no glossary or commentary). The differences are '务必'/'系统'/'好' — pure wording, no effect on the reader.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "case": "english-explanation",
+      "answers": {
+        "brief": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 3,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "skill": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 4
+          }
+        },
+        "plain": {
+          "material_errors": [],
+          "scores": {
+            "clarity": 4,
+            "causality": 4,
+            "decision": 4,
+            "naturalness": 4,
+            "economy": 3
+          }
+        }
+      },
+      "preferences": {
+        "brief/skill": "skill",
+        "brief/plain": "plain",
+        "skill/plain": "tie"
+      },
+      "reason": "All three carry 60/client/min, 30,000 at 500, 6,000 at five seconds, up to four extra seconds, the conflict with the two-second promise, the estimate-not-load-test caveat, and the untested SSE reconnect/cost. B and C commit to a recommendation (hold at one second, test SSE and load before deciding); A ends with an either/or — 'either keep 1-second polling ... or explicitly reset that SLA' — leaving the PM to make the call.",
+      "raw_judgment": "evals/speak-human/runs/2026-09-14-v1-judging-4/131c3d29/result.json",
+      "anonymous_mapping": {
+        "A": "brief",
+        "B": "skill",
+        "C": "plain"
+      }
+    }
+  ],
+  "aggregate": [
+    {
+      "model": "claude",
+      "arms": {
+        "plain": {
+          "quality_mean": 3.6604,
+          "material_error_cases": 1,
+          "characters": 6517
+        },
+        "brief": {
+          "quality_mean": 4,
+          "material_error_cases": 0,
+          "characters": 3802
+        },
+        "skill": {
+          "quality_mean": 3.975,
+          "material_error_cases": 0,
+          "characters": 4721
+        }
+      },
+      "skill_preferences": {
+        "plain": {
+          "wins": 5,
+          "ties": 3,
+          "losses": 0,
+          "unscored": 0
+        },
+        "brief": {
+          "wins": 1,
+          "ties": 6,
+          "losses": 1,
+          "unscored": 0
+        }
+      }
+    },
+    {
+      "model": "deepseek-api",
+      "arms": {
+        "plain": {
+          "quality_mean": 3.8687,
+          "material_error_cases": 0,
+          "characters": 3995
+        },
+        "brief": {
+          "quality_mean": 3.5312,
+          "material_error_cases": 1,
+          "characters": 2323
+        },
+        "skill": {
+          "quality_mean": 3.775,
+          "material_error_cases": 1,
+          "characters": 2356
+        }
+      },
+      "skill_preferences": {
+        "plain": {
+          "wins": 1,
+          "ties": 3,
+          "losses": 4,
+          "unscored": 0
+        },
+        "brief": {
+          "wins": 5,
+          "ties": 2,
+          "losses": 1,
+          "unscored": 0
+        }
+      }
+    },
+    {
+      "model": "gemini-api",
+      "arms": {
+        "plain": {
+          "quality_mean": 3.6521,
+          "material_error_cases": 2,
+          "characters": 3414
+        },
+        "brief": {
+          "quality_mean": 3.7625,
+          "material_error_cases": 2,
+          "characters": 2886
+        },
+        "skill": {
+          "quality_mean": 3.8312,
+          "material_error_cases": 1,
+          "characters": 2706
+        }
+      },
+      "skill_preferences": {
+        "plain": {
+          "wins": 4,
+          "ties": 1,
+          "losses": 3,
+          "unscored": 0
+        },
+        "brief": {
+          "wins": 3,
+          "ties": 2,
+          "losses": 3,
+          "unscored": 0
+        }
+      }
+    },
+    {
+      "model": "glm",
+      "arms": {
+        "plain": {
+          "quality_mean": 3.7354,
+          "material_error_cases": 1,
+          "characters": 3842
+        },
+        "brief": {
+          "quality_mean": 3.5688,
+          "material_error_cases": 1,
+          "characters": 3996
+        },
+        "skill": {
+          "quality_mean": 4,
+          "material_error_cases": 0,
+          "characters": 3755
+        }
+      },
+      "skill_preferences": {
+        "plain": {
+          "wins": 4,
+          "ties": 4,
+          "losses": 0,
+          "unscored": 0
+        },
+        "brief": {
+          "wins": 6,
+          "ties": 2,
+          "losses": 0,
+          "unscored": 0
+        }
+      }
+    },
+    {
+      "model": "gpt",
+      "arms": {
+        "plain": {
+          "quality_mean": 3.8937,
+          "material_error_cases": 0,
+          "characters": 2852
+        },
+        "brief": {
+          "quality_mean": 4,
+          "material_error_cases": 1,
+          "characters": 2328
+        },
+        "skill": {
+          "quality_mean": 3.7833,
+          "material_error_cases": 1,
+          "characters": 2745
+        }
+      },
+      "skill_preferences": {
+        "plain": {
+          "wins": 2,
+          "ties": 4,
+          "losses": 2,
+          "unscored": 0
+        },
+        "brief": {
+          "wins": 2,
+          "ties": 3,
+          "losses": 3,
+          "unscored": 0
+        }
+      }
+    },
+    {
+      "model": "grok",
+      "arms": {
+        "plain": {
+          "quality_mean": 3.85,
+          "material_error_cases": 1,
+          "characters": 2635
+        },
+        "brief": {
+          "quality_mean": 3.8438,
+          "material_error_cases": 1,
+          "characters": 2656
+        },
+        "skill": {
+          "quality_mean": 3.8937,
+          "material_error_cases": 0,
+          "characters": 2650
+        }
+      },
+      "skill_preferences": {
+        "plain": {
+          "wins": 2,
+          "ties": 4,
+          "losses": 2,
+          "unscored": 0
+        },
+        "brief": {
+          "wins": 3,
+          "ties": 2,
+          "losses": 3,
+          "unscored": 0
+        }
+      }
+    },
+    {
+      "model": "kimi",
+      "arms": {
+        "plain": {
+          "quality_mean": 3.8937,
+          "material_error_cases": 0,
+          "characters": 4006
+        },
+        "brief": {
+          "quality_mean": 3.875,
+          "material_error_cases": 1,
+          "characters": 3466
+        },
+        "skill": {
+          "quality_mean": 3.975,
+          "material_error_cases": 0,
+          "characters": 3972
+        }
+      },
+      "skill_preferences": {
+        "plain": {
+          "wins": 3,
+          "ties": 5,
+          "losses": 0,
+          "unscored": 0
+        },
+        "brief": {
+          "wins": 3,
+          "ties": 4,
+          "losses": 1,
+          "unscored": 0
+        }
+      }
+    }
+  ]
+}

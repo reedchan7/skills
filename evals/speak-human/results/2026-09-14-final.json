@@ -1,0 +1,470 @@
+{
+  "final_skill_sha256": "457ab45aebd945e5e32b188bd07a901513a26384be33960e660ec2e2b6aeca52",
+  "snapshots": [
+    {
+      "skill_sha256": "457ab45aebd945e5e32b188bd07a901513a26384be33960e660ec2e2b6aeca52",
+      "cases_sha256": "e71bcc71e60cc92aa4ce78f00ca514bb2e0a8baf6f21c12d9fe0b6bf4605d003",
+      "protocol_sha256": "118c9de3edb361abc1697903c4fbfcd31e349af81f54550545c296116ecf3bc5",
+      "models": [
+        "claude"
+      ],
+      "arms": [
+        "skill"
+      ],
+      "timeout_seconds": 240
+    },
+    {
+      "skill_sha256": "457ab45aebd945e5e32b188bd07a901513a26384be33960e660ec2e2b6aeca52",
+      "cases_sha256": "e71bcc71e60cc92aa4ce78f00ca514bb2e0a8baf6f21c12d9fe0b6bf4605d003",
+      "protocol_sha256": "118c9de3edb361abc1697903c4fbfcd31e349af81f54550545c296116ecf3bc5",
+      "models": [
+        "gpt",
+        "grok",
+        "kimi",
+        "glm",
+        "gemini-api",
+        "deepseek-api"
+      ],
+      "arms": [
+        "skill"
+      ],
+      "timeout_seconds": 240
+    }
+  ],
+  "observations": [
+    {
+      "model_family": "claude",
+      "arm": "skill",
+      "prompt_sha256": "8154e40764290a93d2a59fac36d56d7d7e5bbd1d7d88c9e9d9dcd287fd331db7",
+      "exit_code": 0,
+      "elapsed_seconds": 79.53,
+      "answers": {
+        "release-status": "**结论：现在不能上线。** 修复本身看起来对路，但验证和部署的前置条件都还没做完。\n\n**已经确定的部分**\n- 根因清楚：上传第一次请求超时后客户端重试，结果创建了两条同样的 Asset。本地可复现。\n- 修复方式：给 Asset 的业务键加唯一约束，同时让客户端重试时复用同一个 key。\n- 重复上传的本地回归 12/12 通过。\n\n**还差的部分（这些是不能上线的原因）**\n1. 代码没提交、没部署，所以目前线上仍是有 bug 的版本。\n2. 完整测试第一次 86/87，失败的那项是 OAuth 回调超时。单独重跑通过，但完整测试没有重跑过——这一项是偶发还是真问题，现在还判断不了。\n3. 数据库迁移没在 staging 执行过，生产的重试流量也没验证过。也就是说，唯一约束在真实数据上会不会撞到已有的重复记录、线上重试路径是否真的复用同一个 key，都还是未知。\n4. 回滚不对称：只回滚应用删不掉数据库里的约束，必须单独回滚迁移。上线前得先准备好这个回滚脚本，否则出问题时退不干净。\n\n**建议的顺序**\n先提交代码 → 重跑完整测试（确认 OAuth 那项是偶发）→ 在 staging 执行迁移，并检查存量数据是否有会违反唯一约束的重复记录 → 在 staging 用重试流量验证 → 写好并演练迁移回滚 → 再安排上线。\n\n**另外：** 第三方配额告警是之前就有的，和这次修复无关，不影响这次上线决定，但仍然需要单独跟进。",
+        "choose-provider": "**推荐 A，每月约 ¥700。**\n\n算一下你的 1200 个任务：\n- **A**：¥600 含 1000 个，超出的 200 个按 ¥0.50 计 ¥100，合计 **¥700/月**。数据在中国境内，迁移 1 天，两天窗口内做得完。\n- **B**：1200 × ¥0.40 = ¥480，最便宜，但机房在新加坡，不满足数据留境内的硬要求，直接排除。\n- **C**：¥850/月，在预算内也在境内，但迁移要 3 天，本月只剩 2 天窗口，这个月落不了地。\n\n所以在“境内 + 本月能迁完 + 预算内”三个条件下，只有 A 同时满足。它还有 ¥200 的预算余量，迁移只占 1 天，万一以后要换，沉没成本也最小。\n\n**代价**：A 的费用随量浮动，不像 C 那样封顶。按报价推算，量到 1500 个时 A 正好也是 ¥850，到 1600 个就是 ¥900、刚好顶到预算上限，再多就超预算了。\n\n**什么时候该换**：如果稳定月用量升到 1500 左右，A 的价格优势就没了，该重新考虑 C——但要提前安排 3 天迁移，不能等到月底窗口。如果用量会常态超过 1500，C 也不行（它限 1500 且不支持超额加购），得重新找方案。只有在数据留境内这条要求被取消的情况下，B 才重新进入选项。\n\n**一个提醒**：三家在你这种负载上的速度和可靠性都是未知的，上面只比了价格、合规和迁移时间。建议迁到 A 之后先观察一段时间实际延迟和失败率，把这块空白补上。",
+        "causal-uncertainty": "**不能信，更不该现在全量。** 这个数字既没算准，也不能归因到改版。\n\n**先说数字本身**：2% 涨到 3% 是提高了 1 个百分点，说成“增长 50%”是相对值，听起来大得多。而且后台导出的同一周是 2.7%，周报写 3%，两个口径还没对齐——连这 1 个百分点是不是真的都没定。另外没有样本量和置信区间，如果基数不大，2% 和 3% 的差别可能就是随机波动。\n\n**再说归因**：新版只发给新注册用户，旧版是新老用户混在一起。新用户和老用户的付费倾向本来就不一样，这两组不可比。同期还有一个只针对新用户的优惠券活动，正好覆盖同一批人。也没有随机分流记录。所以“新版更好”“新用户本来就更容易付费”“优惠券起作用”这三种解释，现在的数据一个都排除不了。\n\n**建议**：\n1. 先核对口径，确定到底是 2.7% 还是 3%，并把样本量和置信区间补上。\n2. 在同一批人群里做随机分流——都是新注册用户，都在优惠券活动范围内，只有版本不同。这样才能把改版的效果和其他因素分开。\n3. 有了随机实验结果再决定全量。在那之前可以小流量扩，但不要按“提升 50%”这个结论做决策。",
+        "technical-chinese": "请求进来后，先由中间件做参数校验（schema validation）；校验通过就放进队列，由 worker 取出任务去调第三方 API。\n\n这里的关键是：接口返回 HTTP 202 只表示“请求已收到”，不代表第三方那边真的执行成功了。\n\n问题出在任务状态只存在 worker 的内存里，没有落库。worker 一重启，内存里的状态就没了。这时前端刷新页面，只能从数据库读到迁移前那条旧的 pending 记录，于是界面一直转圈。\n\n这个原因已经复现过：把 worker 停掉、重启，再刷新页面，就会出现同样的现象。\n\n打算的修法是把任务状态和最终结果都持久化到数据库，这样重启后前端还能读到真实进度。不过这部分还没实现。",
+        "faithful-dense": "## 迁移须知\n\n**时间与范围**\n9 月 20 日 02:00–02:20（Asia/Shanghai）执行迁移，只影响 EU workspace，US 不受影响。\n\n**执行步骤（按顺序，任何一步失败立即停止）**\n1. 备份，并确认快照能够恢复。\n2. 暂停写入。\n3. 运行 `migrate --region eu --batch-size 200`。\n\n**回滚**\n超过 20 分钟仍未完成，由值班的李明执行回滚。注意：回滚只能恢复到迁移前的数据状态，因此暂停写入期间如果有违规写入，这些写入会丢失。\n\n**迁移期间用户会遇到什么**\n- 旧 SDK（低于 2.4）调用上传接口会返回 HTTP 426；下载不受影响，仍然可用。\n- 移动端的离线草稿不会自动迁移，用户需要先同步，否则草稿不会被带过去。\n- 旧的下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会造成重复计费。\n\n**完成后**\n恢复写入，并逐项确认上传、下载、webhook 都正常。",
+        "exact-format": "{\"status\": \"未发布\", \"reason\": \"测试环境 smoke 测试已通过，但生产部署尚未开始。\", \"next_action\": \"等待负责人在明早 10:00 决定是否发布。\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，期间无法上传新文件，已上传的文件仍然可以正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "**The short version:** our 1-second status polling generates about 30,000 requests per minute at 500 active clients, and the obvious fix — polling less often — would break a promise we've already made to customers.\n\n**Why it matters:** each active client sends 60 status requests a minute. At 500 concurrent clients that's 30,000 per minute hitting our status endpoint, and it scales linearly with usage. Note that this is a calculated estimate from the polling interval, not something we've confirmed with a load test — we don't actually know yet whether 30,000/min is causing real strain.\n\n**The catch with the easy fix:** dropping to 5-second polling cuts traffic to 6,000 per minute (an 80% reduction), but it adds up to 4 seconds of delay before a client notices a status change. We currently promise status updates within 2 seconds, so 5-second polling would put us out of compliance with our own commitment. That's a product decision, not just an engineering one.\n\n**What we can do:**\n1. **Load-test first.** Before changing anything user-facing, confirm whether 30,000 requests/min is actually a problem at our current capacity. If it isn't, we don't need to trade anything away yet.\n2. **Consider a middle interval.** By the same arithmetic, 2-second polling would be 15,000/min (half the load) with up to 1 second of added delay — which keeps worst-case detection inside the 2-second promise. This is derived from the same estimate, so it needs the same load-test validation.\n3. **Finish evaluating SSE.** A prototype exists and would eliminate polling volume without the latency tradeoff, but reconnect behavior and operating cost are both untested. Those two unknowns are what decide whether it's viable — worth scoping that work now so it's ready if traffic grows.\n\nIf we decide we do want 5-second polling, we'd need to renegotiate the 2-second commitment with customers explicitly rather than quietly miss it."
+      },
+      "status": "completed",
+      "mechanical_issues": [],
+      "characters": 4599
+    },
+    {
+      "model_family": "gpt",
+      "arm": "skill",
+      "prompt_sha256": "8154e40764290a93d2a59fac36d56d7d7e5bbd1d7d88c9e9d9dcd287fd331db7",
+      "exit_code": 0,
+      "elapsed_seconds": 59.44,
+      "answers": {
+        "release-status": "建议暂不上线。重复创建 Asset 的修复已通过本地回归，但上线前的关键验证还没完成。\n\n问题已在本地复现：第一次上传请求超时后，客户端重试，两次请求创建了同一条 Asset。修复给 Asset 的业务键加了唯一约束，并让客户端重试时复用同一个 key；重复上传的本地回归测试 12/12 通过。\n\n目前还有这些缺口：\n\n- 完整测试首次通过 86/87，失败项是 OAuth 回调超时。该项单独重跑通过，但完整测试尚未重跑。\n- 数据库迁移尚未在 staging 执行，生产重试流量也未验证。\n- 代码没有提交，也没有部署。\n\n建议先在 staging 验证迁移和上传重试流程，重跑完整测试，并明确生产重试流量的验证安排与回滚方案，再决定发布。回滚必须包含独立的数据库迁移回滚：只回滚应用不会删除新增的唯一约束。\n\n此前的第三方配额告警仍然存在，与本次修复无关，需要单独跟进。",
+        "choose-provider": "推荐 A。按每月 1200 个任务、一个任务计一次且不含税计算，费用为 ¥600 + 200 × ¥0.50 = ¥700/月，低于 ¥900 预算；数据留在中国境内，迁移需要 1 天，也能赶上本月剩余的 2 天窗口。\n\n代价是每月固定支付 ¥600，超过 1000 个任务后按量加费。三家在你的工作负载上的速度和可靠性都未知，目前无法据此判断优劣。\n\nB 每月只需 ¥480，但数据在新加坡，不符合境内要求。C 每月 ¥850、境内、最多 1500 个任务，但迁移需要 3 天，本月窗口不够。\n\n如果以后迁移窗口达到 3 天，且月用量稳定在 1501–1600 个，C 仍不能选，因为它最多支持 1500 个任务。真正适合考虑换 C 的范围是每月 1501 个以下且接近上限：更准确地说，用量在 1500 个时，A 和 C 都是 ¥850，C 并无价格优势。因此，现有报价下没有明确的换 C 理由；只有后续实测表明 C 的速度或可靠性更适合你，且用量不超过 1500 个、迁移窗口至少 3 天时，再考虑更换。A 超过每月 1600 个任务就会超预算，届时这三家的现有方案都无法同时满足用量、预算和境内要求，需要重新询价。",
+        "causal-uncertainty": "不能据此认定“改版让付费率提升 50%”，也不建议立刻全量。\n\n从 2% 到 3%，算术上确实是相对增长 50%，绝对增加 1 个百分点。但这还不能证明增长来自改版：\n\n- 新版只给新注册用户，旧版包含新老用户，两组人群不同。\n- 同期还有仅面向新用户的优惠券活动，无法区分改版和优惠券的影响。\n- 没有随机分流记录，也没有样本量和置信区间，无法判断差异是否可靠。\n- 同一周后台导出为 2.7%，周报为 3%，数据口径尚未核对。如果采用 2.7%，相对 2% 的增长是 35%。\n\n先核对付费率口径和原始数据、补齐样本量，再在可比用户中做随机分流，并让两组的优惠券条件一致。拿到能区分改版效果的结果后，再决定是否全量。",
+        "technical-chinese": "请求先经过中间件，按 schema 校验数据结构；通过后进入任务队列，再由 worker 取出任务并调用第三方 API。接口返回 HTTP 202，只表示请求已接收，不代表任务执行成功。\n\n前端一直显示加载中，是因为任务状态只保存在 worker 内存里。worker 重启后，这些状态会丢失；刷新页面时，前端只能从数据库读到旧的 pending（等待中）状态，因此一直等待。\n\n这个原因已通过停止 worker、重启后刷新页面的方式复现确认。计划把任务状态和最终结果保存到数据库，但目前还没有实现。",
+        "faithful-dense": "迁移安排在 9 月 20 日 02:00–02:20（Asia/Shanghai），仅影响 EU workspace，US 不变。\n\n执行顺序：\n\n1. 先备份，并确认快照能够恢复。\n2. 暂停写入。\n3. 运行 `migrate --region eu --batch-size 200`。\n4. 完成后恢复写入，并确认上传、下载、webhook 均正常。\n\n任何一步失败都立即停止。超过 20 分钟仍未完成，由值班李明回滚。回滚只能恢复迁移前的数据；暂停写入期间如果仍有违规写入，这些写入会丢失。\n\n请提前告知受影响用户：\n\n- 旧 SDK（版本 <2.4）的上传接口会返回 HTTP 426，下载仍可用。\n- 移动端离线草稿不会自动迁移，用户须在迁移前同步。\n- 旧下载链接继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。",
+        "exact-format": "{\"status\":\"生产部署尚未开始\",\"reason\":\"测试环境冒烟测试已通过，是否发布仍待负责人决定\",\"next_action\":\"明早十点由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，已上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "One-second polling generates 60 status requests per minute per active client. With 500 active clients, that totals 30,000 requests per minute, so request volume grows directly with the number of active clients.\n\nPolling every five seconds would reduce that to 6,000 requests per minute—an 80% reduction—but could add up to four seconds to status-detection delay compared with one-second polling. That would not support our current promise of updates within two seconds, so I would not recommend it unless that promise changes. These figures are calculated estimates, not load-test results.\n\nKeep one-second polling for now and evaluate the existing SSE prototype as an alternative. Test whether it meets the two-second promise, including during reconnects, and measure its operating cost. Load-test the current polling approach as a baseline before deciding whether to switch."
+      },
+      "status": "completed",
+      "mechanical_issues": [],
+      "characters": 2854
+    },
+    {
+      "model_family": "grok",
+      "arm": "skill",
+      "prompt_sha256": "8154e40764290a93d2a59fac36d56d7d7e5bbd1d7d88c9e9d9dcd287fd331db7",
+      "exit_code": 0,
+      "elapsed_seconds": 122.81,
+      "answers": {
+        "release-status": "现在不能上线。\n\n重复上传的问题已在本地修好：第一次请求超时后客户端重试，会建成两条 Asset；你们给业务键加了唯一约束，并让客户端复用同一个 key。本地回归 12/12 通过。完整测试第一次 86/87，失败项是 OAuth 回调超时，单独重跑通过，完整测试还没重跑。数据库迁移没在 staging 执行，生产上的重试流量也没验证。代码没提交，也没部署。\n\n只回滚应用去不掉这条数据库约束，必须单独回滚迁移。第三方配额告警还在，和这次修复无关，不决定这次能不能上线。\n\n先提交代码，在 staging 执行迁移并完整重跑测试，再验证生产重试路径，同时准备好迁移回滚。这些做完之前不要上线。",
+        "choose-provider": "推荐 A。\n\n按每月 1200 个任务、一个任务计一次、不考虑税：A 是固定 ¥600（含 1000 个）加超额 200×¥0.50，合计 ¥700，数据在中国境内，迁移 1 天，赶得上本月仅剩的 2 天窗口，也在 ¥900 预算内。\n\nB 是 ¥0.40/个、无月费，1200 个为 ¥480，但在新加坡，不满足数据留在境内。C 固定 ¥850、含 1500 个、不能超额加购，也在境内和预算内，但迁移要 3 天，超过本月窗口。三家在你这套负载上的速度和可靠性都没有数据。\n\nA 的代价是：超出 1000 个按 ¥0.50/个计费；月用量到 1600 个时费用正好 ¥900，再高就超预算。\n\n如果数据可以出境，选更便宜的 B。如果迁移窗口能放到 3 天及以上，且希望固定价、含到 1500 个、不要超额，再考虑 C。如果月用量会超过 1600，A 会超预算，C 又不能加购且上限 1500，需要另谈套餐。",
+        "causal-uncertainty": "不能信，也不该立刻全量。\n\n周报把旧版付费率 2%、新版 3% 标成提升 50%，只是这两个百分比的相对增幅，没有样本量，也没有置信区间。比较本身也不成立：新版只给新注册用户，旧版含新老用户；同期还有只针对新用户的优惠券；没有随机分流记录。同一周后台导出新版是 2.7%，周报写 3%，口径还没核对。\n\n现有数字说明不了改版导致付费率上升。要对齐口径，拆开优惠券和新用户结构，再用随机分流测过，才能决定是否全量。",
+        "technical-chinese": "请求会先经过 middleware 做 schema 校验，通过后才进队列。worker 取出任务，再调用第三方 API。返回 HTTP 202 只表示请求已被接收，不保证任务真的执行成功。\n\n任务状态目前只存在 worker 内存里，进程一重启状态就丢。前端刷新只能读到数据库里仍是 pending 的旧记录，所以会一直 loading。这个过程已经用「停掉 worker → 重启 → 刷新页面」复现过。\n\n打算把任务状态和最终结果写入数据库，但还没做。",
+        "faithful-dense": "9 月 20 日 02:00–02:20（Asia/Shanghai）做迁移，只影响 EU workspace，US 不变。\n\n执行顺序：先备份并确认快照能恢复，再暂停写入，随后运行 migrate --region eu --batch-size 200。任何一步失败就停止。\n\n旧 SDK 低于 2.4 的上传接口会返回 HTTP 426，下载继续可用。移动端离线草稿不会自动迁移，用户须先同步。旧下载链接继续有效 24 小时。EU 的 webhook 最多延迟 15 分钟，不会重复计费。\n\n超过 20 分钟未完成，由值班李明回滚。回滚只能恢复迁移前的数据；暂停写入期间如果仍有写入，这些写入会丢失。\n\n完成后恢复写入，并确认上传、下载、webhook 均正常。",
+        "exact-format": "{\"status\":\"尚未发布\",\"reason\":\"测试环境冒烟测试已通过，生产部署尚未开始。\",\"next_action\":\"明早10:00由负责人决定是否发布。\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传。已上传的文件仍可下载。请在 22:00 前保存草稿。",
+        "english-explanation": "One-second polling means each active client sends 60 status requests per minute. At 500 active clients that is 30,000 requests per minute. That volume can dominate traffic and capacity even though users never see those calls.\n\nPolling every five seconds would drop the estimate to 6,000 requests per minute and add up to four seconds of extra delay in noticing a status change, relative to one-second polling. The product currently promises updates within two seconds, so a five-second interval would miss that promise. These figures are calculated estimates, not load-test results.\n\nAn SSE prototype already exists and could push status instead of polling. Reconnect behavior and operating cost have not been tested, so it is not ready to ship on this evidence.\n\nKeep one-second polling while the two-second promise stands. If the goal is fewer requests without breaking that promise, test SSE reconnect and cost before adopting it. If you lengthen the poll interval, change the two-second promise first. Run a load test if you need measured traffic rather than this estimate."
+      },
+      "status": "completed",
+      "mechanical_issues": [],
+      "characters": 2678
+    },
+    {
+      "model_family": "kimi",
+      "arm": "skill",
+      "prompt_sha256": "8154e40764290a93d2a59fac36d56d7d7e5bbd1d7d88c9e9d9dcd287fd331db7",
+      "exit_code": 0,
+      "elapsed_seconds": 143.16,
+      "answers": {
+        "release-status": "建议：现在不能上线。修复方向对、本地验证也过了，但离上线还差几步关键验证。\n\n已完成：上传重试导致重复创建 Asset 的 bug 已在本地复现并修复（业务键加唯一约束 + 客户端复用同一个 key），重复上传的本地回归测试 12/12 全部通过。\n\n还没完成的，按上线前的依赖顺序：\n- 代码尚未提交、未部署，修复目前只存在于本地。\n- 数据库迁移还没在 staging 执行，生产环境的重试流量也没验证过——唯一约束遇到真实存量数据会不会报错，只有跑了才知道。\n- 完整测试第一轮 86/87，失败的 OAuth 回调超时单独重跑通过了，但完整套件还没重跑，不能排除用例之间的相互影响。\n\n两个需要提前知道的风险：\n- 回滚要分两步：只回滚应用代码删不掉数据库里的唯一约束，迁移需要单独回滚。\n- 第三方配额告警仍然存在，与本次修复无关，但上线后注意别把它误判成回归。\n\n建议的上线条件：提交代码 → 在 staging 执行迁移并用接近生产的重试流量验证 → 完整测试套件重跑全绿。三项都过了再排发布，回滚预案里把「应用回滚」和「迁移回滚」分开写。",
+        "choose-provider": "推荐 A。按每月 1200 个任务算：月费 ¥600 含 1000 个，超出 200 个 × ¥0.50 = ¥100，合计 ¥700/月，在 ¥900 预算内；数据在中国境内；迁移只要 1 天，赶得上本月剩的 2 天迁移窗口。\n\n另外两家为什么不合适：\n- B 最便宜（1200 × ¥0.40 = ¥480/月），但数据在新加坡，违反「数据留在中国境内」的硬要求，直接排除。\n- C 也合规（¥850/月、境内、1500 个上限），但比 A 贵，迁移要 3 天、本月窗口装不下，而且不支持超额加购，用量超过 1500 个就顶死。\n\n代价和要注意的：\n- A 的超额单价（¥0.50）高于 B（¥0.40）；在 ¥900 预算内，A 最多承接到每月 1600 个任务，超过就破预算。\n- 三家在你的工作负载上的速度和可靠性都没有数据，签约前建议先小流量试用。\n\n什么情况下换：按现有报价，C 在 1500 个以内的任何用量都不比 A 便宜（1500 个时两家恰好同为 ¥850），超过 1500 个 C 又不接单，所以 C 只在 A 试用后速度或可靠性不达标时作为备选。B 只有在数据出境要求放开后才值得考虑。如果月量长期超过 1600 个，A 会破预算，届时需要重新谈价或调整预算。",
+        "causal-uncertainty": "不能信，至少不能凭这个数据立刻全量。「提升 50%」这个算法本身没错（2% → 3%），但它能否归因于改版，目前的证据撑不住：\n\n- 两组人不可比：新版只给新注册用户看，旧版数据里混着新老用户。新老用户的付费意愿通常不同，仅这一点就可能解释这 1 个百分点的差异。\n- 有同期干扰：同一周有一个仅针对新用户的优惠券活动，而新版恰好也只给新用户看——付费率上升可能来自优惠券，和改版的效果分不开。\n- 数字本身没对齐：后台导出同一周新版是 2.7%，周报写 3%，口径尚未核对。涨的是 50% 还是 35% 都还没定。\n- 没有样本量、没有置信区间，也没有随机分流记录，无法判断差异是真实效果还是随机波动。\n\n建议：先核对 2.7% 与 3% 的口径差异；然后做一次真正的随机分流（新老用户各自随机看到新旧两版），把优惠券活动隔离开或等它结束，拿到样本量和置信区间。届时新版在可比人群中仍显著更高，再全量不迟。",
+        "technical-chinese": "流程是这样的：请求先进 middleware 做 schema 校验，通过后丢进队列；worker 从队列里取任务，再去调第三方 API。第三方返回 HTTP 202 只表示「请求收到了」，不代表任务真的执行成功。\n\n问题的根因是：任务状态只存在 worker 的内存里，没有写进数据库。worker 一重启，这些状态就全丢了；前端刷新页面时读的是数据库，里面还是重启前写入的 pending 状态，所以页面一直停在 loading。\n\n这个根因已经复现确认过：停掉 worker、重启、再刷新页面，现象一模一样。修复方案是把任务状态和最终结果持久化到数据库，目前还没有实现。",
+        "faithful-dense": "# EU workspace 迁移须知\n\n**时间**：9 月 20 日 02:00–02:20（Asia/Shanghai）。只影响 EU workspace，US 不受影响。\n\n**执行顺序**（任何一步失败立即停止，不要继续下一步）：\n1. 备份，并确认快照确实能恢复。\n2. 暂停写入。\n3. 运行 `migrate --region eu --batch-size 200`。\n\n**超时与回滚**：\n- 超过 20 分钟仍未完成，由值班李明执行回滚。\n- 回滚只能恢复到迁移前的数据；暂停写入期间如有违规写入，这些写入会丢失。\n\n**完成后**：恢复写入，并确认上传、下载、webhook 三项均正常。\n\n**对用户的影响**（提前知会）：\n- 旧版 SDK（低于 2.4）的上传接口会返回 HTTP 426；下载不受影响，继续可用。\n- 移动端离线草稿不会自动迁移，用户须先手动同步。\n- 旧下载链接在迁移后继续有效 24 小时。\n- EU 的 webhook 最多延迟 15 分钟，不会重复计费。",
+        "exact-format": "{\"status\":\"待发布\",\"reason\":\"测试环境 smoke 已通过，生产部署尚未开始\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传，已上传的文件仍可正常下载。请在 22:00 前保存好草稿。",
+        "english-explanation": "Our status polling is getting expensive as usage grows. Each active client asks the server for a status update once per second — 60 requests per minute. With 500 active clients, that's about 30,000 requests per minute just for status checks, and the volume grows in lockstep with every new active client.\n\nWhy it matters: this is pure overhead — most polls return \"nothing changed\" — and it scales linearly, so every growth milestone makes it worse.\n\nWhat we can do:\n- Slow polling to every 5 seconds: cuts volume to about 6,000 requests/minute, but adds up to 4 seconds of extra delay before a status change is detected. That breaks our current product promise of updates within 2 seconds, so we'd have to change the promise first.\n- Switch to SSE (server-sent events): the server pushes updates the moment they happen, keeping the 2-second promise while slashing request volume. A prototype exists, but reconnect behavior and operating cost are untested.\n\nOne caveat: these figures are arithmetic estimates, not load-test results — we haven't measured how much the current load actually hurts.\n\nRecommendation: pursue SSE, since it's the only option that cuts load without breaking the 2-second promise — but validate reconnect behavior and cost before committing. If SSE proves too costly or fragile, fall back to 5-second polling only if we're willing to relax the update-speed promise."
+      },
+      "status": "completed",
+      "mechanical_issues": [],
+      "characters": 3694
+    },
+    {
+      "model_family": "glm",
+      "arm": "skill",
+      "prompt_sha256": "8154e40764290a93d2a59fac36d56d7d7e5bbd1d7d88c9e9d9dcd287fd331db7",
+      "exit_code": 0,
+      "elapsed_seconds": 98.55,
+      "status": "blocked",
+      "error": "Expecting value: line 1 column 1 (char 0)"
+    },
+    {
+      "model_family": "gemini-api",
+      "arm": "skill",
+      "prompt_sha256": "8154e40764290a93d2a59fac36d56d7d7e5bbd1d7d88c9e9d9dcd287fd331db7",
+      "exit_code": 0,
+      "elapsed_seconds": 58.45,
+      "answers": {
+        "release-status": "结论：目前**不能上线**。\n\n原因：\n1. 代码尚未提交和部署，且未在 staging 环境执行数据库迁移。\n2. 生产环境的重试流量尚未得到验证。\n3. 完整测试套件因偶发超时（OAuth 回调）未跑全，目前只单独重跑了失败项。\n\n修复方案与风险：\n本次通过给数据库加唯一约束和客户端复用 key 来防重。但如果上线后出问题，只回滚应用代码无效，必须单独回滚数据库。第三方配额告警依然存在，但与本次修复无关。\n\n建议：\n1. 提交代码并部署到 staging 环境。\n2. 在 staging 验证数据库迁移和重试机制。\n3. 重新跑通完整的自动化测试。\n以上验证无误后，再考虑生产上线。",
+        "choose-provider": "建议选择**方案 A**。\n\n**为什么选 A：**\n- 数据留存在中国境内（方案 B 在新加坡，不合规）。\n- 迁移只需 1 天，能在本月剩余的 2 天窗口内完成（方案 C 需要 3 天，来不及）。\n\n**代价（成本）：**\n每月预计花费 ¥700（¥600 基础费包含 1000 个任务，超出的 200 个按 ¥0.50/个计费），完全符合 ¥900 的预算。\n\n**什么情况下需要换：**\n- 当每月任务量超过 1600 个时（此时方案 A 成本将超过方案 C 的 ¥850）。\n- 如果实际上线后，发现速度或可靠性无法满足业务需求（目前三家这方面的数据均未知）。",
+        "causal-uncertainty": "结论：**不能直接相信该结论，不建议立刻全量。**\n\n原因：这份数据的可靠性存在严重缺陷，无法证明转化率提升是因为改版。\n1. **对比口径不一致且存在干扰**：新版只针对新用户，旧版包含新老用户。且同期还有仅针对新用户的优惠券活动，转化率提升很可能是因为优惠券，而不是改版。\n2. **数据未对齐**：后台导出的新版转化率是 2.7%，与周报上的 3% 存在偏差，尚未核实原因。\n3. **缺乏统计依据**：没有严格的随机分流记录，也没有提供样本量和置信区间，无法排除偶然波动。\n\n建议：\n暂停全量上线。需重新设计严格的 A/B 测试（控制变量，仅对比新旧版本），排除优惠券等干扰因素后再做决策。",
+        "technical-chinese": "问题原因已经查明，并在重启 worker 后成功复现。\n\n当请求通过校验并进入队列后，worker 会去调用第三方 API。第三方 API 返回 HTTP 202 仅表示请求已接收，并不保证执行成功。\n\n目前的缺陷在于，任务状态只保存在 worker 的内存里，一旦重启就会丢失。此时前端刷新页面，只能从数据库读到旧的 pending 状态，导致页面一直显示 loading。\n\n后续计划将任务的实时状态和最终结果都保存到数据库中，但该方案尚未实现。",
+        "faithful-dense": "**EU 区域迁移执行指南**\n\n**时间与影响范围：**\n- 9 月 20 日 02:00–02:20 (Asia/Shanghai)\n- 仅影响 EU workspace（US 区域不受影响）。\n\n**执行步骤：**\n1. **备份**：先备份，并确认快照能成功恢复。\n2. **暂停写入**：暂停系统写入。\n3. **迁移**：运行命令 `migrate --region eu --batch-size 200`。**若任何一步失败，请立即停止。**\n4. **恢复**：完成后恢复写入，确认上传、下载、webhook 均正常。\n\n**回滚机制（李明值班）：**\n- 如果超过 20 分钟未完成，由李明执行回滚。\n- **风险提示**：回滚只能恢复迁移前的数据。如果在“暂停写入”期间发生违规写入，这些写入数据将会丢失。\n\n**注意事项：**\n- **旧版 SDK**：低于 2.4 版本的旧 SDK 上传接口将返回 HTTP 426，但下载继续可用。旧下载链接继续有效 24 小时。\n- **移动端**：离线草稿不会自动迁移，用户必须先同步。\n- **Webhook**：EU 的 webhook 最多延迟 15 分钟，不会重复计费。",
+        "exact-format": "{\n  \"status\": \"待部署\",\n  \"reason\": \"测试环境冒烟通过，生产部署尚未开始\",\n  \"next_action\": \"明早 10:00 负责人决定是否发布\"\n}",
+        "already-clear": "今晚 22:00–22:10 暂停上传。请在 22:00 前保存草稿；已上传的文件仍可正常下载。",
+        "english-explanation": "**Why it matters:**\nWe are facing a tradeoff between server load and our product promise. Currently, polling every 1 second generates 30,000 requests per minute with 500 active clients. Changing this to 5 seconds would reduce the load by 80% (to 6,000 requests/minute), but it would delay status updates by up to 4 seconds. This violates our product promise of delivering updates within 2 seconds. (Note: These are calculated estimates, not actual load test results).\n\n**What we can do:**\n1. **Short-term:** Maintain the 1-second polling to keep our latency promise, but we should run load tests to verify our servers can handle 30,000 requests/minute.\n2. **Long-term:** Evaluate the existing Server-Sent Events (SSE) prototype, which could solve both load and latency issues. We need to test its operating cost and reconnect behavior before using it in production."
+      },
+      "status": "completed",
+      "mechanical_issues": [],
+      "characters": 2633
+    },
+    {
+      "model_family": "deepseek-api",
+      "arm": "skill",
+      "prompt_sha256": "8154e40764290a93d2a59fac36d56d7d7e5bbd1d7d88c9e9d9dcd287fd331db7",
+      "exit_code": 0,
+      "elapsed_seconds": 68.48,
+      "answers": {
+        "release-status": "现在还不能上线。修复方向是对的，但离发布还差几步：代码没提交、也没部署；数据库迁移还没在 staging 跑过；生产环境的重试流量没验证；完整测试第一次是 86/87，唯一的 OAuth 回调超时单独重跑通过，但完整测试没有再整体重跑一遍。另外回滚有隐患：只回滚应用删不掉数据库里的唯一约束，必须再单独回滚迁移，这条回滚路径要提前准备好。之前那个第三方配额告警还在，但和本次修复无关，不用因它卡上线。建议按顺序补齐再上：提交并部署代码 → 在 staging 执行迁移 → 重跑完整测试到全部通过 → 验证生产重试场景 → 备好迁移的独立回滚脚本。这些都做完再决定上线。",
+        "choose-provider": "推荐 A。理由：1200 个任务，A 的费用是 600 + 200×0.5 = ¥700，低于 ¥900 预算，也低于 C 的 ¥850；数据在中国境内，符合硬性要求；迁移只要 1 天，本月还剩 2 天窗口，来得及。B 单价最低（1200×0.4 = ¥480），但服务器在新加坡，不满足数据留在中国境内，直接排除。代价：A 超额单价 ¥0.50 会随用量涨，而且三家在你这种负载上的速度和可靠性都未知，这是选 A 后仍要验证的风险。什么时候换：如果月任务稳定超过约 1500 个，A 的总价会超过 C（C 封顶 ¥850，但上限就是 1500、不支持加购，再高得另想办法）；如果 A 实测不可靠，或你更想要一口价、不想算超额，就换 C——但 C 迁移要 3 天，超出本月 2 天窗口，得等下一个窗口。当前数据下 B 不符合要求，不能选。",
+        "causal-uncertainty": "不能信。这个 50% 是把旧版 2%、新版 3% 直接相除得出的，但两组人并不可比：新版只开放给新注册用户，旧版却混着新老用户；同一周后台导出文件里新版其实是 2.7%，和周报的 3% 对不上，口径还没核对；同期又有一个只给新用户的优惠券活动，付费率提升很可能是券带来的，不是改版。最关键的是没有任何随机分流记录，也没给样本量和置信区间，无法判断 3% 是真差异还是随机波动。所以在补上样本量、统一口径、并控制掉优惠券和用户差异之前，不要据此全量。",
+        "technical-chinese": "这个请求先经过中间件做参数校验，通过后放进队列；worker 从队列取出任务，再去调第三方 API。返回 HTTP 202 只代表请求被接收了，不代表执行一定成功。因为任务状态只存在 worker 的内存里，一旦重启状态就丢了，前端刷新只能读到数据库里旧的 pending 状态，所以页面一直显示加载中。这个原因是通过停掉 worker、重启后刷新页面复现出来的。计划是把任务状态和最终结果持久化到数据库，但还没实现。",
+        "faithful-dense": "迁移时间：9 月 20 日 02:00–02:20（Asia/Shanghai），只影响 EU workspace，US 不变。执行顺序：先备份并确认快照能恢复；再暂停写入；然后运行 migrate --region eu --batch-size 200。任何一步失败就停止。迁移期间的影响：旧 SDK（低于 2.4）的上传接口会返回 HTTP 426，但下载仍可用；移动端离线草稿不会自动迁移，用户必须先手动同步；旧下载链接在迁移后继续有效 24 小时；EU 的 webhook 最多延迟 15 分钟，不会重复计费。回滚：超过 20 分钟未完成，由值班李明执行回滚；回滚只能恢复到迁移前的数据，暂停写入期间如果有违规写入，这部分写入会丢失。完成后：恢复写入，并确认上传、下载、webhook 都正常。",
+        "exact-format": "{\"status\":\"待发布\",\"reason\":\"测试环境 smoke 通过，生产部署尚未开始\",\"next_action\":\"明早 10:00 由负责人决定是否发布\"}",
+        "already-clear": "今晚 22:00–22:10 暂停上传；已上传的文件仍可正常下载。请在 22:00 前保存草稿。",
+        "english-explanation": "Polling once per second sends 60 status requests per minute per active client; at 500 active clients that is 30,000 requests a minute. That load risks cost and stability. Slowing to once every five seconds cuts it to 6,000 a minute but can add up to four seconds to how quickly a client notices a status change. Two caveats: these are estimates, not load-test results, and we currently promise updates within two seconds — five-second polling would miss that promise unless we change it. A better path is likely the SSE prototype, which pushes updates instead of polling; but its reconnect behavior and operating cost are untested, so we should validate those before committing. What we can do now: confirm actual request load, decide whether to keep the two-second promise, and run a cost-and-reconnect check on SSE before choosing it over slower polling."
+      },
+      "status": "completed",
+      "mechanical_issues": [],
+      "characters": 2429
+    }
+  ],
+  "independent_audits": {
+    "claude": {
+      "exit_code": 0,
+      "status": "completed",
+      "audit": {
+        "cases": [
+          {
+            "id": "release-status",
+            "issues": []
+          },
+          {
+            "id": "choose-provider",
+            "issues": []
+          },
+          {
+            "id": "causal-uncertainty",
+            "issues": []
+          },
+          {
+            "id": "technical-chinese",
+            "issues": [
+              {
+                "quote": "只能从数据库读到迁移前那条旧的 pending 记录",
+                "reason": "源文只说前端刷新时只能读到数据库里旧的 pending 状态（\"前端 refresh 只能读 DB 的旧 pending\"）。源文中不存在任何\"迁移\"（migration）环节；加入\"迁移前\"凭空引入了一个不存在的事件，会让读者误以为该 bug 与某次数据迁移有关，而实际原因是状态只存在 worker 内存、重启后丢失。"
+              }
+            ]
+          },
+          {
+            "id": "faithful-dense",
+            "issues": []
+          },
+          {
+            "id": "exact-format",
+            "issues": []
+          },
+          {
+            "id": "already-clear",
+            "issues": []
+          },
+          {
+            "id": "english-explanation",
+            "issues": [
+              {
+                "quote": "with up to 1 second of added delay — which keeps worst-case detection inside the 2-second promise",
+                "reason": "Per the source, 1-second polling already carries up to 1 second of detection delay, so 2-second polling's worst-case detection delay is a full 2 seconds — exactly at, not inside, the stated \"status updates within two seconds\" promise, with zero margin for request processing or delivery. Presenting 2-second polling as compliant overstates certainty against the product limit the answer itself cites; the source gives no basis for claiming it stays within the commitment."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "deepseek-api": {
+      "exit_code": 0,
+      "status": "completed",
+      "audit": {
+        "cases": [
+          {
+            "id": "release-status",
+            "issues": [
+              {
+                "quote": "建议按顺序补齐再上：提交并部署代码 → 在 staging 执行迁移 → 重跑完整测试到全部通过 → 验证生产重试场景 → 备好迁移的独立回滚脚本。",
+                "reason": "该顺序与来源中的限制冲突。来源明确指出“只回滚应用无法删除数据库约束，需独立回滚迁移”，因此独立的迁移回滚方案必须在执行迁移/部署之前准备好，而答案把它排在最后一步（在部署和生产验证之后）。同时把“部署代码”排在“在 staging 执行迁移”和“重跑完整测试”之前，也与来源“数据库迁移尚未在 staging 执行”“完整测试尚未重跑”的前置条件相矛盾，且与答案自身“现在还不能上线”“这些都做完再决定上线”的结论不一致（第 4 步“验证生产重试场景”已隐含上线）。"
+              }
+            ]
+          },
+          {
+            "id": "choose-provider",
+            "issues": []
+          },
+          {
+            "id": "causal-uncertainty",
+            "issues": []
+          },
+          {
+            "id": "technical-chinese",
+            "issues": []
+          },
+          {
+            "id": "faithful-dense",
+            "issues": []
+          },
+          {
+            "id": "exact-format",
+            "issues": []
+          },
+          {
+            "id": "already-clear",
+            "issues": []
+          },
+          {
+            "id": "english-explanation",
+            "issues": []
+          }
+        ]
+      }
+    },
+    "gpt": {
+      "exit_code": 0,
+      "status": "completed",
+      "audit": {
+        "cases": [
+          {
+            "id": "release-status",
+            "issues": []
+          },
+          {
+            "id": "choose-provider",
+            "issues": []
+          },
+          {
+            "id": "causal-uncertainty",
+            "issues": []
+          },
+          {
+            "id": "technical-chinese",
+            "issues": []
+          },
+          {
+            "id": "faithful-dense",
+            "issues": [
+              {
+                "quote": "请提前告知受影响用户：",
+                "reason": "源文中没有任何“提前通知用户”的步骤或要求。源文只是陈述迁移带来的影响（旧 SDK 上传返回 426、离线草稿需用户先同步、旧下载链接 24 小时有效、webhook 最多延迟 15 分钟），并未指示执行同事去通知用户。把这些事实改写为一条执行指令，给负责执行的读者增加了源文未授权的动作项。"
+              }
+            ]
+          },
+          {
+            "id": "exact-format",
+            "issues": []
+          },
+          {
+            "id": "already-clear",
+            "issues": []
+          },
+          {
+            "id": "english-explanation",
+            "issues": []
+          }
+        ]
+      }
+    },
+    "gemini-api": {
+      "exit_code": 0,
+      "status": "completed",
+      "audit": {
+        "cases": [
+          {
+            "id": "release-status",
+            "issues": []
+          },
+          {
+            "id": "choose-provider",
+            "issues": [
+              {
+                "quote": "当每月任务量超过 1600 个时（此时方案 A 成本将超过方案 C 的 ¥850）。",
+                "reason": "重算：A 的费用 = 600 + (N−1000)×0.50。N=1500 时恰为 ¥850，与 C 持平；超过 1500 个 A 才贵于 C，而不是 1600。¥1600 个对应的是 A 达到 ¥900（600+300），即触碰用户预算上限的点，被答案错标成了与 C 的交叉点。而且来源写明 C「限 1500 个，不支持超额加购」，所以任务量超过 1500 时 C 根本不可用，不能作为换用对象——真正的换方案信号应是量逼近 1500/1600 这两个不同含义的门槛，答案把两者混为一谈。"
+              }
+            ]
+          },
+          {
+            "id": "causal-uncertainty",
+            "issues": []
+          },
+          {
+            "id": "technical-chinese",
+            "issues": [
+              {
+                "quote": "第三方 API 返回 HTTP 202 仅表示请求已接收，并不保证执行成功。",
+                "reason": "来源只说「HTTP 202 only means accepted，不 guarantee execution success」，并未说明 202 由第三方 API 返回。按上下文（请求校验通过后 enqueue、前端随后一直 loading），202 更可能是本系统对该 request 的响应。把它改写成第三方的返回值是新增的归属事实，并切断了「客户端拿到 202→任务未必成功→前端读到旧 pending 一直 loading」这条因果链，改变了读者对问题的理解。"
+              }
+            ]
+          },
+          {
+            "id": "faithful-dense",
+            "issues": []
+          },
+          {
+            "id": "exact-format",
+            "issues": []
+          },
+          {
+            "id": "already-clear",
+            "issues": []
+          },
+          {
+            "id": "english-explanation",
+            "issues": []
+          }
+        ]
+      }
+    },
+    "grok": {
+      "exit_code": 0,
+      "status": "completed",
+      "audit": {
+        "cases": [
+          {
+            "id": "release-status",
+            "issues": []
+          },
+          {
+            "id": "choose-provider",
+            "issues": [
+              {
+                "quote": "如果数据可以出境，选更便宜的 B。",
+                "reason": "源文件说明 B「已有接口迁移需 2 个工作日」，而「本月还有 2 天迁移窗口」。答案给出了 A（1 天）和 C（3 天）的迁移成本，却在把 B 作为备选推荐时省略了 B 需要 2 个工作日这一事实——这恰好用尽整个剩余窗口，且「工作日」与「天」口径不同，可能根本赶不上。这个缺失的事实会影响是否以及何时切换的决策。"
+              }
+            ]
+          },
+          {
+            "id": "causal-uncertainty",
+            "issues": []
+          },
+          {
+            "id": "technical-chinese",
+            "issues": []
+          },
+          {
+            "id": "faithful-dense",
+            "issues": []
+          },
+          {
+            "id": "exact-format",
+            "issues": []
+          },
+          {
+            "id": "already-clear",
+            "issues": []
+          },
+          {
+            "id": "english-explanation",
+            "issues": [
+              {
+                "quote": "That volume can dominate traffic and capacity even though users never see those calls.",
+                "reason": "The source gives only the request-rate arithmetic (60/min per client, 30,000/min at 500 clients) and explicitly labels it a calculated estimate, not a load-test result. It says nothing about what share of traffic or capacity these requests consume. Asserting that the volume can dominate traffic and capacity is an invented claim about system impact that a PM could act on."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "kimi": {
+      "exit_code": 0,
+      "status": "completed",
+      "audit": {
+        "cases": [
+          {
+            "id": "release-status",
+            "issues": []
+          },
+          {
+            "id": "choose-provider",
+            "issues": []
+          },
+          {
+            "id": "causal-uncertainty",
+            "issues": []
+          },
+          {
+            "id": "technical-chinese",
+            "issues": []
+          },
+          {
+            "id": "faithful-dense",
+            "issues": []
+          },
+          {
+            "id": "exact-format",
+            "issues": []
+          },
+          {
+            "id": "already-clear",
+            "issues": []
+          },
+          {
+            "id": "english-explanation",
+            "issues": [
+              {
+                "quote": "the server pushes updates the moment they happen, keeping the 2-second promise while slashing request volume",
+                "reason": "Presented as established fact, but the source says only that \"An SSE prototype exists; reconnect behavior and operating cost are untested.\" It provides no latency figure, no request-volume figure, and no evidence that SSE meets the two-second promise. The later recommendation compounds this by asserting SSE \"is the only option that cuts load without breaking the 2-second promise\" — an unmeasured claim used as the basis for the recommendation, which the follow-on \"validate ... before committing\" caveat does not repair."
+              },
+              {
+                "quote": "most polls return \"nothing changed\"",
+                "reason": "Invented factual claim. The source gives only request counts (60/min per client, 30,000/min at 500 clients) and says nothing about what fraction of poll responses contain a status change. This unsupported claim is what carries the \"this is pure overhead\" framing."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "completion": {
+    "families_attempted": 7,
+    "complete_batches": 6,
+    "case_answers": 48,
+    "incomplete_families": [
+      "glm"
+    ],
+    "strict_format_cases_passed": 6
+  },
+  "gate": {
+    "semantic_preservation": "not_met",
+    "stable_comparative_uplift": "not_demonstrated",
+    "basis": "Confirmed source contamination and unsupported factual assertions remain. V3 is single-arm; V1/V2 comparisons do not establish final-candidate superiority."
+  }
+}

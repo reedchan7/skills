@@ -17,6 +17,7 @@ want to keep across local agents, experiments, and future projects.
 | [`git-commit`](./skills/git-commit/SKILL.md) | — | Write clear, scoped, review-friendly Conventional Commit messages and commits. |
 | [`handoff`](./skills/handoff/SKILL.md) | — | Write (and resume from) a HANDOFF.md so a zero-context future session can continue the work. |
 | [`refactor`](./skills/refactor/SKILL.md) | [`evals/refactor`](./evals/refactor) | Assess, plan, and execute behavior-preserving refactors: information hiding, change locality, complexity, pattern tradeoffs, security boundaries, and evidence of maintenance benefit. Scales from local edits and Tidy sweeps to systemic changes and self-contained RT tasks. |
+| [`speak-human`](./skills/speak-human/SKILL.md) | [`evals/speak-human`](./evals/speak-human) | Answer with minimal necessary text, natural sentences, and causal support; organize longer answers by conclusion, supporting points, and evidence. Chinese name: 说人话. |
 | [`tasteful-frontend`](./skills/tasteful-frontend/SKILL.md) | [`evals/tasteful-frontend`](./evals/tasteful-frontend) | Build and restyle UI with modern, high-taste polish: direction-setting, typography, layout, color, depth, motion, states, copy, accessibility floors, and anti-AI-slop discipline with concrete values and a 10-item ship gate. |
 | [`tasteful-frontend-audit`](./skills/tasteful-frontend-audit/SKILL.md) | [`evals/tasteful-frontend-audit`](./evals/tasteful-frontend-audit) | Audit, score, and diagnose existing UI (product / page / component) against the tasteful-frontend invariants: measured evidence, a severity-weighted deduction ledger, and triage-ordered concrete fixes. |
 | [`viral-video-prompt`](./skills/viral-video-prompt/SKILL.md) | [`evals/viral-video-prompt`](./evals/viral-video-prompt) | Turn a product description (plus optional images and a reference video) into one timestamped pack: market and viral-reference research, two or more rival concepts each naming its target metric, audience segment and proof, dense change maps rather than shot lists, and paste-ready prompts compiled into each video model's own dialect. User-invoked as `/viral-video-prompt`. |
@@ -36,6 +37,7 @@ paired workflow, not two independent products.
 |   |-- git-commit/
 |   |-- handoff/
 |   |-- refactor/
+|   |-- speak-human/
 |   |-- tasteful-frontend/
 |   |-- tasteful-frontend-audit/
 |   `-- viral-video-prompt/
@@ -44,6 +46,7 @@ paired workflow, not two independent products.
 |   |-- deep-research/
 |   |-- feature-dev/             # covers feature-design + feature-implement
 |   |-- refactor/
+|   |-- speak-human/
 |   |-- tasteful-frontend/
 |   |-- tasteful-frontend-audit/
 |   `-- viral-video-prompt/
@@ -68,6 +71,8 @@ skills/skill-name/
 ---
 name: skill-name
 description: Use when ...
+metadata:
+  version: "1.0.0"
 ---
 ```
 
@@ -146,6 +151,8 @@ Hub root: `~/.agents/skills`.
 
 ## Writing Guidelines
 
+- Give every new skill an initial `metadata.version: "1.0.0"` in its YAML
+  frontmatter; maintain that version as the skill evolves.
 - Keep each skill focused on one workflow.
 - For model-invoked skills, put trigger branches (not workflow summaries) in
   `description`; for user-invoked skills, set `disable-model-invocation: true`

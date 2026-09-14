@@ -1,0 +1,151 @@
+[
+  {
+    "id": "heldout-business",
+    "request": "我们只有两个人，明天要决定未来六周做什么。请根据下面这份调研，给合伙人写一段可以直接发过去的决策建议：这轮押哪类客户、交付到什么程度、暂时放弃什么，以及什么结果值得继续投。我们既需要尽快收到钱，也不想做半年后还得靠人盯着的外包生意。",
+    "source": "《小店售后机会调研合并稿》第四版。以下全部为虚构业务资料。整理人：许知、陈禾。原始笔记来自访谈、演示、付款记录和内部讨论，日期截至8月27日；有些早期判断没有从正文删掉。\n\n一、为什么开始看这个方向\n我们原来给小商家做订单页面，最近三个月这块收入下降。团队两人：许知负责开发，每周最多投入32小时；陈禾负责销售、交付和客户支持，每周最多投入30小时。现有项目维护已占许知每周10小时、陈禾每周8小时。账上现金按目前支出还能撑四个月，已签旧项目预计下月到账1.2万元，回款时间由客户控制，不能算新方向收入。内部讨论出现两个目标：未来六周先验证有人愿意为新产品付钱，争取累计收到至少1.5万元新业务款；未来六个月形成月度经常性收入3万元、陈禾每周售后不超过8小时的产品。六周收款达标不等于六个月目标已经成立。陈禾备注：别再拿一次性交付费当订阅收入。\n\n二、样本与最初印象\n共访谈27家：19家单店或两店的小商家，8家有3至12家门店的区域连锁。访谈对象都提到退款、补发、换货记录散在聊天和表格里，但原话里的“处理售后”涵盖了登记、追进度、查物流、确认责任和实际退款，不能当成同一种需求。21家愿意看演示，13家说价格合适就试，5家主动问是否可以自动退款。早期摘要写过“售后自动化需求强，建议尽快做全流程”，这是第一次访谈后的结论，尚未包含后面的接入测试和付款情况。\n\n三、小商家的实际表现\n19家小商家每月售后单中位数为46单；14家没有专职客服，老板或店员顺手处理。他们更在意少漏一单，未必在意统计图表。展示每月299元的方案后，9家愿意继续聊，3家口头同意试用，只有1家支付了299元首月费，其余两家表示旺季结束再说。付款的这家主营定制礼盒，每月约120单售后，明显高于该组中位数。它在两周内使用了7天，陈禾做了两次共80分钟的远程指导。老板说产品有用，但若还要单独登记，淡季可能停订。小商家很少问权限管理，希望开通就能用；其中6家明确说超过每月200元需要认真考虑。我们尚未投广告，小商家全部来自许知以前服务过的客户及其介绍，不能据此推算陌生客户的获客成本。\n\n四、区域连锁的试验\n8家连锁中，5家把跨店交接遗漏列为主要问题，3家更关心总部查看汇总。4家参与了两周的售后交接台账试验。试验让门店上传现有表格，由总部负责人指定下一步处理人、期限和完成状态，每日有一条待办提醒。它没有处理退款，也没有自动判断赔付金额。两家已经分别支付6000元，合同包含首次导入、两次培训和三个月试用；这是已经到账的1.2万元，可计入六周新业务收款目标。合同另写明试用结束后可选择每月1200元续订，但没有自动续费，也没有任何一家承诺续订。第三家采购负责人接受价格，称需老板签字，至今未付款。第四家要求先接入收银系统，否则不购买。\n\n使用结果看起来不错：四家合计记录312条售后，按预定时限完成下一步交接的比例由试验前约61%升至84%，总部经理每周催问时间平均少了2.5小时。不过“按时交接”指有人接住下一步，不代表客户问题已解决。前后数据来自门店台账和经理自报，试验期间陈禾每天检查遗漏并私聊提醒，不能把改善全部归因于软件。已付款的两家都有固定总部负责人负责推动门店执行；第三家只有老板兼职管，第二周使用明显下降。客户最常用的是责任人、截止时间和待办列表，四家都没打开过按商品分类的趋势页。\n\n五、渠道和获客\n陈禾认识一家本地零售服务商，对方愿意介绍最多6家区域连锁，预计未来三周安排第一批沟通，不保证成交。其负责人建议包装成“总部售后协同”，少讲技术。合作尚未签署；对方提出成交后拿首年实收收入的20%，需要在试点之后再谈。现有两家付款客户由陈禾个人关系获得，没有支付渠道费。另有一个小商家社群愿意让我们免费分享，但管理员不保证曝光，也未提供活跃人数。内部有人据此写了“小商家渠道充足”，目前没有数据支持。\n\n六、技术记录，补记于附录页\n现有原型能完成表格导入、指派、状态更新、待办提醒和简单导出。导入字段稍有变化就可能需要许知调整映射。两家付款客户的首次配置分别耗费许知6小时和9小时，陈禾培训及整理资料分别耗费5小时和7小时。当前每家每周还需要陈禾约2.5小时检查数据、提醒和答疑，其中约1.5小时是替客户追门店。总部负责人若自行追踪，这部分可能下降，尚未验证。\n\n重要接入边界：本轮能运行的范围仅限客户主动导出的售后台账，不能从电商平台自动读取聊天，也没有任何平台的退款执行权限。8家连锁里只有两家付款客户已经确认愿意持续手动导出；第三家尚未确认，第四家已经拒绝。访谈中的5家“自动退款”意向来自另一组问题，不能作为台账产品的购买意向。向平台申请权限、商务审核和接口改造最快需要多久，目前没有可靠信息。许知估计把导入模板、异常提示和门店权限做稳定需要三周，之后仍需在真实客户上观察；这是基于现有原型的开发估算。完整聊天接入、自动判责和退款执行没有可承诺的工期。服务商说“接口应该不难”只是口头判断。\n\n七、产品提议与分歧\n许知希望做全自动售后助手，认为自动化才能支撑长期订阅，担心台账只是临时工具。陈禾认为客户先买的是交接不漏，但也承认当前效果有自己代运营的贡献。候选方案A：未来六周扩大小商家自助订阅，补引导流程并做社群推广，开发约两周，但没有新增付费转化证据。方案B：只服务愿意表格导入、有总部推动人的区域连锁，把现有试点标准化，暂时只卖交接台账与提醒。方案C：立即开发跨平台全自动售后，争取更高客单价；两位访谈对象说如果能自动退款，最多愿付每月5000元，均未签意向或支付订金。\n\n八、费用和承诺提醒\n两笔6000元付款已经对应三个月试用和约定培训，不能因为方向调整就停止履约。没有客户购买无限定制，两家合同均允许我们使用统一模板。对外还没有承诺任何平台接入日期。陈禾想再收一家6000元试点款，就能让累计新业务收款超过1.5万元目标；但如果同时接很多店，交付会挤占销售和验证时间。按现有每家每周2.5小时服务量，即使每家都按1200元续订，要达到3万元月度经常性收入也需25家，对应每周62.5小时服务，远超过长期上限。此测算只是暴露交付方式的问题，不是收入预测。\n\n九、尚未完成的观察\n下一轮可以先让两家付款客户的总部负责人接管催办，陈禾只处理产品问题，并记录每周实际服务时长、交接及时率和持续使用情况。客户是否愿意在去掉人工催办后续订，比增加多少演示预约更有解释力。三个月试用期晚于本轮六周结束，因此六周内可观察接管后的使用和服务负担、争取明确的续订安排，但正常周期的实际续费仍需后续核实。我们还没测过客户能否独立完成第二次表格导入，也未统计每条售后能节省多少现金成本。合伙人周会上说：只要两家客户说好就加人。财务备注：现在没有招聘预算，新增固定人员会缩短现金可支撑时间。",
+    "required": [
+      "建议未来六周优先推进有总部推动人、愿意持续手动导出表格的区域连锁，并以现有付款试点标准化为主要路径；现有证据支持这一受限客户群，不能外推至所有连锁。",
+      "近期交付应围绕稳定导入、责任人、截止时间、状态和提醒等交接能力，履行已有三个月试用及培训承诺，并限制新增试点数量和定制范围以适应两人产能。",
+      "当前产品仅处理客户导出的售后台账，不能自动读取聊天或执行退款；平台权限与完整自动化工期未知，因此不能把全流程自动化作为本轮可承诺交付。",
+      "短期目标是六周累计至少1.5万元新业务实收，已有1.2万元到账，再成交一家同价试点可超过目标；旧项目回款不属于这一目标。",
+      "两笔6000元是包含配置、培训和三个月试用的款项，不能视为已验证的持续订阅收入；每月1200元只是可选续订价格，尚无续订承诺。",
+      "长期目标包含六个月月度经常性收入3万元和每周售后不超过8小时，必须同时验证续费与降低人工服务负担，短期收款不能替代长期可行性判断。",
+      "现有按时交接比例与催问时间的改善包含陈禾每日检查和人工催办的贡献，且交接及时不等于售后问题解决，不能据此宣称软件已经独立产生全部效果。",
+      "下一阶段应让客户总部接管催办，观察持续使用、独立重复导入、交接表现和实际服务时长，再结合续订安排判断是否继续投入；六周结束时通常还不能得到正常周期的实际续费证据。",
+      "当前每家每周约2.5小时服务的方式无法支撑长期目标，按现价达到目标需要25家并产生每周62.5小时服务，因此扩大销售前必须验证交付负担明显下降。",
+      "暂缓广泛扩张小商家订阅和跨平台全自动售后：小商家实际付款证据薄弱且唯一付款者并不典型，自动退款的高报价意向也没有订单或订金支持。",
+      "服务商介绍和第三家口头接受价格可以作为待验证线索，不能算已成交收入或稳定获客渠道；若客户接管后使用或效果明显下滑、服务负担降不下来，应收缩或调整产品假设，不能仅凭好评扩张或招聘。"
+    ],
+    "reader_questions": [
+      {
+        "question": "为什么这轮可以押区域连锁，却不能直接去卖给所有连锁？",
+        "answer": "区域连锁已有两家真实付款，交接需求也有使用证据，但两家都有固定总部推动人并接受持续手动导出。其他客户对导出方式和系统接入的要求不同，现有成功条件只覆盖这一受限客户群。"
+      },
+      {
+        "question": "再收到一家6000元，是不是就说明这个生意跑通了？",
+        "answer": "这会使六周新业务实收达到1.8万元，超过短期目标，但试点费包含交付和三个月使用，尚未证明客户会按月续订，也未证明两个人能够低负担地服务更多客户。"
+      },
+      {
+        "question": "六周内最值得做的产品和业务验证是什么？",
+        "answer": "先把现有台账交接流程和导入做稳定，让客户总部接管催办，观察客户能否独立重复导入、持续使用并保持交接表现，同时记录团队实际服务时长、推进明确续订安排。正常周期实际续费要等三个月试用结束后继续核实。"
+      },
+      {
+        "question": "如果客户很满意，为什么还不能据此扩大团队或开做自动退款？",
+        "answer": "满意可能依赖陈禾的人工催办，当前服务量无法支撑长期规模，团队也没有招聘预算。自动退款还缺平台权限、可靠工期和真实付款证据，台账试点的好评不能证明这条产品路线可交付或有人买单。"
+      }
+    ],
+    "traps": "报告开头保留了过时的全流程自动化建议，关键接入限制埋在技术附录；容易把售后交接误写成自动解决售后，把人工参与下的前后改善当成软件净效果。另有多个貌似积极但证据等级不同的信号：演示意愿、口头接受价格、介绍承诺、自动退款心理价位与已经到账的试点款。回答需要区分六周现金目标和六个月可持续订阅目标，也要识别三个月试用导致的续费观察时间差。不能把两家经过关系筛选、有总部负责人且接受手动导出的客户外推为整个连锁市场，不能默认权限、获客或降本已经验证，也不能自行编造已达成的续费率或服务时长门槛。只给出谨慎观望同样不足，必须形成两人能执行的投入选择、交付边界和继续投入条件。"
+  },
+  {
+    "id": "heldout-english",
+    "request": "I'm the chair of the Bellweather Library Board. Before Thursday's meeting, explain whether the trial gives us enough reason to extend evening opening across our branches. I need a short briefing I can use to recommend what we should fund next quarter and explain the tradeoff to residents who have been asking for later hours.",
+    "source": "BELLWEATHER LIBRARY SERVICE — collected notes for the September board meeting. All names, events, figures, and organizations in this case are fictional.\n\nFrom director Lena Ortiz's covering email: We need a decision for the October–December quarter. Residents have requested later opening for three years, particularly people who work outside Bellweather. The trial ran for ten weeks, from June 8 through August 14. Harbor and Northgate stayed open until 8 p.m. on Tuesdays instead of closing at 5 p.m. Their other opening hours did not change. The other four branches kept their existing schedules. The board can authorize up to $18,000 in additional operating expenditure next quarter. That funding is available for one quarter only; an ongoing allocation would need approval in December. Please don't describe any option as a permanent service commitment yet.\n\nOperations spreadsheet, with a correction from the analyst: Harbor and Northgate recorded 1,140 visits during the extra Tuesday hours, counting entries rather than distinct people. Someone visiting on several Tuesdays appears several times. Their combined total visits across all opening hours were 9% higher than in the preceding ten weeks. Visits at the four other branches rose 4% over the same comparison. These are changes within each group, not evidence that the trial produced a five-percentage-point gain. The trial branches were chosen because their managers volunteered and both already had relatively high attendance. Harbor's roof repairs ended just before the trial, reopening its children's room. Northgate hosted a popular local-history exhibition during six trial weeks. The earlier comparison period included two public holidays, and the trial overlapped school holidays. No adjustment has been made for those differences.\n\nFront-desk staff say some regular visitors moved their usual Tuesday afternoon visit into the evening. That could explain part of the evening traffic without creating additional visits. It could still mean the opening time suited those residents better. We did not track individual attendance across times, so we cannot say how many evening visits were genuinely additional. Door counters also cannot tell whether people borrowed books, used computers, attended an event, or briefly accompanied someone else.\n\nSurvey file: Staff invited departing evening visitors to complete a paper or online form during the final three weeks. There were 126 responses; the number invited was not recorded. Seventy-eight respondents said they could not normally visit during the existing opening hours. Thirty-one mentioned working late or commuting, and others mentioned childcare, study, or caring responsibilities. Those reasons could overlap. This supports an access benefit for some people who attended, but it is not a representative survey of branch users or the town. People who could not reach an evening session were absent from the sample. Nine respondents specifically requested Thursday evenings instead, and Northgate staff have separately heard that Tuesday clashes with a large employer's late shift. We have no count of how widespread that conflict is.\n\nA second, separate trial concerned reserved books. Across all six branches, 960 eligible reservation notices were randomly assigned, in equal groups, either to the usual collection notice alone or to that notice plus a reminder two days before the reservation expired. Only one reservation per member was included, all participating members had agreed to text messages, and staff used the same seven-day collection window in both groups. The extra reminder did not offer an extension or mention the evening-opening trial. Books remained uncollected at expiry for 18% of the usual-notice group and 12% of the reminder group, rounded to whole percentages. Assignment was balanced within each branch. The analyst says this is reasonable evidence that reminders reduced missed collections among members eligible for the experiment. It does not establish what would happen for members without text access, and it does not show that reminders meet the needs of people unable to attend during opening hours. There were too few trial-branch reservations to estimate reliably whether reminders worked differently where evening access was available.\n\nAn early slide circulated to councillors says, 'Later hours cut missed collections by a third.' Please withdraw that slide. It took the relative reduction from the randomized reminder experiment and attached it to evening opening. We have not established that later opening reduced missed collections. The reminder finding is a six-percentage-point reduction, equivalent to roughly one-third relative to the usual-notice rate. The board does not need both figures unless they help the explanation.\n\nStaffing note: No trial evening shift fell below the required staffing level, and no security incidents were logged. However, seven of the twenty branch-evenings depended on managers covering gaps or staff agreeing to overtime at short notice. That arrangement was accepted for the trial, but managers say it should not become the normal rota. The finance estimates below replace that informal cover with scheduled staffing. The estimates include ordinary security and cleaning costs. Expanding evening opening using only current staff would require reducing some daytime opening; that alternative has not been costed or assessed for its effect on users.\n\nFinance options for the thirteen-week next quarter: Continuing Tuesday evenings at Harbor and Northgate with planned staffing costs $12,600. Giving all six branches the same Tuesday extension costs $35,400. Neither estimate includes the reminder service. Sending the extra reminder service-wide to members who have opted into texts costs $1,400 for the quarter, including setup and message charges; existing paper and telephone collection notices would continue. A $2,000 evaluation package would add consistent visit counts, a brief survey offered during both daytime and evening sessions, outreach through the commuter association and carers' network to hear from non-attenders, and a structured comparison with branches retaining current hours. It would improve the evidence but would not make branch selection random or prove the long-term effect of evening opening.\n\nDirector's proposed decision: Fund the two existing Tuesday evenings, reminders, and evaluation for $16,000 next quarter, leaving $2,000 uncommitted. Review the results before December's ongoing budget decision. Track staffing reliability, total weekly attendance, and whether later access serves people who struggle with daytime hours. Ask the evaluation to examine preferred evenings as well. We have no defensible attendance threshold for permanent expansion yet; the board should agree its decision criteria before the next quarter begins. A resident petition asks for all six branches to open later immediately. Its 840 signatures demonstrate interest but provide neither a branch-by-branch demand estimate nor information about which evenings signatories could attend.",
+    "required": [
+      "The evening trial supports a limited continuation to learn more, but does not establish enough evidence for a permanent service-wide expansion.",
+      "The recommended next-quarter package continues Tuesday evenings at Harbor and Northgate with planned staffing, introduces reminders for text-eligible members, and funds evaluation.",
+      "The recommended package costs $16,000 within the $18,000 quarterly allowance, leaving $2,000 uncommitted; funding beyond that quarter is not yet approved.",
+      "Extending Tuesday evening opening to all six branches costs $35,400 before reminders and exceeds the available budget; using existing staff would entail unassessed daytime service reductions.",
+      "The 1,140 evening visits demonstrate use but count repeat entries and may include visits shifted from daytime, so they cannot be treated as new users or wholly additional visits.",
+      "The attendance comparison cannot isolate the effect of later opening because branch selection, reopened facilities, an exhibition, and calendar differences offer alternative explanations.",
+      "Survey responses indicate an access benefit for some evening attendees, but the sample cannot establish town-wide demand or the needs of people who did not attend.",
+      "Random assignment supports attributing the reduction in expired, uncollected reservations from 18% to 12% to extra reminders among eligible members, rather than to evening opening.",
+      "Reminders and later hours address different barriers, so the reminder finding does not establish that reminders can replace evening access.",
+      "Reliable scheduled staffing is needed because the trial frequently relied on informal cover despite meeting staffing requirements and recording no security incidents.",
+      "The next quarter should assess staffing reliability, weekly attendance, unmet access needs, and preferred evenings against criteria agreed in advance, informing December's decision while retaining uncertainty about causation and long-term effects."
+    ],
+    "reader_questions": [
+      {
+        "question": "What should the board fund next quarter?",
+        "answer": "Fund staffed Tuesday evening opening at the two trial branches, opt-in text reminders across the service, and the proposed evaluation for $16,000, with a review before any ongoing commitment."
+      },
+      {
+        "question": "Did later opening cause the reported reduction in missed book collections?",
+        "answer": "That has not been established. The reduction from 18% to 12% came from the separate randomized reminder experiment and supports the effect of reminders among eligible members."
+      },
+      {
+        "question": "Why not give every branch later hours now?",
+        "answer": "The staffed expansion costs $35,400 before reminders, exceeding the $18,000 allowance, and current evidence does not establish demand or benefits across all branches. Covering it with existing staff would require daytime cuts whose effects have not been assessed."
+      },
+      {
+        "question": "What would another quarter resolve?",
+        "answer": "It would provide better evidence about reliable staffing, overall attendance, access benefits, and preferred evenings for December's funding decision. It would still not conclusively isolate the causal or long-term effect of later opening."
+      }
+    ],
+    "traps": "Misattribute the randomized reminder result to evening opening; treat the difference between branch attendance trends as a causal estimate; equate evening entries with additional visits or unique residents; dismiss improved convenience merely because some visits may have shifted from daytime; generalize the attendee survey or petition to all residents; present reminders as a substitute for usable opening hours; recommend an unaffordable expansion or silently assume daytime cuts; overlook the dependence on informal staffing; describe one-quarter funding as permanent approval; promise that the proposed evaluation will prove causation; bury the concrete funding recommendation beneath methodological qualifications."
+  },
+  {
+    "id": "heldout-handover",
+    "request": "我今晚接手桥港项目值班，没参加下午的排障。请把下面群聊和工单整理成一份可以直接交给接班同事的操作交接，讲清今晚处理哪些单、按什么顺序做、什么情况必须停，以及出问题找谁。明早业务会拿这份交接核对结果，容易混淆的数字和例外也请保留。",
+    "source": "【桥港项目｜6月18日晚班交接材料，以下时间均为北京时间】\n16:42，客服许禾：商家后台还有一批订单显示“待仓库确认”，仓库说货已经收到。先别让客服再点催单，今天有人连点了三次。业务问是不是要补发订单，我暂时回复在查。\n16:51，仓储接口负责人周岑：已定位。14:10到14:37，桥港生产环境的北仓收货回执消费进程停过，订单下发正常，货也正常收了，缺的是平台侧回执入账。这次只能重放收货回执，不能重新下发订单，否则仓库会收到重复作业。南仓没有受影响，测试环境也不在这次处理范围。旧工单标题写“全仓回执补偿”，标题没改，别按标题操作。\n17:08，数据同事陆遥：按北仓原始接收时间取闭区间[14:10:00,14:37:00]，去重后共有286条候选回执。这个数是回执数，不是订单数，同一个订单可以分箱有多条。监控首页显示312，是未去重的投递次数，不能拿来做验收分母。候选清单已冻结在服务端批次BG-0618-N，后续正常进来的回执不会被这个批次捞到。\n17:19，商家运营叶澄：候选里客户代码YH的18条先扣住。他们今天临时改了验收口径，得等明天签字；不管今晚他们在群里怎么催，都不补。服务端批次已经加了排除标签，晚班不用手工删清单，更不能换成全量查询。286减掉这18条后，今晚应处理268条；扣住的18条要单独写在结果里，不能记失败。\n17:36，运维唐启：新版消费进程16:55恢复，正常流量已经跑稳，但重放任务只安排22:00到22:30。先在值班控制台看北仓实时回执积压，必须连续10分钟为0，才允许开始；只看到某一刻是0不算。如果22:20前还没满足这个条件，今晚取消，不要为赶窗口挤着跑，留到下一次获批窗口。\n17:48，周岑：顺序补全：满足积压条件后，先对冻结批次做预检，命令是 `receipt-replay inspect --env prod --warehouse north --batch BG-0618-N --exclude-tag hold-yh`。预检必须同时显示 eligible=268、held=18、unknown=0。任何一个不对就停在这里，找陆遥核对清单，不允许自己调参数把数字凑对。预检只读，不会触发补偿。\n18:03，唐启：执行账号用当班个人运维账号，主机固定ops-gw-02，不要沿用聊天里上周那条旧批次命令。预检正确后执行 `receipt-replay run --env prod --warehouse north --batch BG-0618-N --exclude-tag hold-yh --rate 20 --stop-on-error`。这个20是每秒最多20条回执，不是并发20个任务。命令返回的job_id记下来，后面查状态、对账都靠它。\n18:11，周岑：补一句，运行中出现任意一条处理错误，工具会自动停止；如果北仓实时积压重新大于0，即使工具没报错，也要在值班控制台点“停止当前补偿任务”。到22:30还有任务在跑，同样停止。以上三种情况都不要自行重跑，保留job_id和首个异常时间，联系我判断下一步。我今晚是技术主值，值班通讯录可直接呼叫；联系不上再升级给唐启。\n18:24，陆遥：不要把命令退出码0当完成。任务结束后，在“回执对账”页面按job_id看最终状态，要同时满足入账成功268、失败0、处理中0，而且批次里YH那18条仍为held，才算今晚验收通过。页面可能延迟，任务结束后等5分钟再刷新一次；还是对不上就把页面结果发给我核对，先记“待核验”，别报成功，也别用再次执行来试。\n18:40，客服许禾：明早客服需要知道能不能回复“已恢复”。交接结果请写候选286条、实际入账数、保留18条、是否通过验收；如果取消或中止，说明触发原因。再带上job_id（没启动就写未启动）、开始和结束时间。最晚明天08:30贴到桥港值班工单，由我确认客户通知，晚班不要直接向商家承诺全部恢复。YH那18条明天由叶澄拿到客户书面确认后另开批次处理，不续跑今晚这个批次。\n18:52，唐启：置顶旧消息里的“低峰可直接跑”和“失败后重试一次”都作废，以这段交接为准。今晚没有数据库修复步骤，也不需要重启消费进程。",
+    "required": [
+      "故障是北仓收货回执未在平台入账，订单下发和实物收货正常；本次仅重放桥港生产环境北仓指定时间闭区间内的回执，不涉及南仓、测试环境或重新下发订单。",
+      "服务端冻结批次为BG-0618-N，包含去重后的286条候选回执；286不是订单数，监控的312是未去重投递次数，不能作为验收分母。",
+      "客户YH的18条回执必须按既有hold-yh标签排除，今晚应处理268条；18条属于保留项而非失败，明天由叶澄取得书面确认后另开批次。",
+      "重放窗口为22:00至22:30，启动前北仓实时积压必须连续10分钟为0；若22:20前仍未满足条件，今晚取消并等待下一次获批窗口。",
+      "操作须使用当班个人运维账号，在ops-gw-02上执行，并遵循先确认积压条件、再预检、预检通过后才运行的顺序。",
+      "预检命令为receipt-replay inspect --env prod --warehouse north --batch BG-0618-N --exclude-tag hold-yh，预期结果必须同时为eligible=268、held=18、unknown=0；不符即停止并找陆遥核对，不得自行修改参数凑数。",
+      "执行命令为receipt-replay run --env prod --warehouse north --batch BG-0618-N --exclude-tag hold-yh --rate 20 --stop-on-error；速率为每秒最多20条回执，必须保存返回的job_id。",
+      "任一处理错误会触发工具自动停止；实时积压重新大于0或22:30任务仍在运行时，须在控制台停止当前补偿任务。",
+      "运行中止后不得自行重跑，须保留job_id及首个异常时间，联系技术主值周岑，联系不上则升级给唐启；旧的直接运行和失败重试指示已作废，本次无数据库修复或重启步骤。",
+      "验收须按job_id查看回执对账，入账成功268、失败0、处理中0且YH的18条仍为held才通过；退出码0不足以证明完成。",
+      "对账页面可能延迟，任务结束后等待5分钟再刷新；仍不一致则交陆遥核对并标记待核验，不得报成功或通过再次执行排查。",
+      "最晚次日08:30将候选286条、实际入账数、保留18条、验收状态、取消或中止原因及任务标识和起止时间写入桥港值班工单；未启动须明确记录，由许禾确认客户通知，晚班不得承诺全部恢复。"
+    ],
+    "reader_questions": [
+      {
+        "question": "监控首页有312条，今晚为什么只补268条，剩余部分是不是都算失败？",
+        "answer": "312是未去重的投递次数，冻结批次实际有286条去重回执，其中YH的18条按标签保留，今晚处理268条。保留的18条不算失败，明天取得客户书面确认后另开批次。"
+      },
+      {
+        "question": "22:18积压刚变成0，能立刻启动来赶上窗口吗？",
+        "answer": "不能。必须连续10分钟积压为0，而22:20前无法满足这一条件，因此今晚取消，等待下一次获批窗口。"
+      },
+      {
+        "question": "运行时积压重新出现，但命令没有报错，应该怎么做？",
+        "answer": "在值班控制台停止当前补偿任务，保存job_id和首个异常时间，不自行重跑；联系周岑，联系不上则升级给唐启。"
+      },
+      {
+        "question": "命令退出码是0，对账页面却只有267条成功，能先报恢复吗？",
+        "answer": "不能。任务结束后等5分钟再刷新，须确认成功268、失败0、处理中0且18条YH回执仍为held。仍不一致就标记待核验并找陆遥核对，不再次执行；客户通知由许禾确认。"
+      }
+    ],
+    "traps": "容易沿用旧工单的全仓范围或作废的重试指示；把回执数写成订单数；把312与268的差额统称失败；漏掉YH例外及次日另开批次的责任人；将瞬时零积压误当启动条件；忽略22:20取消门槛与22:30停止时点的区别；改写命令时丢失生产环境、批次、排除标签或停止参数；把速率20解释为并发数；只保留自动停止而漏掉人工停止条件；将退出码0当作验收成功；省略页面延迟后的处理路径、交接截止时间或客户通知责任，导致接班人能启动却无法正确收口。"
+  },
+  {
+    "id": "heldout-mechanism",
+    "request": "我是「集货台」的产品经理，下午要决定是否把新版商品同步扩大到全部商家。下面是排查代理给我的回复。我还是没弄明白：为什么页面显示同步成功，门店却搜不到商品；已经发生的问题能不能自己恢复；我们现在该继续放量还是先停。请用我能直接转给运营负责人的中文解释清楚，并告诉我接下来需要确认什么。",
+    "source": "以下为排查代理合并输出，时间口径如无另行标识均为今天，环境限定为集货台生产环境的新版商品同步链路。先对结果做一个语义上的约束：本次属于同步成功状态之后的可见性未达成，不能直接把它等同于商品写入失败，不过也不能因为写入成功就认定用户已经可以使用。我们目前在三个位置复用了 success 这个值，其实际描述对象不同，后面会展开。昨天上线的是新版同步，目前开放给20家试点商家，全量为260家，原计划今天16:00扩大开放。旧版同步未使用这次新增的批次完成标记，不受下面这条具体故障路径影响。\n\n从入口开始，商家点击同步后，接口会先创建批次并把商品处理任务放入队列，返回202和批次号。这个返回只说明系统已经受理，不说明商品处理结束。之后商品处理器逐条读取供应商数据、校验必填字段，并将通过校验的数据写入商品主库；同一笔数据库事务还会写一条待发送事件，事件转发器再把它发到检索队列。主库是商品详情和编辑页的数据来源，门店端的搜索、分类列表与扫码选品统一走检索索引，没有在索引缺失时查询主库的备用路径。因此，本次确实可以出现运营在后台打开商品详情正常、门店三个入口都找不到它的情况。门店此前已加入购物车的旧商品，本次没有观察到因此被移除。\n\n批次服务的完成判定是所有商品处理任务均已结束，且没有校验或主库写入错误。满足该条件后，批次记录变为COMPLETED，前端把它翻译成绿色的“同步成功”。这里没有等待检索消费，更没有做门店可见性确认。批次服务还会发送一条BatchClosed事件，它与商品事件进入不同队列，所以批次事件先被检索服务处理是允许发生的正常时序，并不能从发送顺序推导消费顺序。检索侧看到BatchClosed后，为减少迟到事件的重复处理，会保存该批次closed=true。新版消费者读取商品事件时新增了一条判断：如果所属批次已closed，就把事件按重复事件确认消费，不再更新索引。这条判断原本想过滤重放，却没有区分真正重复的事件与第一次到达的迟到事件；因此，合法商品事件也可能被直接跳过。这里的因果依赖是完成事件先到、关闭标记先落、商品事件后到，三者一起触发，并非任意索引延迟都会丢商品。\n\n今天09:40供应商有一波集中更新，商品事件队列出现积压，批次完成队列没有同等积压，两个队列的进度差扩大。监控能证明这个时间段的队列进度差，但不能把所有门店搜索问题都归到这次缺陷。我们针对商家青岚食品的B731批次做了逐项核对：共480件商品，主库480件写入成功；其中390件的商品事件先于关闭标记处理，索引存在；剩余90件的事件在关闭标记之后到达，日志均记录为closed_batch_skip，索引不存在。这90件都是这次首次上架的商品，所以表现为搜不到；如果相同路径命中已有商品更新，理论上可能表现为门店仍看到旧内容，但本轮没有核实到这样的实例。这里的90件不能用来推算其他批次缺失数量。\n\n计数面目前拿到的是20家试点中的6家在09:40至10:15之间有closed_batch_skip日志，总计涉及11个批次。这个数字是潜在受影响范围，不是已经逐件确认的门店缺失清单：该日志也可能包含确实重复的事件。只有B731完成了主库、事件和索引的全量对账，其他10个批次还没有完成，因而不能声称只有90件受影响，也不能声称11个批次里的商品全部不可用。所有20家试点均仍可发起同步；目前没有暂停入口，也没有开启全量。当前看到商品队列积压已恢复正常，仅说明后续事件等待时间缩短，无法据此证明已缺失的商品恢复。\n\n关于自动恢复，索引服务有针对处理异常的自动重试，最多5次，但上述跳过分支返回的是成功确认，不会抛异常，也不会进入失败队列；消息一经确认，普通消费重试便不会再次处理它。因此，“队列排空以后就会补齐”在这条路径上不成立。系统另有每晚02:00的索引对账任务，但它按索引中已经存在的商品记录检查版本差异，并不扫描主库寻找完全缺失的索引记录，所以不能指望它找回B731这90件新商品。目前没有另一个已确认会自动补回它们的任务。\n\n运营问再次点击同步是否能好：这个按钮会创建新批次，并重新产生该商家当前商品的事件；新批次有机会避开原来的时序，但新版判断未修正前，也可能再次遇到相同问题。它会同步商家全部当前商品，增加队列负载，而且没有完成逐件对账之前，绿色状态仍不足以证明恢复。因此我们没有把反复点击作为修复建议。至于补偿脚本，研发已经在测试环境用一组模拟缺失记录验证了“从主库重建索引”的基本路径，不过还没在生产执行，也没验证脚本读取之后商品又被编辑时会不会覆盖较新版本。当前只能称为候选修复手段，不能承诺今晚之前全部找回。\n\n研发手上有一版尚未发布的修改：去掉根据批次关闭标记直接跳过商品事件的逻辑，沿用消费者已有的商品版本号检查来防止旧事件覆盖新版本。版本号检查是同一商品范围内的比较；测试环境已通过完成事件先到、商品事件后到的用例，但乱序更新与重复投递的回归尚未结束，生产也没有观测结果。这版修改解决的是后续事件被错误跳过，不会使之前已确认消费的消息重新出现，所以发布修改与修复存量缺失是两件分别需要完成的事。单独回滚应用代码也不会自动重建缺失索引。\n\n还有一个容易被当成快速闭环的提议：前端把“同步成功”改成“商品已保存”。这个描述会比现有文案更接近批次状态，但如果业务仍把按钮任务理解为门店可售，改文案无法补齐索引。要显示真正的“门店已可用”，还需要索引处理结果回传与批次级聚合；目前没有这套信号，开发量也尚未评估。现有请求日志里的accepted、商品任务里的success、批次里的COMPLETED，以及队列面板里的已消费，都不能单独提供门店可用的证明。\n\n发布讨论中，销售希望按16:00计划扩至260家，理由是上午高峰已过且页面全部为绿色；值班研发建议取消今天的扩大开放，并临时关闭20家试点的新同步提交入口，保留详情编辑与现有门店检索，先避免继续产生同类批次。关闭入口只阻止新批次，不会取消已在队列中的任务，也不会恢复已缺失商品。该措施尚未执行，需要产品负责人确认。研发尚未提供回归完成时间、生产补偿执行时间或完整影响清单。可以支撑再次讨论放量的证据包括：修正版在相关乱序与重复场景下通过回归、受影响范围完成对账、存量缺失补偿后从门店入口确认可见，以及小范围生产同步证明绿色状态之外的实际可用结果。以上证据目前尚未齐备。",
+    "required": [
+      "明确区分接口受理、主库处理完成与门店可用；页面的同步成功仅对应主库任务完成，不能证明索引已经可用。",
+      "说明后台详情读取主库，而门店搜索、分类列表和扫码选品依赖索引，因此同一商品可以在后台存在却在门店找不到。",
+      "保留完整因果链：商品队列积压使不同队列的完成事件更容易先到，检索侧先关闭批次，迟到的合法商品事件被误当重复事件跳过，导致索引缺失。",
+      "区分已确认与潜在影响：B731的480件中确认90件新商品缺失；6家11个批次存在相关日志，但其余批次未完成对账，不能直接推算缺失数量。",
+      "解释无法依靠现有自动机制恢复：跳过事件被成功确认，不触发异常重试；夜间对账只检查已有索引记录，不能发现完全缺失的新商品。",
+      "说明队列恢复正常不等于存量恢复，再次同步可能成功也可能重现故障，并会增加负载，不能以再次出现绿色状态认定修复。",
+      "区分阻止新增问题与补回存量：待发布修改针对错误跳过逻辑，仍有回归未完成；修改或回滚都不会自动重建已缺失的索引。",
+      "说明生产补偿尚未执行，候选脚本仍有并发编辑覆盖新版本的未验证风险，因此恢复时间与完整恢复结果不能承诺。",
+      "基于当前证据建议暂停扩大开放，并临时停止试点的新同步提交；明确该措施尚待负责人确认，且不会取消在途任务或修复缺失商品。",
+      "提出恢复放量需要确认的关键证据与安排，包括相关回归、小范围生产实际可用结果、完整影响对账、存量补偿及门店入口确认，并取得负责人与时间安排。",
+      "说明修改成功文案只能改善状态表达，不能修复商品不可见；真正表达门店可用需要目前尚不存在的索引结果回传与批次聚合信号。"
+    ],
+    "reader_questions": [
+      {
+        "question": "页面成功是不是说明商品已经同步到了门店？",
+        "answer": "不是。页面只确认商品主库处理完成，门店依赖的索引可能还没更新，甚至可能因为错误跳过事件而一直缺失。"
+      },
+      {
+        "question": "为什么这次排队会变成商品缺失，而不只是晚一点出现？",
+        "answer": "两个队列独立推进，批次完成事件先到后设置了关闭标记，检索消费者把随后首次到达的合法商品事件误判为重复并成功确认，索引更新因此被跳过。"
+      },
+      {
+        "question": "等队列处理完或者等夜间任务跑完，已缺失商品会回来吗？",
+        "answer": "现有机制不能保证，也没有已确认的自动补回路径。被跳过的事件不会进入异常重试，夜间任务又不查完全缺失的索引，需要另行对账和补偿；生产补偿方案尚未验证完毕。"
+      },
+      {
+        "question": "今天是否适合全量开放，什么情况下可以重新考虑？",
+        "answer": "当前不适合扩大开放，建议同时临时暂停试点的新同步提交。应先完成相关回归与影响对账，安全补回存量并从门店确认可见，再取得小范围生产同步实际可用的证据；目前无法给出可靠的恢复时间。"
+      }
+    ],
+    "traps": "把多个成功状态合并成业务成功；只说索引延迟而遗漏事件被永久跳过的机制；把跨队列消费顺序当成发送顺序；把6家11批次当作全部确认受损或把90件当作总影响；把已有商品显示旧版本的推测写成已证实事实；承诺排空队列、夜间对账、反复同步、发布修复或回滚可以自动补回存量；把测试环境的脚本验证描述为生产恢复完成；编造恢复期限、负责人或回归结果；把尚未执行的暂停措施写成已经实施；只建议改文案，或堆叠状态名和术语却不给出放量判断及其依据。"
+  }
+]
