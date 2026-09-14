@@ -9,12 +9,13 @@
 #   ./scripts/link-skills.sh --unlink <name> # remove from hub + agents
 #
 # Full sync (no args):
-#   1. Links personal skills in this repo (with local aliases)
+#   1. Links personal skills in this repo (canonical names, plus extra aliases)
 #   2. If a Matt Pocock clone is found, links its skills (with Matt aliases)
-#   3. Retires known renames
-#   4. Never overwrites a hub name owned by another source
-#   5. Sweeps broken hub symlinks
-#   6. Materializes Antigravity Agent/IDE/CLI views as real skill folders
+#   3. Personal names reclaim a hub entry Matt's installer stole
+#   4. Retires known renames
+#   5. Never overwrites a hub name owned by another non-Matt source
+#   6. Sweeps broken hub symlinks
+#   7. Materializes Antigravity Agent/IDE/CLI views as real skill folders
 #
 # Env: SKILLS_HUB_DIR, MATT_SKILLS_REPO
 # macOS /bin/bash 3.2 compatible.
@@ -51,17 +52,24 @@ AGENTS=(
 )
 
 # Per-source install-name overrides: "upstream:install-as"
+# Personal skills keep their folder names on the hub (`code-review`, `handoff`).
+# Matt skills that collide get a `matt-` prefix.
 PERSONAL_ALIASES="
-code-review:code-review-pro
 "
 MATT_ALIASES="
 code-review:matt-code-review
+handoff:matt-handoff
+"
+
+# Extra hub names for a personal skill (source:extra-name). Same files, second
+# command name. `code-review-pro` stays so older `/code-review-pro` callers work.
+PERSONAL_EXTRA="
+code-review:code-review-pro
 "
 
 # After new name exists, drop the old hub name: "old:new"
 RETIRED="
 writing-great-skills:writing-for-agents
-code-review:code-review-pro
 feature-spec:feature-design
 new-feature:feature-design
 "
@@ -314,13 +322,20 @@ install_skill() {
 	install_name="${install_name:-$source_name}"
 	[[ -n "$source_root" ]] || source_root="$(cd "$(dirname "$source_path")" && pwd)"
 
+	hub_entry="$HUB_DIR/$install_name"
+	mkdir -p "$HUB_DIR"
+
+	# Personal skills own their canonical names. Matt's link-skills.sh writes
+	# unprefixed names; reclaim those so a later personal sync can take over.
+	if [[ "$source_root" == "$REPO_DIR" && -d "$MATT_REPO" ]] && resolves_under "$hub_entry" "$MATT_REPO"; then
+		echo "→ reclaim $install_name from mattpocock"
+		unlink_everywhere "$install_name"
+	fi
+
 	if should_preserve "$install_name" "$source_root"; then
 		echo "· preserve $install_name (owned by another source)"
 		return 0
 	fi
-
-	hub_entry="$HUB_DIR/$install_name"
-	mkdir -p "$HUB_DIR"
 
 	if [[ "$install_name" == "$source_name" ]]; then
 		if [[ -L "$hub_entry" ]]; then
@@ -447,7 +462,8 @@ full_sync() {
 	echo "Hub: $HUB_DIR"
 	echo
 
-	# Personal first → preserve wins over later sources for the same install name.
+	# Personal first so canonical names (`code-review`, `handoff`) belong here.
+	# Matt collisions are installed later under `matt-*`.
 	echo "== personal =="
 	local src n=0 install_as
 	while IFS= read -r src; do
@@ -457,6 +473,20 @@ full_sync() {
 		n=$((n + 1))
 	done < <(find_personal_skills)
 	echo "  ($n considered)"
+	echo
+
+	echo "== personal extra names =="
+	local extra_src extra_as extra_n=0 extra_line
+	while IFS= read -r extra_line; do
+		[[ -z "${extra_line// /}" ]] && continue
+		extra_src="${extra_line%%:*}"
+		extra_as="${extra_line#*:}"
+		if [[ -f "$SKILLS_DIR/$extra_src/SKILL.md" ]]; then
+			install_skill "$SKILLS_DIR/$extra_src" "$extra_as" "$REPO_DIR" || true
+			extra_n=$((extra_n + 1))
+		fi
+	done <<< "$PERSONAL_EXTRA"
+	echo "  ($extra_n considered)"
 	echo
 
 	if [[ -d "$MATT_REPO/skills" ]]; then

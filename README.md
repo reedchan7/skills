@@ -112,10 +112,13 @@ One script. No args = full smart sync:
 
 It will:
 
-1. Link every personal skill in `skills/` (`code-review` publishes as
-   `code-review-pro`)
-2. Auto-detect a Matt Pocock clone and link those too (`code-review` → `matt-code-review`)
-3. Keep personal names when they already own a hub entry (e.g. `handoff`)
+1. Link every personal skill in `skills/` under its folder name
+   (`/code-review`, `/handoff`); `code-review` also publishes as
+   `code-review-pro` for older callers
+2. Auto-detect a Matt Pocock clone and link those too, prefixing collisions
+   (`code-review` → `matt-code-review`, `handoff` → `matt-handoff`)
+3. Reclaim a personal name if Matt's installer overwrote it; keep other
+   foreign hub entries
 4. Retire known renames and sweep broken hub symlinks
 5. Fan out hub entries to Claude / Codex / Grok / zcode / kimi / pi /
    reasonix / Gemini / Antigravity (Agent + IDE + CLI) / dsh / Cursor / agy /
@@ -131,7 +134,7 @@ Optional one-offs:
 
 ```bash
 ./scripts/link-skills.sh git-commit              # single personal skill
-./scripts/link-skills.sh code-review             # still installs as code-review-pro
+./scripts/link-skills.sh code-review             # installs as /code-review
 ./scripts/link-skills.sh /path/to/skill [as]     # any external skill dir
 ./scripts/link-skills.sh --unlink some-name      # remove from hub + agents
 ```
